@@ -25,6 +25,9 @@
 
 /***************************** Include Files ********************************/
 #include "xuartps_hw.h"
+#ifdef SDT
+#include "xuartps_config.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 
@@ -151,4 +154,16 @@ void XUartPs_ResetHw(u32 BaseAddress)
 						(u32)XUARTPS_CR_STOPBRK));
 
 }
+
+#ifdef SDT
+#ifdef XPAR_STDIN_IS_UARTPS
+void outbyte(char c) {
+         XUartPs_SendByte(STDOUT_BASEADDRESS, c);
+}
+
+char inbyte(void) {
+         return XUartPs_RecvByte(STDIN_BASEADDRESS);
+}
+#endif
+#endif
 /** @} */
