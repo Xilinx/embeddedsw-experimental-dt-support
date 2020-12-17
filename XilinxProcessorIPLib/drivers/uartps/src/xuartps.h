@@ -268,7 +268,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;	 /**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress; /**< Base address of device (IPIF) */
 	u32 InputClockHz;/**< Input clock frequency */
 	s32 ModemPinsConnected; /** Specifies whether modem pins are connected
@@ -440,7 +444,11 @@ typedef struct {
 /************************** Function Prototypes *****************************/
 
 /* Static lookup function implemented in xuartps_sinit.c */
+#ifndef SDT
 XUartPs_Config *XUartPs_LookupConfig(u16 DeviceId);
+#else
+XUartPs_Config *XUartPs_LookupConfig(u32 BaseAddress);
+#endif
 
 /* Interface functions implemented in xuartps.c */
 s32 XUartPs_CfgInitialize(XUartPs *InstancePtr,
