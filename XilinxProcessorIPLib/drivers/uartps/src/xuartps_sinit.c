@@ -28,7 +28,9 @@
 /***************************** Include Files ********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xuartps.h"
 
 /************************** Constant Definitions ****************************/
@@ -38,7 +40,12 @@
 /***************** Macros (Inline Functions) Definitions ********************/
 
 /************************** Variable Definitions ****************************/
+#ifndef SDT
 extern XUartPs_Config XUartPs_ConfigTable[XPAR_XUARTPS_NUM_INSTANCES];
+#else
+extern XUartPs_Config XUartPs_ConfigTable[];
+#endif
+
 
 /************************** Function Prototypes *****************************/
 
@@ -56,6 +63,7 @@ extern XUartPs_Config XUartPs_ConfigTable[XPAR_XUARTPS_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XUartPs_Config *XUartPs_LookupConfig(u16 DeviceId)
 {
 	XUartPs_Config *CfgPtr = NULL;
@@ -71,4 +79,21 @@ XUartPs_Config *XUartPs_LookupConfig(u16 DeviceId)
 
 	return (XUartPs_Config *)CfgPtr;
 }
+#else
+XUartPs_Config *XUartPs_LookupConfig(u32 BaseAddress)
+{
+	XUartPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XUartPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XUartPs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XUartPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XUartPs_Config *)CfgPtr;
+}
+#endif
 /** @} */
