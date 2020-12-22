@@ -363,7 +363,11 @@ static int XAVBuf_ConfigureVideo(XAVBuf *InstancePtr, u8 VideoSrc)
  * @note	Base address and DeviceId is same as the DP Core driver.
  *
 *******************************************************************************/
+#ifndef SDT
 void XAVBuf_CfgInitialize(XAVBuf *InstancePtr, u32 BaseAddr, u16 DeviceId)
+#else
+void XAVBuf_CfgInitialize(XAVBuf *InstancePtr, u32 BaseAddr)
+#endif
 {
 	Xil_AssertVoid(InstancePtr != NULL);
 
