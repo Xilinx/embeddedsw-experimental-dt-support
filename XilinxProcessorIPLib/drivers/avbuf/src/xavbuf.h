@@ -198,7 +198,11 @@ typedef struct {
  * This typedef stores the AVBuf Configuration information.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;
+#else
+	char *Name;
+#endif
 	u32 BaseAddr;
 } XAVBuf_Config;
 
@@ -227,7 +231,11 @@ typedef struct {
 /**************************** Function Prototypes *****************************/
 
 /* xavbuf.c: Setup and initialization functions. */
+#ifndef SDT
 void XAVBuf_CfgInitialize(XAVBuf *InstancePtr, u32 BaseAddr, u16 DeviceId);
+#else
+void XAVBuf_CfgInitialize(XAVBuf *InstancePtr, u32 BaseAddr);
+#endif
 
 /* xavbuf.c: Functions to setup the Input Video and Audio sources */
 void XAVBuf_InputVideoSelect(XAVBuf *InstancePtr, XAVBuf_VideoStream VidStream,
