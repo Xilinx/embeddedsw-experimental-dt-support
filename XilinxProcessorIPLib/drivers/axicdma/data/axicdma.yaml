@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for AXI CDMA controller
+
+maintainers:
+  - Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,axi-cdma-4.1
+          - xlnx,axi-cdma-1.00.a
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,include-dre:
+    description: AXI CDMA controller is configured with DRE enabled
+  xlnx,lite-mode:
+    description: AXI CDMA controller is configured with axi lite mode enabled
+  xlnx,datawidth:
+    description: AXI CDMA controller configured data width
+  xlnx,max-burst-len:
+    description: AXI CDMA controller configured burst length
+  xlnx,addrwidth:
+    description: AXI CDMA controller configured address width
+
+config:
+    - XAxiCdma_Config
+
+required:
+    - compatible
+    - reg
+    - xlnx,include-dre
+    - xlnx,lite-mode
+    - xlnx,datawidth
+    - xlnx,max-burst-len
+    - xlnx,addrwidth
+    - interrupts
+    - interrupt-parent
+
+examples:
+    xaxicdma_example_simple_intr.c:
+        - interrupts
+    xaxicdma_example_sg_intr.c:
+        - interrupts
+    xaxicdma_example_hybrid_intr.c:
+        - interrupts
+...
