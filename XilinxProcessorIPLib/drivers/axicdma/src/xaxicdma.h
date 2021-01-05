@@ -401,7 +401,11 @@ typedef struct {
  * @{
  */
 typedef struct {
+#ifndef SDT
 	u32 DeviceId;             /**< Unique ID of this instance */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;          /**< Physical address of this instance */
 	int HasDRE;               /**< Whether support unaligned transfers */
 	int IsLite;               /**< Whether hardware build is lite mode */
@@ -501,7 +505,11 @@ typedef struct {
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 XAxiCdma_Config *XAxiCdma_LookupConfig(u32 DeviceId);
+#else
+XAxiCdma_Config *XAxiCdma_LookupConfig(u32 BaseAddress);
+#endif
 
 u32 XAxiCdma_CfgInitialize(XAxiCdma *InstancePtr, XAxiCdma_Config *CfgPtr,
         UINTPTR EffectiveAddr);
