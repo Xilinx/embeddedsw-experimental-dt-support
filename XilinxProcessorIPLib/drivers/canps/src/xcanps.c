@@ -85,7 +85,9 @@ s32 XCanPs_CfgInitialize(XCanPs *InstancePtr, XCanPs_Config *ConfigPtr,
 	 */
 	InstancePtr->IsReady = 0U;
 	InstancePtr->CanConfig.BaseAddr = EffectiveAddr;
+#ifndef SDT
 	InstancePtr->CanConfig.DeviceId = ConfigPtr->DeviceId;
+#endif
 
 	/*
 	 * Set all handlers to stub values, let user configure this data later.

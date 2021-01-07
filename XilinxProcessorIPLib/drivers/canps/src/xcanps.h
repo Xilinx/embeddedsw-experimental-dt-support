@@ -228,7 +228,11 @@ extern "C" {
  * This typedef contains configuration information for a device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;		/**< Unique name of the device */
+#endif
 	UINTPTR BaseAddr;	/**< Register base address */
 } XCanPs_Config;
 
@@ -551,7 +555,11 @@ s32 XCanPs_SetHandler(XCanPs *InstancePtr, u32 HandlerType,
 /*
  * Functions in xcanps_sinit.c
  */
+#ifndef SDT
 XCanPs_Config *XCanPs_LookupConfig(u16 DeviceId);
+#else
+XCanPs_Config *XCanPs_LookupConfig(u32 BaseAddress);
+#endif
 
 #ifdef __cplusplus
 }
