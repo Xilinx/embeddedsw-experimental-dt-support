@@ -32,7 +32,9 @@
 /***************************** Include Files *********************************/
 
 #include "xcanps.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -58,6 +60,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XCanPs_Config *XCanPs_LookupConfig(u16 DeviceId)
 {
 	XCanPs_Config *CfgPtr = NULL;
@@ -72,4 +75,22 @@ XCanPs_Config *XCanPs_LookupConfig(u16 DeviceId)
 
 	return (XCanPs_Config *)CfgPtr;
 }
+#else
+XCanPs_Config *XCanPs_LookupConfig(u32 BaseAddress)
+{
+	XCanPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XCanPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XCanPs_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XCanPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XCanPs_Config *)CfgPtr;
+}
+
+#endif
 /** @} */
