@@ -652,7 +652,11 @@ XClockRate XClock_FetchRate(XClock_Types NodeType, u8 NodeIdx);
 
 /* APIs */
 XClockPs_Config *XClock_LookupConfig(u16 DeviceId);
+#ifndef SDT
 XStatus XClock_CfgInitialize(XClock *InstancePtr, XClockPs_Config *ConfigPtr);
+#else
+XStatus XClock_CfgInitialize(XClock *InstancePtr, u32 BaseAddress);
+#endif
 XStatus XClock_EnableClock(XClock_OutputClks ClockId);
 XStatus XClock_DisableClock(XClock_OutputClks ClockId);
 XStatus XClock_GetParent(XClock_OutputClks ClockId,

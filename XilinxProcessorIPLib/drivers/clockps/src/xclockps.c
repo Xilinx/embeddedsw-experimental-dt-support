@@ -95,14 +95,24 @@ XClock_SetParentFuncPtr   XClock_MuxSetParent;
 *		clock nodes and handles initialization for the same.
 *
 ******************************************************************************/
+#ifndef SDT
 XStatus XClock_CfgInitialize(XClock *InstancePtr, XClockPs_Config *ConfigPtr)
+#else
+XStatus XClock_CfgInitialize(XClock *InstancePtr, u32 BaseAddress)
+#endif
 {
 	/* Arguments validation */
 	XCLOCK_VALIDATE_PTR(InstancePtr);
+#ifndef SDT
 	XCLOCK_VALIDATE_PTR(ConfigPtr);
+#endif
 
 	/* Copying instance */
+#ifdef SDT
+	InstancePtr->BaseAddress = BaseAddress;
+#else
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 
 	/* Setup clock modules */
 	XClock_SetupClockModules();
