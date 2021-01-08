@@ -159,7 +159,11 @@ typedef void (*XRtcPsu_Handler) (void *CallBackRef, u32 Event);
  * This typedef contains configuration information for a device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddr;	/**< Register base address */
 } XRtcPsu_Config;
 
@@ -388,7 +392,11 @@ void XRtcPsu_SetHandler(XRtcPsu *InstancePtr, XRtcPsu_Handler FunctionPtr,
 s32 XRtcPsu_SelfTest(XRtcPsu *InstancePtr);
 
 /* Functions in xrtcpsu_sinit.c */
+#ifndef SDT
 XRtcPsu_Config *XRtcPsu_LookupConfig(u16 DeviceId);
+#else
+XRtcPsu_Config *XRtcPsu_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 #ifdef __cplusplus
 }
