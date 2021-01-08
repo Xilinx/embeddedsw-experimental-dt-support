@@ -105,7 +105,9 @@ s32 XRtcPsu_CfgInitialize(XRtcPsu *InstancePtr, XRtcPsu_Config *ConfigPtr,
 	 */
 	InstancePtr->IsReady = 0U;
 	InstancePtr->RtcConfig.BaseAddr = EffectiveAddr;
+#ifndef SDT
 	InstancePtr->RtcConfig.DeviceId = ConfigPtr->DeviceId;
+#endif
 
 	if (InstancePtr->OscillatorFreq == 0U) {
 		InstancePtr->CalibrationValue = XRTC_CALIBRATION_VALUE;

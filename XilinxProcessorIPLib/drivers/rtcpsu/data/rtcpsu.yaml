@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for RTCPSU controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,zynqmp-rtc
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XRtcPsu_Config
+ 
+required:
+    - compatible
+    - reg
+    - interrupts: 2 
+    - interrupt-parent
+...
