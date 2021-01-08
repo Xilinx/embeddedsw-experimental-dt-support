@@ -377,7 +377,11 @@ typedef void (*XSysMonPsu_Handler) (void *CallBackRef);
  * This typedef contains configuration information for a device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u16 InputClockMHz;	/**< Input clock frequency */
 } XSysMonPsu_Config;
@@ -660,7 +664,11 @@ void XSysMonPsu_IntrClear(XSysMonPsu *InstancePtr, u64 Mask);
 s32 XSysMonPsu_SelfTest(XSysMonPsu *InstancePtr);
 
 /* Functions in xsysmonpsu_sinit.c */
+#ifndef SDT
 XSysMonPsu_Config *XSysMonPsu_LookupConfig(u16 DeviceId);
+#else
+XSysMonPsu_Config *XSysMonPsu_LookupConfig(u32 BaseAddress);
+#endif
 
 
 #ifdef __cplusplus
