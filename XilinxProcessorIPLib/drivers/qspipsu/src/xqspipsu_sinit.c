@@ -29,7 +29,9 @@
 
 #include "xstatus.h"
 #include "xqspipsu.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -57,6 +59,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XQspiPsu_Config *XQspiPsu_LookupConfig(u16 DeviceId)
 {
 	XQspiPsu_Config *CfgPtr = NULL;
@@ -70,4 +73,20 @@ XQspiPsu_Config *XQspiPsu_LookupConfig(u16 DeviceId)
 	}
 	return (XQspiPsu_Config *)CfgPtr;
 }
+#else
+XQspiPsu_Config *XQspiPsu_LookupConfig(u32 BaseAddress)
+{
+	XQspiPsu_Config *CfgPtr = NULL;
+	s32 Index;
+
+	for (Index = 0; XQspiPsu_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XQspiPsu_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XQspiPsu_ConfigTable[Index];
+			break;
+		}
+	}
+	return (XQspiPsu_Config *)CfgPtr;
+}
+#endif
 /** @} */
