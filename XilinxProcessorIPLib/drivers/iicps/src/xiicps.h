@@ -262,7 +262,11 @@ typedef void (*XIicPs_IntrHandler) (void *CallBackRef, u32 StatusEvent);
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;     /**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;  /**< Base address of the device */
 	u32 InputClockHz; /**< Input clock frequency */
 #if defined  (XCLOCKING)
@@ -355,7 +359,11 @@ extern XIicPs_Config XIicPs_ConfigTable[];	/**< Configuration table */
 /*
  * Function for configuration lookup, in xiicps_sinit.c
  */
+#ifndef SDT
 XIicPs_Config *XIicPs_LookupConfig(u16 DeviceId);
+#else
+XIicPs_Config *XIicPs_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Functions for general setup, in xiicps.c
