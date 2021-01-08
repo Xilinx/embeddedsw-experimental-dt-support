@@ -183,7 +183,11 @@ typedef void (*XGpioPs_Handler) (void *CallBackRef, u32 Bank, u32 Status);
  * This typedef contains configuration information for a device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddr;		/**< Register base address */
 } XGpioPs_Config;
 
@@ -264,7 +268,11 @@ u32 XGpioPs_IntrGetStatusPin(const XGpioPs *InstancePtr, u32 Pin);
 void XGpioPs_IntrClearPin(const XGpioPs *InstancePtr, u32 Pin);
 
 /* Functions in xgpiops_sinit.c */
+#ifndef SDT
 XGpioPs_Config *XGpioPs_LookupConfig(u16 DeviceId);
+#else
+XGpioPs_Config *XGpioPs_LookupConfig(u32 BaseAddress);
+#endif
 #ifdef __cplusplus
 }
 #endif

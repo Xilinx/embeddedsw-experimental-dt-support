@@ -30,7 +30,9 @@
 /***************************** Include Files *********************************/
 
 #include "xgpiops.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -39,7 +41,6 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-
 
 /*****************************************************************************/
 /**
@@ -56,6 +57,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XGpioPs_Config *XGpioPs_LookupConfig(u16 DeviceId)
 {
 	XGpioPs_Config *CfgPtr = NULL;
@@ -70,4 +72,21 @@ XGpioPs_Config *XGpioPs_LookupConfig(u16 DeviceId)
 
 	return (XGpioPs_Config *)CfgPtr;
 }
+#else
+XGpioPs_Config *XGpioPs_LookupConfig(u32 BaseAddress)
+{
+	XGpioPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = (u32)0x0; XGpioPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XGpioPs_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XGpioPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XGpioPs_Config *)CfgPtr;
+}
+#endif
 /** @} */
