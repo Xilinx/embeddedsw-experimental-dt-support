@@ -27,7 +27,9 @@
 /***************************** Include Files *********************************/
 
 #include "xresetps.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -37,7 +39,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /*************************** Variable Definitions ****************************/
+#ifndef SDT
 extern XResetPs_Config XResetPs_ConfigTable[XPAR_XRESETPS_NUM_INSTANCES];
+#else
+extern XResetPs_Config XResetPs_ConfigTable[];
+#endif
 
 /************************** Function Prototypes ******************************/
 
@@ -54,6 +60,7 @@ extern XResetPs_Config XResetPs_ConfigTable[XPAR_XRESETPS_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XResetPs_Config *XResetPs_LookupConfig(u16 DeviceId)
 {
 	XResetPs_Config *CfgPtr = NULL;
@@ -67,4 +74,20 @@ XResetPs_Config *XResetPs_LookupConfig(u16 DeviceId)
 	}
 	return (XResetPs_Config *)CfgPtr;
 }
+#else
+XResetPs_Config *XResetPs_LookupConfig(u32 BaseAddress)
+{
+	XResetPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XResetPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XResetPs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+                    !BaseAddress) {
+			CfgPtr = &XResetPs_ConfigTable[Index];
+			break;
+		}
+	}
+	return (XResetPs_Config *)CfgPtr;
+}
+#endif
 /** @} */
