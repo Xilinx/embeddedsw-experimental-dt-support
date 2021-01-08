@@ -88,7 +88,9 @@ s32 XWdtPs_CfgInitialize(XWdtPs *InstancePtr,
 		/*
 		 * Copy configuration into instance.
 		 */
+#ifndef SDT
 		InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 
 		/*
 		 * Save the base address pointer such that the registers of the block

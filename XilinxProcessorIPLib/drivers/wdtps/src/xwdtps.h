@@ -107,7 +107,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Base address of the device */
 } XWdtPs_Config;
 
@@ -173,7 +177,11 @@ extern XWdtPs_Config XWdtPs_ConfigTable[];      /**< Configuration table */
 /*
  * Lookup configuration in xwdtps_sinit.c.
  */
+#ifndef SDT
 XWdtPs_Config *XWdtPs_LookupConfig(u16 DeviceId);
+#else
+XWdtPs_Config *XWdtPs_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Interface functions in xwdtps.c
