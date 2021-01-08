@@ -97,7 +97,9 @@ s32 XSysMonPsu_CfgInitialize(XSysMonPsu *InstancePtr, XSysMonPsu_Config *ConfigP
 	Xil_AssertNonvoid(ConfigPtr != NULL);
 
 	/* Set the values read from the device config and the base address. */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 	InstancePtr->Config.InputClockMHz = ConfigPtr->InputClockMHz;
 
