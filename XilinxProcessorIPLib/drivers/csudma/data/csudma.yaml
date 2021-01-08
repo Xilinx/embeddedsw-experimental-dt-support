@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for CSUDMA controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,zynqmp-csudma-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,dma-type:
+    description: |
+      Differentiates the dma controller that driver supports
+      0 - CSUDMA   controller
+      1 - PMCDMA-0 controller
+      2 - PMCDMA-1 controller
+
+config:
+    - XCsuDma_Config
+
+required:
+    - compatible
+    - reg
+    - xlnx,dma-type
+    - interrupts
+    - interrupt-parent
+
+examples:
+    xcsudma_intr_example.c:
+        - interrupts
+...
