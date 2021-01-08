@@ -25,7 +25,9 @@
 /******************************* Include Files ********************************/
 
 #include "xdppsu.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /*************************** Variable Declarations ****************************/
 /*************************** Constant Declarations ****************************/
@@ -52,6 +54,7 @@ extern XDpPsu_Config XDpPsu_ConfigTable[XPAR_XDPPSU_NUM_INSTANCES];
  * @note	None.
  *
 *******************************************************************************/
+#ifndef SDT
 XDpPsu_Config *XDpPsu_LookupConfig(u16 DeviceId)
 {
 	XDpPsu_Config *CfgPtr;
@@ -66,3 +69,20 @@ XDpPsu_Config *XDpPsu_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XDpPsu_Config *XDpPsu_LookupConfig(u32 BaseAddress)
+{
+	XDpPsu_Config *CfgPtr;
+	u32 Index;
+
+	for (Index = (u32)0x0; XDpPsu_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XDpPsu_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XDpPsu_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif

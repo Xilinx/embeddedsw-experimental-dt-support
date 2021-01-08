@@ -53,8 +53,12 @@ extern "C" {
  */
 
 typedef struct {
-
+#ifndef SDT
 	u16 DeviceId;		/**< Device instance ID. */
+#else
+	char *Name;
+#endif
+
 	u32 BaseAddr;		/**< The base address of the core instance. */
 } XDpPsu_Config;
 /**
@@ -322,7 +326,11 @@ void XDpPsu_HpdInterruptHandler(XDpPsu *InstancePtr);
 u32 XDpPsu_SelfTest(XDpPsu *InstancePtr);
 
 /* xdppsu_sinit.c: Configuration extraction function.*/
+#ifndef SDT
 XDpPsu_Config *XDpPsu_LookupConfig(u16 DeviceId);
+#else
+XDpPsu_Config *XDpPsu_LookupConfig(u32 BaseAddress);
+#endif
 
 /* xdppsu_edid.c: EDID utility functions. */
 u32 XDpPsu_GetEdid(XDpPsu *InstancePtr, u8 *Edid);
