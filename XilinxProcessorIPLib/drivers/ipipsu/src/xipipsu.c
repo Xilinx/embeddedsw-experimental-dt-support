@@ -71,7 +71,9 @@ XStatus XIpiPsu_CfgInitialize(XIpiPsu *InstancePtr, XIpiPsu_Config * CfgPtr,
 	Xil_AssertNonvoid(InstancePtr != NULL);
 	Xil_AssertNonvoid(CfgPtr != NULL);
 	/* Set device base address and ID */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = CfgPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
 	InstancePtr->Config.BitMask = CfgPtr->BitMask;
 	InstancePtr->Config.IntId = CfgPtr->IntId;

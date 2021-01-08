@@ -121,7 +121,11 @@ typedef struct {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u32 DeviceId; /**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress; /**< Base address of the device */
 	u32 BitMask; /**< BitMask to be used to identify this CPU */
 	u32 BufferIndex; /**< Index of the IPI Message Buffer */
@@ -280,8 +284,11 @@ extern XIpiPsu_Config XIpiPsu_ConfigTable[XPAR_XIPIPSU_NUM_INSTANCES];
 /************************** Function Prototypes *****************************/
 
 /* Static lookup function implemented in xipipsu_sinit.c */
-
+#ifndef SDT
 XIpiPsu_Config *XIpiPsu_LookupConfig(u32 DeviceId);
+#else
+XIpiPsu_Config *XIpiPsu_LookupConfig(u32 BaseAddress);
+#endif
 
 /* Interface Functions implemented in xipipsu.c */
 
