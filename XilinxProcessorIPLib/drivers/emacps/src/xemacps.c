@@ -85,7 +85,9 @@ LONG XEmacPs_CfgInitialize(XEmacPs *InstancePtr, XEmacPs_Config * CfgPtr,
 	Xil_AssertNonvoid(CfgPtr != NULL);
 
 	/* Set device base address and ID */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = CfgPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
 	InstancePtr->Config.IsCacheCoherent = CfgPtr->IsCacheCoherent;
 #if defined  (XCLOCKING)
