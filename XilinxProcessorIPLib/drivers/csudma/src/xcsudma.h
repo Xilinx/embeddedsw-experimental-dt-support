@@ -348,8 +348,12 @@ typedef enum {
 * Each CSU_DMA core should have a configuration structure associated.
 */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< DeviceId is the unique ID of the
 				  *  device */
+#else
+	char *Name;		/**< Unique name of the device */
+#endif
 	UINTPTR BaseAddress;	/**< BaseAddress is the physical base address
 				  *  of the device's registers */
 	u8 DmaType;		/**< DMA type
@@ -398,12 +402,20 @@ typedef struct {
 
 /************************** Variable Definitions *****************************/
 
+#ifndef SDT
 extern XCsuDma_Config XCsuDma_ConfigTable[XPAR_XCSUDMA_NUM_INSTANCES];
+#else
+extern XCsuDma_Config XCsuDma_ConfigTable[];
+#endif
 
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 XCsuDma_Config *XCsuDma_LookupConfig(u16 DeviceId);
+#else
+XCsuDma_Config *XCsuDma_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 s32 XCsuDma_CfgInitialize(XCsuDma *InstancePtr, XCsuDma_Config *CfgPtr,
 			UINTPTR EffectiveAddr);
