@@ -27,7 +27,9 @@
 /******************************* Include Files ********************************/
 
 #include "xdpdma.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /**************************** Function Definitions ****************************/
 
@@ -45,6 +47,7 @@
  * @note	None.
  *
 *******************************************************************************/
+#ifndef SDT
 XDpDma_Config *XDpDma_LookupConfig(u16 DeviceId)
 {
 	XDpDma_Config *CfgPtr = NULL;
@@ -59,4 +62,21 @@ XDpDma_Config *XDpDma_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XDpDma_Config *XDpDma_LookupConfig(u32 BaseAddress)
+{
+	XDpDma_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = (u32)0x0; XDpDma_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XDpDma_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XDpDma_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */
