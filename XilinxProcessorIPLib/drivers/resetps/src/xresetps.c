@@ -430,7 +430,11 @@ XStatus XResetPs_CfgInitialize(XResetPs *InstancePtr,
 	Xil_AssertNonvoid(ConfigPtr != NULL);
 
 	/* Copying instance */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#else
+	InstancePtr->Config.BaseAddress = ConfigPtr->BaseAddress;
+#endif
 
 	return XST_SUCCESS;
 }
