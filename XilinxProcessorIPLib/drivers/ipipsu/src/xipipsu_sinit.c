@@ -26,7 +26,9 @@
 
 /***************************** Include Files *********************************/
 #include "xil_types.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xipipsu.h"
 
 /*****************************************************************************/
@@ -46,6 +48,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XIpiPsu_Config *XIpiPsu_LookupConfig(u32 DeviceId)
 {
 	XIpiPsu_Config *CfgPtr = NULL;
@@ -60,4 +63,21 @@ XIpiPsu_Config *XIpiPsu_LookupConfig(u32 DeviceId)
 
 	return (XIpiPsu_Config *) CfgPtr;
 }
+#else
+XIpiPsu_Config *XIpiPsu_LookupConfig(u32 BaseAddress)
+{
+	XIpiPsu_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XIpiPsu_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XIpiPsu_ConfigTable[Index].BaseAddress == BaseAddress) ||
+                    !BaseAddress) {
+			CfgPtr = &XIpiPsu_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XIpiPsu_Config *) CfgPtr;
+}
+#endif
 /** @} */
