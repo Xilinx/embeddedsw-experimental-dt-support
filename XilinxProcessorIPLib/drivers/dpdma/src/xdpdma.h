@@ -102,7 +102,11 @@ typedef struct {
  * This typedef contains configuration information for the DPDMA.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;			/**< Device ID */
+#else
+	char *Name;
+#endif
 	u32 BaseAddr;			/**< Base Address */
 } XDpDma_Config;
 
@@ -229,7 +233,11 @@ typedef struct {
 } XDpDma;
 
 void XDpDma_CfgInitialize(XDpDma *InstancePtr, XDpDma_Config *CfgPtr);
+#ifndef SDT
 XDpDma_Config *XDpDma_LookupConfig(u16 DeviceId);
+#else
+XDpDma_Config *XDpDma_LookupConfig(u32 BaseAddress);
+#endif
 int XDpDma_SetChannelState(XDpDma *InstancePtr, XDpDma_ChannelType Channel,
 					XDpDma_ChannelState ChannelState);
 void XDpDma_SetQOS(XDpDma *InstancePtr, u8 QOS);

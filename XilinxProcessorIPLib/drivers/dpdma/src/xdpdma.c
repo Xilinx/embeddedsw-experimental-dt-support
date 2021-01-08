@@ -330,7 +330,9 @@ static void XDpDma_SetupAudioDescriptor(XDpDma_Descriptor *CurrDesc,
  * **************************************************************************/
 void XDpDma_CfgInitialize(XDpDma *InstancePtr, XDpDma_Config *CfgPtr)
 {
+#ifndef SDT
 	InstancePtr->Config.DeviceId = CfgPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddr = CfgPtr->BaseAddr;
 
 	InstancePtr->Video.Channel[XDPDMA_VIDEO_CHANNEL0].Current = NULL;
