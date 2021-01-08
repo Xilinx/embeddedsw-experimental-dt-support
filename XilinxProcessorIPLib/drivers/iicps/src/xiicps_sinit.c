@@ -27,7 +27,9 @@
 /***************************** Include Files *********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xiicps.h"
 
 /************************** Constant Definitions *****************************/
@@ -60,6 +62,7 @@ extern XIicPs_Config XIicPs_ConfigTable[XPAR_XIICPS_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XIicPs_Config *XIicPs_LookupConfig(u16 DeviceId)
 {
 	XIicPs_Config *CfgPtr = NULL;
@@ -74,4 +77,21 @@ XIicPs_Config *XIicPs_LookupConfig(u16 DeviceId)
 
 	return (XIicPs_Config *)CfgPtr;
 }
+#else
+XIicPs_Config *XIicPs_LookupConfig(u32 BaseAddress)
+{
+	XIicPs_Config *CfgPtr = NULL;
+	s32 Index;
+
+	for (Index = 0; XIicPs_ConfigTable[Index].Name != NULL; Index++) {
+		if (XIicPs_ConfigTable[Index].BaseAddress == BaseAddress ||
+		    !BaseAddress) {
+			CfgPtr = &XIicPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XIicPs_Config *)CfgPtr;
+}
+#endif
 /** @} */

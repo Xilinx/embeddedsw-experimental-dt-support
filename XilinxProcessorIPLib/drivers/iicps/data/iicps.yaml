@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for IICPS controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - cdns,i2c-r1p14
+          - cdns,i2c-r1p10
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,clock-freq:
+    description: Input clock frequency
+
+config:
+    - XIicPs_Config 
+ 
+required:
+    - compatible
+    - reg
+    - xlnx,clock-freq
+    - interrupts
+    - interrupt-parent
+    - ref-clk
+
+examples:
+    xiicps_eeprom_intr_example.c:
+        - interrupts
+
+    xiicps_intr_master_example.c:
+        - interrupts
+
+    xiicps_intr_multi_master_example.c:
+        - interrupts
+
+    xiicps_intr_slave_example.c:
+        - interrupts
+
+    xiicps_slave_monitor_example.c:
+        - interrupts
+...
