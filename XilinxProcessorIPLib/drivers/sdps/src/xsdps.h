@@ -243,7 +243,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;			/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;		/**< Base address of the device */
 	u32 InputClockHz;		/**< Input clock frequency */
 	u32 CardDetect;			/**< Card Detect */
@@ -356,7 +360,11 @@ typedef struct {
 #define ENABLE_HS400_MODE
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 XSdPs_Config *XSdPs_LookupConfig(u16 DeviceId);
+#else
+XSdPs_Config *XSdPs_LookupConfig(u32 BaseAddress);
+#endif
 s32 XSdPs_CfgInitialize(XSdPs *InstancePtr, XSdPs_Config *ConfigPtr,
 				u32 EffectiveAddr);
 s32 XSdPs_CardInitialize(XSdPs *InstancePtr);
