@@ -72,7 +72,12 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;                    /**< Unique ID of device */
+#else
+	char *Name;
+	u32 BaseAddress;
+#endif
 } XResetPs_Config;
 
 /**
@@ -345,7 +350,11 @@ typedef enum {
 /*
  * Lookup configuration in xresetps_sinit.c.
  */
+#ifndef SDT
 XResetPs_Config *XResetPs_LookupConfig(u16 DeviceId);
+#else
+XResetPs_Config *XResetPs_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Interface functions in xresetps.c
