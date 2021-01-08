@@ -98,8 +98,13 @@ extern "C" {
 /************************** Constant Definitions *****************************/
 /** Ranges of Size */
 
+#ifndef SDT
 #define PMCDMA_0_DEVICE_ID      XPAR_XCSUDMA_0_DEVICE_ID /* PMCDMA device Id */
 #define PMCDMA_1_DEVICE_ID      XPAR_XCSUDMA_1_DEVICE_ID /* PMCDMA device Id */
+#else
+#define PMCDMA_0_DEVICE_ID      XPAR_XCSUDMA_0_BASEADDR /* PMCDMA device Id */
+#define PMCDMA_1_DEVICE_ID      XPAR_XCSUDMA_1_BASEADDR /* PMCDMA device Id */
+#endif
 #define PMCDMA_LOOPBACK_CFG     (0x0000000FU)   /* LOOP BACK configuration */
 
 #define XPMCDMA_SIZE_MAX 	XCSUDMA_SIZE_MAX /* Maximum allowed no of words */
