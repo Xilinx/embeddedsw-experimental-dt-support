@@ -1,0 +1,38 @@
+---
+title: Bindings for TTCPS controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    items:
+        - enum:
+          - cdns,ttc
+          - xlnx,psv-ttc
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,clock-freq:
+    description: Input clock frequency
+
+config:
+    - XTtcPs_Config
+
+required:
+    - compatible
+    - reg
+    - xlnx,clock-freq
+    - interrupts: 3
+    - interrupt-parent 
+
+examples:
+
+    xttcps_intr_example.c:
+        - interrupts
+    xttcps_rtc_example.c:
+        - interrupts
+    xttcps_tapp_example.c:
+        - interrupts
+
+
+...

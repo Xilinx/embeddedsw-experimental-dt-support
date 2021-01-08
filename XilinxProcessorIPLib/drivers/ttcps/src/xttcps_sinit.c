@@ -26,7 +26,9 @@
 /***************************** Include Files *********************************/
 
 #include "xttcps.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -37,7 +39,11 @@
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
+#ifndef SDT
 extern XTtcPs_Config XTtcPs_ConfigTable[XPAR_XTTCPS_NUM_INSTANCES];
+#else
+extern XTtcPs_Config XTtcPs_ConfigTable[];
+#endif
 
 /*****************************************************************************/
 /**
@@ -55,6 +61,7 @@ extern XTtcPs_Config XTtcPs_ConfigTable[XPAR_XTTCPS_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XTtcPs_Config *XTtcPs_LookupConfig(u16 DeviceId)
 {
 	XTtcPs_Config *CfgPtr = NULL;
@@ -69,4 +76,21 @@ XTtcPs_Config *XTtcPs_LookupConfig(u16 DeviceId)
 
 	return (XTtcPs_Config *)CfgPtr;
 }
+#else
+XTtcPs_Config *XTtcPs_LookupConfig(u32 BaseAddress)
+{
+	XTtcPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XTtcPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XTtcPs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		     !BaseAddress) {
+			CfgPtr = &XTtcPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XTtcPs_Config *)CfgPtr;
+}
+#endif
 /** @} */
