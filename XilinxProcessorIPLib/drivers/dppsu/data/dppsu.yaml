@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for DPPSU controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - const: xlnx,zynqmp-dpsub-1.7
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,clock-freq:
+    description: Input clock frequency
+
+config:
+    - XDpPsu_Config
+
+required:
+    - compatible
+    - reg
+    - xlnx,clock-freq
+
+optional:
+    - interrupts 
+
+depends:
+    - avbuf
+    - video_common
+...
