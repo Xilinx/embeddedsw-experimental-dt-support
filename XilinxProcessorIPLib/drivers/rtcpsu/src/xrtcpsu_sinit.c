@@ -36,7 +36,9 @@
 /***************************** Include Files *********************************/
 
 #include "xrtcpsu.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -64,6 +66,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XRtcPsu_Config *XRtcPsu_LookupConfig(u16 DeviceId)
 {
 	XRtcPsu_Config *CfgPtr = NULL;
@@ -78,4 +81,21 @@ XRtcPsu_Config *XRtcPsu_LookupConfig(u16 DeviceId)
 
 	return (XRtcPsu_Config *)CfgPtr;
 }
+#else
+XRtcPsu_Config *XRtcPsu_LookupConfig(UINTPTR BaseAddress)
+{
+	XRtcPsu_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XRtcPsu_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XRtcPsu_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XRtcPsu_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XRtcPsu_Config *)CfgPtr;
+}
+#endif
 /** @} */
