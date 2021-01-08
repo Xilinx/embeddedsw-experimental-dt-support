@@ -200,7 +200,11 @@ typedef void (*XTtcPs_StatusHandler) (const void *CallBackRef, u32 StatusEvent);
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;	  /**< Unique ID for device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;  /**< Base address for device */
 	u32 InputClockHz; /**< Input clock frequency */
 } XTtcPs_Config;
@@ -480,7 +484,11 @@ typedef u32 XMatchRegValue;
 /*
  * Initialization functions in xttcps_sinit.c
  */
+#ifndef SDT
 XTtcPs_Config *XTtcPs_LookupConfig(u16 DeviceId);
+#else
+XTtcPs_Config *XTtcPs_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Required functions, in xttcps.c
