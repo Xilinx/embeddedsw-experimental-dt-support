@@ -88,7 +88,9 @@ s32 XGpioPs_CfgInitialize(XGpioPs *InstancePtr, const XGpioPs_Config *ConfigPtr,
 	 */
 	InstancePtr->IsReady = 0U;
 	InstancePtr->GpioConfig.BaseAddr = EffectiveAddr;
+#ifndef SDT
 	InstancePtr->GpioConfig.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Handler = (XGpioPs_Handler)StubHandler;
 	InstancePtr->Platform = XGetPlatform_Info();
 
