@@ -160,5 +160,15 @@ static INLINE u32 XCoresightPs_DccGetStatus(void)
 #endif
 	return Status;
 }
+
+#ifdef XPAR_STDIN_IS_CORESIGHTPS_DCC
+void outbyte(char c) {
+         XCoresightPs_DccSendByte(STDOUT_BASEADDRESS, c);
+}
+
+char inbyte(void) {
+         return XCoresightPs_DccRecvByte(STDIN_BASEADDRESS);
+}
+#endif
 #endif
 /** @} */
