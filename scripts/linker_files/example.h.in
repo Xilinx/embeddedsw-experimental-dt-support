@@ -1,0 +1,6 @@
+#ifndef @DRVNAME@_EXAMPLE_H
+#define @DRVNAME@_EXAMPLE_H
+
+@ADDR_DEFINE@
+
+#endif /* @DRVNAME@_EXAMPLE_H */
