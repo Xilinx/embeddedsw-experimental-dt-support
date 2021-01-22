@@ -507,7 +507,11 @@ typedef struct XAxiDma {
  * This structure passes the hardware building information to the driver
  */
 typedef struct {
+#ifndef SDT
 	u32 DeviceId;
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddr;
 
 	int HasStsCntrlStrm;
@@ -723,8 +727,12 @@ typedef struct {
 /*
  * Initialization and control functions in xaxidma.c
  */
+#ifndef SDT
 XAxiDma_Config *XAxiDma_LookupConfig(u32 DeviceId);
 XAxiDma_Config *XAxiDma_LookupConfigBaseAddr(UINTPTR Baseaddr);
+#else
+XAxiDma_Config *XAxiDma_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XAxiDma_CfgInitialize(XAxiDma * InstancePtr, XAxiDma_Config *Config);
 void XAxiDma_Reset(XAxiDma * InstancePtr);
 int XAxiDma_ResetIsDone(XAxiDma * InstancePtr);
