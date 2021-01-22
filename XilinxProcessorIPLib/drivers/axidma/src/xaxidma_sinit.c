@@ -33,8 +33,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xaxidma.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 
 /*****************************************************************************/
@@ -50,6 +52,7 @@
  * @note	None
  *
  ******************************************************************************/
+#ifndef SDT
 XAxiDma_Config *XAxiDma_LookupConfig(u32 DeviceId)
 {
 	extern XAxiDma_Config XAxiDma_ConfigTable[];
@@ -100,5 +103,25 @@ XAxiDma_Config *XAxiDma_LookupConfigBaseAddr(UINTPTR Baseaddr)
 
 	return CfgPtr;
 }
+#else
+XAxiDma_Config *XAxiDma_LookupConfig(UINTPTR BaseAddress)
+{
+	extern XAxiDma_Config XAxidma_ConfigTable[];
+	XAxiDma_Config *CfgPtr;
+	u32 Index;
+
+	CfgPtr = NULL;
+
+	for (Index = (u32)0x0; XAxiDma_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XAxiDma_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		     !BaseAddress) {
+			CfgPtr = &XAxiDma_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XAxiDma_Config *)CfgPtr;
+}
+#endif
 
 /** @} */
