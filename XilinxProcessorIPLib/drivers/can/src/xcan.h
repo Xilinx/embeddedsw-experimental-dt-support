@@ -461,7 +461,11 @@ typedef struct {
 /*
  * Functions in xcan.c
  */
+#ifndef SDT
 int XCan_Initialize(XCan *InstancePtr, u16 DeviceId);
+#else
+int XCan_Initialize(XCan *InstancePtr, UINTPTR BaseAddress);
+#endif
 int XCan_VmInitialize(XCan *InstancePtr, u16 DeviceId, UINTPTR VirtAddr);
 void XCan_Reset(XCan *InstancePtr);
 u8 XCan_GetMode(XCan *InstancePtr);
@@ -481,7 +485,11 @@ int XCan_AcceptFilterSet(XCan *InstancePtr, u32 FilterIndex,
 			 u32 MaskValue, u32 IdValue);
 void XCan_AcceptFilterGet(XCan *InstancePtr, u32 FilterIndex,
 			  u32 *MaskValue, u32 *IdValue);
+#ifndef SDT
 XCan_Config *XCan_LookupConfig(u16 DeviceId);
+#else
+XCan_Config *XCan_LookupConfig(UINTPTR BaseAddress);
+#endif
 XCan_Config *XCan_GetConfig(unsigned int InstanceIndex);
 
 /*
