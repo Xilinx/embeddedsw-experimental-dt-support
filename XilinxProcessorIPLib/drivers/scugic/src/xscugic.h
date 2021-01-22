@@ -218,7 +218,11 @@ typedef struct
  */
 typedef struct
 {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;		/**< Compatible string */
+#endif
 	u32 CpuBaseAddress;	/**< CPU Interface Register base address */
 	u32 DistBaseAddress;	/**< Distributor Register base address */
 	XScuGic_VectorTableEntry HandlerTable[XSCUGIC_MAX_NUM_INTR_INPUTS];/**<
@@ -568,7 +572,11 @@ u32 XScuGic_GetCpuID(void);
 /*
  * Initialization functions in xscugic_sinit.c
  */
+#ifndef SDT
 XScuGic_Config *XScuGic_LookupConfig(u16 DeviceId);
+#else
+XScuGic_Config *XScuGic_LookupConfig(UINTPTR BaseAddr);
+#endif
 
 /*
  * Interrupt functions in xscugic_intr.c

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for SCUGIC controller driver
+
+maintainers:
+  - Mubin Usman Sayyed <mubin.usman.sayyed@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arm,gic-400
+          - arm,cortex-a15-gic
+          - arm,gic-v3
+          - arm,cortex-a9-gic
+  reg:
+    description: Physical base address and size of the gic controller map
+
+config:
+    - XScuGic_Config
+ 
+required:
+    - compatible
+    - reg: 2
+    - Handler-table
