@@ -35,7 +35,9 @@
 #include "xil_io.h"
 #include "xenv.h"
 #include "xcan.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -81,7 +83,11 @@ static void StubHandler(void);
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XCan_Initialize(XCan *InstancePtr, u16 DeviceId)
+#else
+int XCan_Initialize(XCan *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	XCan_Config *ConfigPtr;
 
@@ -95,7 +101,11 @@ int XCan_Initialize(XCan *InstancePtr, u16 DeviceId)
 	 * configuration info down below when initializing this instance of
 	 * the driver.
 	 */
+#ifndef SDT
 	ConfigPtr = XCan_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XCan_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_DEVICE_NOT_FOUND;
 	}
@@ -166,7 +176,11 @@ int XCan_VmInitialize(XCan *InstancePtr, u16 DeviceId, UINTPTR VirtAddr)
 	 * configuration info down below when initializing this instance of the
 	 * driver.
 	 */
+#ifndef SDT
 	ConfigPtr = XCan_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XCan_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_DEVICE_NOT_FOUND;
 	}
@@ -986,6 +1000,7 @@ void XCan_AcceptFilterGet(XCan *InstancePtr, u32 FilterIndex,
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XCan_Config *XCan_LookupConfig(u16 DeviceId)
 {
 	XCan_Config *CfgPtr = NULL;
@@ -1000,6 +1015,23 @@ XCan_Config *XCan_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XCan_Config *XCan_LookupConfig(UINTPTR BaseAddress)
+{
+	XCan_Config *CfgPtr = NULL;
+	int Index;
+
+	for (Index = 0U; XCan_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XCan_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XCan_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 
 /*****************************************************************************/
 /**

@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for CAN controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,axi-can-1.00.a
+          - xlnx,can-5.0
+  reg:
+    description: Physical base address and size of the controller register map
+  can-num-acf:
+    description: Number of acceptance filters configured in the design
+
+config:
+    - XCan_Config 
+
+required:
+    - compatible
+    - reg
+    - can-num-acf
+    - interrupts
+    - interrupt-parent
+
+examples:
+   xcan_intr_example.c:
+    - interrupts
+...
