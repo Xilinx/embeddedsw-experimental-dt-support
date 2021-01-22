@@ -27,10 +27,15 @@
 
 #include "xil_types.h"
 #include "xstatus.h"
-#include "xparameters.h"
-#include "xil_exception.h"
 
 #ifdef XIL_INTERRUPT
+#ifdef SDT
+#include "xcommon_drv_config.h"
+#else
+#include "xparameters.h"
+#endif
+#include "xil_exception.h"
+
 #if defined(XPAR_AXI_INTC)
 #include "xintc.h"
 #endif
@@ -71,6 +76,4 @@ extern void XGetPriorityTriggerType( u32 IntrId, u8 *Priority, u8 *Trigger, UINT
 extern void XStopInterruptCntrl( UINTPTR IntcParent);
 extern void XRegisterInterruptHandler( void *IntrHandler, UINTPTR IntcParent);
 extern int XSetupInterruptSystem(void *DriverInstance, void *IntrHandler, u32 IntrId,  UINTPTR IntcParent, u16 Priority);
-#endif
-
 #endif  /* end of protection macro */

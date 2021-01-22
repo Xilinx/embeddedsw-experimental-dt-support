@@ -102,7 +102,6 @@ int XConnectToInterruptCntrl(u32 IntrId, void *IntrHandler, void *CallBackRef, U
 	#if defined (XPAR_SCUGIC)
 		u16 IntrNum = XGet_IntrId(IntrId);
 		u16 Offset = XGet_IntrOffset(IntrId);
-
 		IntrNum += Offset;
 		Status = XScuGic_Connect(&XScuGicInstance, IntrNum,  \
 			(Xil_ExceptionHandler) IntrHandler, CallBackRef);
@@ -196,7 +195,6 @@ int XStartInterruptCntrl(u32 Mode, UINTPTR IntcParent)
 	#else
 		return XST_FAILURE;
 	#endif
-
 	}
 
 }
@@ -224,7 +222,6 @@ void XEnableIntrId( u32 IntrId, UINTPTR IntcParent)
 		IntrNum += Offset;
 		XScuGic_Enable(&XScuGicInstance, IntrNum);
 	#endif
-
 	} else {
 	#if defined (XPAR_AXI_INTC)
 		XIntc_Enable(&XIntcInstance, IntrId);
@@ -253,7 +250,6 @@ void XDisableIntrId( u32 IntrId, UINTPTR IntcParent)
 		#if defined (XPAR_SCUGIC)
 			u16 IntrNum = XGet_IntrId(IntrId);
 			u16 Offset = XGet_IntrOffset(IntrId);
-
 			IntrNum += Offset;
 			XScuGic_Disable(&XScuGicInstance, IntrNum);
 		#endif
