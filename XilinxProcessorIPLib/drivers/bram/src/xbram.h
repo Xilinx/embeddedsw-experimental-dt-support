@@ -123,7 +123,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;			   /**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	u32 DataWidth;			   /**< BRAM data width */
 	int EccPresent;			   /**< Is ECC supported in H/W */
 	int FaultInjectionPresent;	   /**< Is Fault Injection
@@ -171,7 +175,11 @@ typedef struct {
 /*
  * Functions in xbram_sinit.c
  */
+#ifndef SDT
 XBram_Config *XBram_LookupConfig(u16 DeviceId);
+#else
+XBram_Config *XBram_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Functions implemented in xbram.c
