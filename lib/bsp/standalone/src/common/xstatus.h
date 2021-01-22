@@ -31,6 +31,7 @@ extern "C" {
 
 #include "xil_types.h"
 #include "xil_assert.h"
+#include "bspconfig.h"
 
 /************************** Constant Definitions *****************************/
 

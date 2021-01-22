@@ -33,8 +33,10 @@
 * None.
 *
 ******************************************************************************/
-#include "xparameters.h"
 #include "bspconfig.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 	.file	"xil-crt0.S"
 	.section ".got2","aw"
 	.align	2
