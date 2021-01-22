@@ -723,7 +723,11 @@ extern "C" {
  * This typedef contains configuration information for a Axi Ethernet device.
  */
 typedef struct XAxiEthernet_Config {
+#ifndef SDT
 	u16 DeviceId;	/**< DeviceId is the unique ID  of the device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;/**< BaseAddress is the physical base address of the
 			  *  device's registers
 			  */
@@ -1446,7 +1450,11 @@ void XAxiEthernet_Reset(XAxiEthernet *InstancePtr);
 /*
  * Initialization functions in xaxitemac_sinit.c
  */
+#ifndef SDT
 XAxiEthernet_Config *XAxiEthernet_LookupConfig(u16 DeviceId);
+#else
+XAxiEthernet_Config *XAxiEthernet_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * MAC configuration/control functions in xaxitemac_control.c
