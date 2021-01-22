@@ -60,8 +60,10 @@
 *
 *
 ******************************************************************************/
-#include "xparameters.h"
 #include "bspconfig.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 	.globl  MMUTableL0
 	.globl  MMUTableL1

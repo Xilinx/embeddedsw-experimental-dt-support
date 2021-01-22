@@ -67,8 +67,10 @@
 *
 ******************************************************************************/
 
-#include "xparameters.h"
 #include "bspconfig.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 #include "xil_errata.h"
 
 .globl MMUTableL0
@@ -82,6 +84,9 @@
 .global __el1_stack
 .global __el0_stack
 .global _vector_table
+#ifdef SDT
+.global XARMv8_ConfigTable
+#endif
 
 .set EL3_stack,		__el3_stack
 .set EL2_stack,		__el2_stack
@@ -97,10 +102,12 @@
 .set vector_base,	_vector_table
 .set rvbar_base,	0xFD5C0040
 
+#ifndef SDT
 #if defined (versal)
 .set counterfreq,       XPAR_CPU_CORTEXA72_0_TIMESTAMP_CLK_FREQ
 #else
 .set counterfreq,	XPAR_CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ
+#endif
 #endif
 
 .set MODE_EL1, 0x5
@@ -227,8 +234,14 @@ InitEL3:
 	msr	S3_1_C15_C2_0, x0 	//CPUACTLR_EL1
 
 	/* program the counter frequency */
+#ifndef SDT
 	ldr	x0,=counterfreq
 	msr	CNTFRQ_EL0, x0
+#else
+	ldr     x0,=XARMv8_ConfigTable
+	ldr     x1,[x0]
+	msr     CNTFRQ_EL0, x1
+#endif
 
 	/*Enable hardware coherency between cores*/
 	mrs      x0, S3_1_c15_c2_1  	//Read EL1 CPU Extended Control Register

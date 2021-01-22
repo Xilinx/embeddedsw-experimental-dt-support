@@ -286,11 +286,15 @@ proc generate {os_handle} {
     set armcommonsrcdir "./src/arm/common"
     set armsrcdir "./src/arm"
     set clksrcdir "./src/common/clocking"
+    set intrsrcdir "./src/common/intr"
 
     foreach entry [glob -nocomplain [file join $commonsrcdir *]] {
         file copy -force $entry "./src"
     }
     foreach entry [glob -nocomplain [file join $clksrcdir *]] {
+        file copy -force $entry "./src"
+    }
+    foreach entry [glob -nocomplain [file join $intrsrcdir *]] {
         file copy -force $entry "./src"
     }
 

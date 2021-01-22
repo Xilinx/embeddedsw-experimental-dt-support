@@ -8,7 +8,10 @@
  */
 #ifndef UNDEFINE_FILE_OPS
 #include "xil_printf.h"
+#include "bspconfig.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +26,7 @@ extern "C" {
 __attribute__((weak)) s32
 read (s32 fd, char8* buf, s32 nbytes)
 {
-#ifdef STDIN_BASEADDRESS
+#if defined (STDIN_BASEADDRESS) || defined(SDT)
   s32 i;
   s32 numbytes = 0;
   char8* LocalBuf = buf;
@@ -51,7 +54,7 @@ read (s32 fd, char8* buf, s32 nbytes)
 __attribute__((weak)) s32
 _read (s32 fd, char8* buf, s32 nbytes)
 {
-#ifdef STDIN_BASEADDRESS
+#if defined(STDIN_BASEADDRESS) || defined(SDT)
   s32 i;
   s32 numbytes = 0;
   char8* LocalBuf = buf;
