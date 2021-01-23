@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for DFX Decoupler
+
+maintainers:
+  - Nava kishore Manne <nava.manne@xilinx.com>
+  - Sai Krishna Potthuri <lakshmi.sai.krishna.potthuri@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,pr_decoupler
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XPrd_Config 
+
+required:
+    - compatible
+    - reg
+
+examples:
+    xprd_example.c:
+        - gpio-connected: phandle
+...

@@ -104,7 +104,11 @@ typedef enum {
 
 /* This typedef contains configuration information for a device */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of the device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< Register Base Address */
 } XPrd_Config;
 
@@ -122,7 +126,11 @@ typedef struct {
 /************************** Function Prototypes ******************************/
 
 /* Functions in xprd_sinit.c */
+#ifndef SDT
 XPrd_Config *XPrd_LookupConfig(u16 DeviceId);
+#else
+XPrd_Config *XPrd_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /* Functions in xprd.c */
 s32 XPrd_CfgInitialize(XPrd *InstancePtr, XPrd_Config *ConfigPtr,
