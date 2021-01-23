@@ -288,7 +288,11 @@ typedef enum {
  * This typedef contains configuration information for the flash device.
  */
 typedef struct {
+#ifndef SDT
 	u16  DeviceId;		/**< Instance ID of device */
+#else
+	char *Name;
+#endif
 	u32  SmcBase;		/**< SMC Base address */
 	u32  FlashBase;		/**< NAND base address */
 	u32  FlashWidth;	/**< Flash width */
@@ -412,7 +416,11 @@ typedef struct {
 /*
  * Functions in xnandps_sinit.c
  */
+#ifndef SDT
 XNandPs_Config *XNandPs_LookupConfig(u16 DeviceId);
+#else
+XNandPs_Config *XNandPs_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Functions in xnandps.c

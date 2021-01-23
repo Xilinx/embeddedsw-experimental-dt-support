@@ -156,7 +156,9 @@ int XNandPs_CfgInitialize(XNandPs *InstancePtr, XNandPs_Config *ConfigPtr,
 	/*
 	 * Set the values read from the device config and the base address.
 	 */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.SmcBase = SmcBaseAddr;
 	InstancePtr->Config.FlashBase = FlashBaseAddr;
 	InstancePtr->Config.FlashWidth = ConfigPtr->FlashWidth;

@@ -28,8 +28,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xnandps.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -59,6 +61,7 @@ extern XNandPs_Config XNandPs_ConfigTable[];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XNandPs_Config *XNandPs_LookupConfig(u16 DeviceId)
 {
 	XNandPs_Config *CfgPtr = NULL;
@@ -72,4 +75,20 @@ XNandPs_Config *XNandPs_LookupConfig(u16 DeviceId)
 	}
 	return CfgPtr;
 }
+#else
+XNandPs_Config *XNandPs_LookupConfig(UINTPTR BaseAddress)
+{
+	XNandPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XNandPs_ConfigTable[Index].Name != NULL; Index++) {
+		if (XNandPs_ConfigTable[Index].SmcBase == BaseAddress ||
+		    !BaseAddress) {
+			CfgPtr = &XNandPs_ConfigTable[Index];
+			break;
+		}
+	}
+	return CfgPtr;
+}
+#endif
 /** @} */
