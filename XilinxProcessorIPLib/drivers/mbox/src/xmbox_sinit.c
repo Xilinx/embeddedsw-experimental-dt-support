@@ -27,7 +27,9 @@
 
 /****************************** Include Files ********************************/
 #include "xmbox.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /*************************** Constant Definitions ****************************/
 
@@ -55,6 +57,7 @@ extern XMbox_Config XMbox_ConfigTable[];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XMbox_Config *XMbox_LookupConfig(u16 DeviceId)
 {
 	XMbox_Config *CfgPtr = NULL;
@@ -69,4 +72,22 @@ XMbox_Config *XMbox_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XMbox_Config *XMbox_LookupConfig(UINTPTR BaseAddress)
+{
+	XMbox_Config *CfgPtr = NULL;
+	u32 Index;
+
+	/* Checks all the instances */
+	for (Index = (u32)0x0; XMbox_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XMbox_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		     !BaseAddress) {
+			CfgPtr = &XMbox_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */
