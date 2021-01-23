@@ -25,7 +25,9 @@
 
 /***************************** Include Files ********************************/
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xnandpsu.h"
 /************************** Constant Definitions ****************************/
 
@@ -53,6 +55,7 @@ extern XNandPsu_Config XNandPsu_ConfigTable[];
 *		controller ID was not found.
 *
 ******************************************************************************/
+#ifndef SDT
 XNandPsu_Config *XNandPsu_LookupConfig(u16 DevID)
 {
 	XNandPsu_Config *CfgPtr = NULL;
@@ -67,4 +70,21 @@ XNandPsu_Config *XNandPsu_LookupConfig(u16 DevID)
 
 	return (XNandPsu_Config *)CfgPtr;
 }
+#else
+XNandPsu_Config *XNandPsu_LookupConfig(UINTPTR BaseAddress)
+{
+	XNandPsu_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XNandPsu_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XNandPsu_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XNandPsu_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XNandPsu_Config *)CfgPtr;
+}
+#endif
 /** @} */

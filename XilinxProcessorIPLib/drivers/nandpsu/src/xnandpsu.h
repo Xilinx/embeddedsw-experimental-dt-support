@@ -211,7 +211,11 @@ extern "C" {
  * controller.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Instance ID of NAND flash controller */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< Base address of NAND flash controller */
 	u8 IsCacheCoherent;	/**< Describes whether Cache Coherent or not */
 #if defined  (XCLOCKING)
@@ -565,7 +569,11 @@ void XNandPsu_Prepare_Cmd(XNandPsu *InstancePtr, u8 Cmd1, u8 Cmd2, u8 EccState,
 			u8 DmaMode, u8 AddrCycles);
 
 /* XNandPsu_LookupConfig in xnandpsu_sinit.c */
+#ifndef SDT
 XNandPsu_Config *XNandPsu_LookupConfig(u16 DevID);
+#else
+XNandPsu_Config *XNandPsu_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 
 #ifdef __cplusplus
