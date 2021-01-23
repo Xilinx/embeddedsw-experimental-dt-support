@@ -27,7 +27,9 @@
 /***************************** Include Files *********************************/
 
 #include "xscutimer.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -36,7 +38,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Variable Definitions ****************************/
+#ifndef SDT
 extern XScuTimer_Config XScuTimer_ConfigTable[XPAR_XSCUTIMER_NUM_INSTANCES];
+#else
+extern XScuTimer_Config XScuTimer_ConfigTable[];
+#endif
 
 /************************** Function Prototypes ******************************/
 
@@ -53,6 +59,7 @@ extern XScuTimer_Config XScuTimer_ConfigTable[XPAR_XSCUTIMER_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XScuTimer_Config *XScuTimer_LookupConfig(u16 DeviceId)
 {
 	XScuTimer_Config *CfgPtr = NULL;
@@ -67,4 +74,20 @@ XScuTimer_Config *XScuTimer_LookupConfig(u16 DeviceId)
 
 	return (XScuTimer_Config *)CfgPtr;
 }
+#else
+XScuTimer_Config *XScuTimer_LookupConfig(UINTPTR BaseAddr)
+{
+	XScuTimer_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XScuTimer_ConfigTable[Index].Name != NULL; Index++) {
+		if (XScuTimer_ConfigTable[Index].BaseAddr == BaseAddr) {
+			CfgPtr = &XScuTimer_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XScuTimer_Config *)CfgPtr;
+}
+#endif
 /** @} */
