@@ -32,7 +32,9 @@
 /***************************** Include Files ********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xgpio_i.h"
 
 /************************** Constant Definitions ****************************/
@@ -66,6 +68,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XGpio_Config *XGpio_LookupConfig(u16 DeviceId)
 {
 	XGpio_Config *CfgPtr = NULL;
@@ -81,8 +84,24 @@ XGpio_Config *XGpio_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XGpio_Config *XGpio_LookupConfig(UINTPTR BaseAddress)
+{
+	XGpio_Config *CfgPtr = NULL;
 
+	int Index;
 
+	for (Index = 0U; XGpio_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XGpio_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XGpio_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /****************************************************************************/
 /**
 * Initialize the XGpio instance provided by the caller based on the
@@ -107,7 +126,11 @@ XGpio_Config *XGpio_LookupConfig(u16 DeviceId)
 * @note		None.
 *
 *****************************************************************************/
+#ifndef SDT
 int XGpio_Initialize(XGpio * InstancePtr, u16 DeviceId)
+#else
+int XGpio_Initialize(XGpio * InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	XGpio_Config *ConfigPtr;
 
@@ -121,7 +144,11 @@ int XGpio_Initialize(XGpio * InstancePtr, u16 DeviceId)
 	 * Use this configuration info down below when initializing this
 	 * driver.
 	 */
+#ifndef SDT
 	ConfigPtr = XGpio_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XGpio_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == (XGpio_Config *) NULL) {
 		InstancePtr->IsReady = 0;
 		return (XST_DEVICE_NOT_FOUND);
