@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for NANDPSU controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arasan,nfc-v3p10
+  reg:
+    description: Physical base address and size of the controller register map
+  dma-coherent:
+    description: Present if dma operations are coherent
+    type: boolean
+
+config:
+    - XNandPsu_Config 
+ 
+required:
+    - compatible
+    - reg
+    - dma-coherent
+    - ref-clk
+...

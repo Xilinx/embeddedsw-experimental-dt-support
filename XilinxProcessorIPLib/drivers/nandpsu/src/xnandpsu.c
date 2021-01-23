@@ -232,7 +232,9 @@ s32 XNandPsu_CfgInitialize(XNandPsu *InstancePtr, XNandPsu_Config *ConfigPtr,
 	s32 Status = XST_FAILURE;
 
 	/* Initialize InstancePtr Config structure */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 	InstancePtr->Config.IsCacheCoherent = ConfigPtr->IsCacheCoherent;
 #if defined  (XCLOCKING)
