@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for GPIO controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,xps-gpio-1.00.a
+          - xlnx,axi-gpio-2.0
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,is-dual:
+    description: 1 if dual channel present, 0 if dual channel not present
+
+config:
+    - XGpio_Config 
+
+required:
+    - compatible
+    - reg
+    - xlnx,is-dual
+    - interrupts
+    - interrupt-parent
+
+examples:
+  xgpio_intr_tapp_example.c:
+    - interrupts
+...
