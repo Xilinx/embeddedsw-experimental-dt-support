@@ -27,7 +27,9 @@
 /***************************** Include Files *********************************/
 
 #include "xdevcfg.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -50,6 +52,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XDcfg_Config *XDcfg_LookupConfig(u16 DeviceId)
 {
 	extern XDcfg_Config XDcfg_ConfigTable[];
@@ -65,4 +68,22 @@ XDcfg_Config *XDcfg_LookupConfig(u16 DeviceId)
 
 	return (CfgPtr);
 }
+#else
+XDcfg_Config *XDcfg_LookupConfig(UINTPTR BaseAddress)
+{
+	extern XDcfg_Config XDevcfg_ConfigTable[];
+	XDcfg_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = (u32)0x0; XDcfg_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XDcfg_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		     !BaseAddress) {
+			CfgPtr = &XDcfg_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (CfgPtr);
+}
+#endif
 /** @} */

@@ -178,7 +178,11 @@ typedef void (*XDcfg_IntrHandler) (void *CallBackRef, u32 Status);
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddr;		/**< Base address of the device */
 } XDcfg_Config;
 
@@ -298,7 +302,11 @@ typedef struct {
 /*
  * Lookup configuration in xdevcfg_sinit.c.
  */
+#ifndef SDT
 XDcfg_Config *XDcfg_LookupConfig(u16 DeviceId);
+#else
+XDcfg_Config *XDcfg_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Selftest function in xdevcfg_selftest.c
