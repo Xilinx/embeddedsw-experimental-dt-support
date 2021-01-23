@@ -247,8 +247,10 @@ extern "C" {
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 #include "xiomodule_l.h"
 #include "xil_types.h"
 
@@ -334,7 +336,11 @@ typedef void (*XIOModule_Handler)(void *CallBackRef,
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;			     /**< Unique ID  of device       */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;		     /**< Unique identifier          */
 	UINTPTR IoBaseAddress;		     /**< IO Bus Base Address        */
 	u32 FastIntr;			     /**< Fast Interrupt enabled     */
@@ -446,8 +452,13 @@ typedef struct {
 /*
  * Required functions in xiomodule.c
  */
+#ifndef SDT
 int XIOModule_Initialize(XIOModule * InstancePtr, u16 DeviceId);
 int XIOModule_Timer_Initialize(XIOModule * InstancePtr, u16 DeviceId);
+#else
+int XIOModule_Initialize(XIOModule * InstancePtr, u32 BaseAddress);
+int XIOModule_Timer_Initialize(XIOModule * InstancePtr, u32 BaseAddress);
+#endif
 
 int XIOModule_Start(XIOModule * InstancePtr);
 void XIOModule_Stop(XIOModule * InstancePtr);
@@ -461,7 +472,11 @@ void XIOModule_Disable(XIOModule * InstancePtr, u8 Id);
 
 void XIOModule_Acknowledge(XIOModule * InstancePtr, u8 Id);
 
+#ifndef SDT
 XIOModule_Config *XIOModule_LookupConfig(u16 DeviceId);
+#else
+XIOModule_Config *XIOModule_LookupConfig(u32 BaseAddress);
+#endif
 
 int XIOModule_ConnectFastHandler(XIOModule *InstancePtr, u8 Id,
 				 XFastInterruptHandler Handler);
