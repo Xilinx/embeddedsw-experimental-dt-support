@@ -484,7 +484,11 @@ typedef void (*XQspiPs_StatusHandler) (void *CallBackRef, u32 StatusEvent,
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< Base address of the device */
 	u32 InputClockHz;	/**< Input clock frequency */
 	u8  ConnectionMode; /**< Single, Stacked and Parallel mode */
@@ -739,7 +743,11 @@ typedef struct {
 /*
  * Initialization function, implemented in xqspips_sinit.c
  */
+#ifndef SDT
 XQspiPs_Config *XQspiPs_LookupConfig(u16 DeviceId);
+#else
+XQspiPs_Config *XQspiPs_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Functions implemented in xqspips.c
