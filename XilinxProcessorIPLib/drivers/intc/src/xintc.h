@@ -216,8 +216,10 @@ extern "C" {
 
 #include "xil_types.h"
 #include "xil_assert.h"
-#include "xparameters.h"
 #include "xstatus.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 #include "xintc_l.h"
 
 /************************** Constant Definitions *****************************/
@@ -277,7 +279,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u32 AckBeforeService;	/**< 0 - Interrupt would be acked before service through primary interrupt handler
 								 1 - Interrupt would be acked after service through primary interrupt handler */
@@ -337,7 +343,11 @@ void XIntc_Disable(XIntc * InstancePtr, u8 Id);
 
 void XIntc_Acknowledge(XIntc * InstancePtr, u8 Id);
 
+#ifndef SDT
 XIntc_Config *XIntc_LookupConfig(u16 DeviceId);
+#else
+XIntc_Config *XIntc_LookupConfig(UINTPTR BaseAddr);
+#endif
 
 int XIntc_ConnectFastHandler(XIntc *InstancePtr, u8 Id,
 				XFastInterruptHandler Handler);

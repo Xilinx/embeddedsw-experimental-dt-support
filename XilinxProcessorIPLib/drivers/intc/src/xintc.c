@@ -116,7 +116,11 @@ static void XIntc_InitializeSlaves(XIntc * InstancePtr);
 *	        initialize Slave Interrupt controllers.
 *
 ******************************************************************************/
+#ifndef SDT
 int XIntc_Initialize(XIntc * InstancePtr, u16 DeviceId)
+#else
+int XIntc_Initialize(XIntc * InstancePtr, UINTPTR BaseAddr)
+#endif
 {
 	u8 Id;
 	XIntc_Config *CfgPtr;
@@ -137,7 +141,11 @@ int XIntc_Initialize(XIntc * InstancePtr, u16 DeviceId)
 	 * Lookup the device configuration in the CROM table. Use this
 	 * configuration info down below when initializing this component.
 	 */
+#ifndef SDT
 	CfgPtr = XIntc_LookupConfig(DeviceId);
+#else
+	CfgPtr = XIntc_LookupConfig(BaseAddr);
+#endif
 	if (CfgPtr == NULL) {
 		return XST_DEVICE_NOT_FOUND;
 	}
@@ -728,6 +736,7 @@ static void StubHandler(void *CallBackRef)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XIntc_Config *XIntc_LookupConfig(u16 DeviceId)
 {
 	XIntc_Config *CfgPtr = NULL;
@@ -745,7 +754,33 @@ XIntc_Config *XIntc_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XIntc_Config *XIntc_LookupConfig(UINTPTR BaseAddr)
+{
+	XIntc_Config *CfgPtr = NULL;
+	int Index;
 
+	for (Index = 0; XIntc_ConfigTable[Index].Name != NULL; Index++) {
+		/*
+		 * If BaseAddress is 0, return Configuration for 0th instance of
+		 * AXI INTC device.
+		 * As AXI INTC instance base address varies based on designs,
+		 * driver examples can pass base address as 0 , to use available
+		 * instance of AXI INTC.
+		 */
+		if ((XIntc_ConfigTable[Index].BaseAddress == BaseAddr) ||
+		!BaseAddr) {
+			CfgPtr = &XIntc_ConfigTable[Index];
+			if (CfgPtr == NULL) {
+				return NULL;
+			}
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /*****************************************************************************/
 /**
 *
