@@ -230,7 +230,11 @@ extern "C" {
 
 /* This typedef contains configuration information for a device */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;			/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;		/**< Register Base Address */
 	u16 NumberOfVsms;		/**< Number of VSMs */
 	u8 RequiresClearBitstreams;	/**< Derived from CP_FAMILY */
@@ -736,7 +740,11 @@ typedef struct {
 /************************** Function Prototypes ******************************/
 
 /* Lookup configuration in xprc_sinit.c */
+#ifndef SDT
 XPrc_Config *XPrc_LookupConfig(u16 DeviceId);
+#else
+XPrc_Config *XPrc_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /* Functions in xprc.c */
 s32 XPrc_CfgInitialize(XPrc *InstancePtr, XPrc_Config *ConfigPtr,

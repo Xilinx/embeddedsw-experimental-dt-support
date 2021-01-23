@@ -29,7 +29,9 @@
 /***************************** Include Files *********************************/
 
 #include "xprc.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -61,6 +63,7 @@ extern XPrc_Config XPrc_ConfigTable[];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XPrc_Config *XPrc_LookupConfig(u16 DeviceId)
 {
 	XPrc_Config *ConfigPtr = NULL;
@@ -75,4 +78,21 @@ XPrc_Config *XPrc_LookupConfig(u16 DeviceId)
 
 	return ConfigPtr;
 }
+#else
+XPrc_Config *XPrc_LookupConfig(UINTPTR BaseAddress)
+{
+	XPrc_Config *ConfigPtr = NULL;
+	u32 Index;
+
+	for (Index = 0; XPrc_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XPrc_ConfigTable[Index].BaseAddress == BaseAddress) ||
+				!BaseAddress) {
+			ConfigPtr = &XPrc_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return ConfigPtr;
+}
+#endif
 /** @} */

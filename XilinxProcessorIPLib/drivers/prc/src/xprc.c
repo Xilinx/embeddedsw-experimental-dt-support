@@ -82,7 +82,9 @@ s32 XPrc_CfgInitialize(XPrc *InstancePtr, XPrc_Config *ConfigPtr,
 	 * is ready to use until everything has been initialized successfully.
 	 */
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 
 	InstancePtr->Config.NumberOfVsms = ConfigPtr->NumberOfVsms;
 	InstancePtr->Config.RequiresClearBitstreams =
