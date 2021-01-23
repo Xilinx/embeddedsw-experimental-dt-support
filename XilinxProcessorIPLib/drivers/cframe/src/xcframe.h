@@ -95,8 +95,12 @@ typedef struct
 * Each CFRAME core should have a configuration structure associated.
 */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< DeviceId is the unique ID of the
 				  *  device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< BaseAddress is the physical base address
 				  *  of the device's registers */
 } XCframe_Config;
@@ -122,7 +126,11 @@ typedef struct {
 #endif
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 XCframe_Config *XCframe_LookupConfig(u16 DeviceId);
+#else
+XCframe_Config *XCframe_LookupConfig(u32 BaseAddress);
+#endif
 s32 XCframe_CfgInitialize(XCframe *InstancePtr, XCframe_Config *CfgPtr,
 			u32 EffectiveAddr);
 s32 XCframe_SelfTest(XCframe *InstancePtr);

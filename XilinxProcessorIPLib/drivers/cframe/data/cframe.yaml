@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for CFRAME controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+config:
+    - XCframe_Config 
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - const: xlnx,cfi-cframe-1.0 
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XCframe_Config 
+
+required:
+    - compatible
+    - reg
+...
