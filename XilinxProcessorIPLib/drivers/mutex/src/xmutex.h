@@ -116,7 +116,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;	/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;/**< Register base address */
 	u32 NumMutex;	/**< Number of Mutexes in this device */
 	 u8 UserReg;	/**< User Register, access not controlled by Mutex */
@@ -157,7 +161,11 @@ int XMutex_SetUser(XMutex *InstancePtr, u8 MutexNumber, u32 User);
 /*
  * Static Initialization function, in file xmutex_sinit.c
  */
+#ifndef SDT
 XMutex_Config *XMutex_LookupConfig(u16 DeviceId);
+#else
+XMutex_Config *XMutex_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Functions for self-test, in file xmutex_selftest.c

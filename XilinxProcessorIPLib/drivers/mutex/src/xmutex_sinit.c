@@ -27,7 +27,9 @@
 
 /****************************** Include Files ********************************/
 #include "xmutex.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /*************************** Constant Definitions ****************************/
 
@@ -55,6 +57,7 @@ extern XMutex_Config XMutex_ConfigTable[];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XMutex_Config *XMutex_LookupConfig(u16 DeviceId)
 {
 	XMutex_Config *CfgPtr = NULL;
@@ -69,4 +72,21 @@ XMutex_Config *XMutex_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XMutex_Config *XMutex_LookupConfig(UINTPTR BaseAddress)
+{
+	XMutex_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = (u32)0x0; XMutex_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XMutex_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		     !BaseAddress) {
+			CfgPtr = &XMutex_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */
