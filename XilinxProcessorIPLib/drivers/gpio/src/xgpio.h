@@ -124,7 +124,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Device base address */
 	int InterruptPresent;	/**< Are interrupts supported in h/w */
 	int IsDual;		/**< Are 2 channels supported in h/w */
@@ -150,8 +154,13 @@ typedef struct {
 /*
  * Initialization functions in xgpio_sinit.c
  */
+#ifndef SDT
 int XGpio_Initialize(XGpio *InstancePtr, u16 DeviceId);
 XGpio_Config *XGpio_LookupConfig(u16 DeviceId);
+#else
+int XGpio_Initialize(XGpio *InstancePtr, UINTPTR BaseAddress;
+XGpio_Config *XGpio_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * API Basic functions implemented in xgpio.c
