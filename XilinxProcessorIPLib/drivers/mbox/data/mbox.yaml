@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for MAILBOX controller
+
+maintainers:
+  - Shubhrajyoti Datta <shubhraj@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,mailbox-2.1
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,use-fsl:
+    description: |
+      Differentiates the dma controller that driver supports
+
+config:
+    - XMbox_Config 
+
+required:
+    - compatible
+    - reg: 1
+    - xlnx,use-fsl
+    - xlnx,tx-fsl
+    - xlnx,rx-fsl
+    - interrupts
+    - interrupt-parent
+
+examples:
+    xmbox_intr_example.c:
+        - interrupts
+...

@@ -163,7 +163,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u8 UseFSL;		/**< use the FSL for the interface. */
 	u8 SendID;		/**< FSL link for the write i/f mailbox. */
@@ -215,7 +219,11 @@ void XMbox_SetReceiveThreshold(XMbox *InstancePtr, u32 Value);
 /*
  * Static initialization function, in file xmbox_sinit.c
  */
+#ifndef SDT
 XMbox_Config *XMbox_LookupConfig(u16 DeviceId);
+#else
+XMbox_Config *XMbox_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 #ifdef __cplusplus
 }
