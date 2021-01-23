@@ -72,7 +72,9 @@
 #include "xil_io.h"
 #include "xenv.h"
 #include "xcanfd.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -131,7 +133,11 @@ int XCanFd_CfgInitialize(XCanFd *InstancePtr, XCanFd_Config *ConfigPtr,
 	 */
 	InstancePtr->IsReady = 0;
 	InstancePtr->CanFdConfig.BaseAddress = EffectiveAddr;
+#ifdef SDT
+	InstancePtr->CanFdConfig.Name = ConfigPtr->Name;
+#else
 	InstancePtr->CanFdConfig.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->CanFdConfig.Rx_Mode = ConfigPtr->Rx_Mode;
 	InstancePtr->CanFdConfig.NumofRxMbBuf = ConfigPtr->NumofRxMbBuf;
 	InstancePtr->CanFdConfig.NumofTxBuf = ConfigPtr->NumofTxBuf;
@@ -1542,8 +1548,13 @@ int XCanFd_Send_Queue(XCanFd *InstancePtr)
 	 */
 	TrrVal = InstancePtr->MultiBuffTrr;
 #ifdef versal
+#ifndef SDT
 	if((XGetPSVersion_Info() == (u32)0x10) &&
 	   (InstancePtr->CanFdConfig.IsPl == (u32)0U)) {
+#else
+	if((XGetPSVersion_Info() == (u32)0x10) &&
+	   (!(strcmp(InstancePtr->CanFdConfig.Name, "xlnx,versal-canfd-2.0")))) {
+#endif
 		for (BufferNumber = 0;BufferNumber < MAX_BUFFER_VAL;
 		     BufferNumber++) {
 			XCanFd_WriteReg(InstancePtr->CanFdConfig.BaseAddress,
