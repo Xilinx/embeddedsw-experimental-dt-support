@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for CORESIGHT controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - const: xlnx,coresight-1.0
+
+required:
+    - compatible
+    - reg
+...
