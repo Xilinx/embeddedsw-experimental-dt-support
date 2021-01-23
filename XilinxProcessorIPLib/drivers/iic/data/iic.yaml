@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for IIC controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,axi-iic-2.0
+          - xlnx,xps-iic-2.00.a
+  reg:
+    description: Physical base address and size of the controller register map
+  Has10BitAddr:
+    description: Does device have 10 bit address decoding
+  GpOutWidth:
+    description: Number of bits in general purpose output
+
+config:
+    - XIic_Config 
+
+required:
+    - compatible
+    - reg
+    - Has10BitAddr
+    - GpOutWidth
+    - interrupts
+    - interrupt-parent
+
+examples:
+    xiic_eeprom_example.c:
+        - interrupts
+
+    xiic_dynamic_eeprom_example.c:
+        - interrupts
+
+    xiic_multi_master_example.c:
+        - interrupts
+
+    xiic_repeated_start_example.c:
+        - interrupts
+
+    xiic_tempsensor_example.c:
+        - interrupts
+
+    xiic_tenbitaddr_example.c:
+        - interrupts
+
+    xiic_slave_example.c:
+        - interrupts
+...

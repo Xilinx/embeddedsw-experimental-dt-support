@@ -377,7 +377,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;	  /**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;  /**< Device base address */
 	int Has10BitAddr; /**< Does device have 10 bit address decoding */
 	u8 GpOutWidth;	  /**< Number of bits in general purpose output */
@@ -496,8 +500,13 @@ static inline u32 XIic_IsIicBusy(XIic *InstancePtr)
 /*
  * Initialization functions in xiic_sinit.c
  */
+#ifndef SDT
 int XIic_Initialize(XIic *InstancePtr, u16 DeviceId);
 XIic_Config *XIic_LookupConfig(u16 DeviceId);
+#else
+int XIic_Initialize(XIic *InstancePtr, u32 BaseAddress);
+XIic_Config *XIic_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Functions in xiic.c
