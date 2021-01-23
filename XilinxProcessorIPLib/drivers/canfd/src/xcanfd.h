@@ -333,7 +333,11 @@ extern "C" {
  * This typedef contains configuration information for a device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u32 Rx_Mode;			/**< 1-Mailbox 0-sequential */
 	u32 NumofRxMbBuf;	/**< Number of RxBuffers */
@@ -1039,7 +1043,11 @@ int XCanFd_AcceptFilterSet(XCanFd *InstancePtr, u32 FilterIndex,
 						u32 MaskValue, u32 IdValue);
 void XCanFd_AcceptFilterGet(XCanFd *InstancePtr, u32 FilterIndex,
 						u32 *MaskValue, u32 *IdValue);
+#ifndef SDT
 XCanFd_Config *XCanFd_LookupConfig(u16 DeviceId);
+#else
+XCanFd_Config *XCanFd_LookupConfig(u32 BaseAddress);
+#endif
 XCanFd_Config *XCanFd_GetConfig(unsigned int InstanceIndex);
 int XCanFd_GetDlc2len(u32 Dlc, u32 Edl);
 u8 XCanFd_GetLen2Dlc(int len);
