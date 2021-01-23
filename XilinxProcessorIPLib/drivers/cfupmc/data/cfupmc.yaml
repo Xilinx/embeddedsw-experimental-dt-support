@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for CFU PMC controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+config:
+    - XCfupmc_Config 
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - const: xlnx,cfu-apb-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XCfupmc_Config 
+
+required:
+    - compatible
+    - reg
+...
