@@ -209,7 +209,11 @@ typedef struct XLlFifo {
 } XLlFifo;
 
 typedef struct XLlFifo_Config {
+#ifndef SDT
 	u32 DeviceId;		/**< Deviceid of the AXI FIFO */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Base Address of the AXI FIFO */
 	u32 Axi4BaseAddress;    /**< Axi4 interface Base address */
 	u32 Datainterface;	/**< Type of Datainterface */
@@ -694,7 +698,11 @@ extern u32 _xllfifo_ipis_value;
 int XLlFifo_CfgInitialize(XLlFifo *InstancePtr,
 			XLlFifo_Config *Config, UINTPTR EffectiveAddress);
 void XLlFifo_Initialize(XLlFifo *InstancePtr, UINTPTR BaseAddress);
+#ifndef SDT
 XLlFifo_Config *XLlFfio_LookupConfig(u32 DeviceId);
+#else
+XLlFifo_Config *XLlFfio_LookupConfig(u32 BaseAddress);
+#endif
 u32 XLlFifo_iRxOccupancy(XLlFifo *InstancePtr);
 u32 XLlFifo_iRxGetLen(XLlFifo *InstancePtr);
 u32 XLlFifo_iTxVacancy(XLlFifo *InstancePtr);
