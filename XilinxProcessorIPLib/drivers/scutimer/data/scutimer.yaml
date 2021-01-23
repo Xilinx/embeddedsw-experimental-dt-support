@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for scutimer controller driver
+
+maintainers:
+  - Mubin Usman Sayyed <mubin.usman.sayyed@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arm,cortex-a9-twd-timer
+  reg:
+    description: Physical base address and size of the scutimer controller map
+
+config:
+    - XScuTimer_Config 
+ 
+required:
+    - compatible
+    - reg
+    - interrupts
+    - interrupt-parent
+
+examples:
+   xscutimer_intr_example.c:
+    - interrupts
+

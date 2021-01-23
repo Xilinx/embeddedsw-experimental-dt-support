@@ -74,7 +74,9 @@ s32 XScuTimer_CfgInitialize(XScuTimer *InstancePtr,
 		/*
 		 * Copy configuration into the instance structure.
 		 */
+#ifndef SDT
 		InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 
 		/*
 		 * Save the base address pointer such that the registers of the block
