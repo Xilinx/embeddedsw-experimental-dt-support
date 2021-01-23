@@ -26,7 +26,9 @@
 /***************************** Include Files *********************************/
 
 #include "xcframe.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -61,6 +63,7 @@
 *
 * @note		None.
 ******************************************************************************/
+#ifndef SDT
 XCframe_Config *XCframe_LookupConfig(u16 DeviceId)
 {
 	extern XCframe_Config XCframe_ConfigTable[XPAR_XCFRAME_NUM_INSTANCES];
@@ -78,4 +81,23 @@ XCframe_Config *XCframe_LookupConfig(u16 DeviceId)
 
 	return (XCframe_Config *)CfgPtr;
 }
+#else
+XCframe_Config *XCframe_LookupConfig(u32 BaseAddress)
+{
+	extern XCframe_Config XCframe_ConfigTable[];
+	XCframe_Config *CfgPtr = NULL;
+	u32 Index;
+
+	/* Checks all the instances */
+	for (Index = 0U; XCframe_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XCframe_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XCframe_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XCframe_Config *)CfgPtr;
+}
+#endif
 /** @} */
