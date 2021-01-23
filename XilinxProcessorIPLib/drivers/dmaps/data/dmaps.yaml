@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for DMAPS controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arm,pl330
+          - arm,primecell
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+   - XDpDma_Config 
+
+required:
+    - compatible
+    - reg
+    - interrupts: 9
+    - interrupt-parent
+
+examples:
+   xdmaps_example_w_intr.c:
+    - interrupts
+...
