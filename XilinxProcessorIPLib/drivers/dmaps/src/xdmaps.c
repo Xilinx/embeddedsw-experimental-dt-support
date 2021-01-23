@@ -143,7 +143,9 @@ int XDmaPs_CfgInitialize(XDmaPs *InstPtr,
 	/*
 	 * Setup the driver instance using passed in parameters
 	 */
+#ifndef SDT
 	InstPtr->Config.DeviceId = Config->DeviceId;
+#endif
 	InstPtr->Config.BaseAddress = EffectiveAddr;
 
 	CfgReg = XDmaPs_ReadReg(EffectiveAddr, XDMAPS_CR1_OFFSET);

@@ -88,7 +88,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;	 /**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress; /**< Base address of device (IPIF) */
 } XDmaPs_Config;
 
@@ -312,7 +316,11 @@ void XDmaPs_FaultISR(XDmaPs *InstPtr);
 /*
  * Static loopup function implemented in xdmaps_sinit.c
  */
+#ifndef SDT
 XDmaPs_Config *XDmaPs_LookupConfig(u16 DeviceId);
+#else
+XDmaPs_Config *XDmaPs_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 
 /*
