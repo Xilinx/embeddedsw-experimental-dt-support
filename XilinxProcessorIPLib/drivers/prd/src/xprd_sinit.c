@@ -36,7 +36,9 @@
 /***************************** Include Files *********************************/
 
 #include "xprd.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -47,7 +49,11 @@
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
+#ifndef SDT
 extern XPrd_Config XPrd_ConfigTable[XPAR_XPRD_NUM_INSTANCES];
+#else
+extern XPrd_Config XPrd_ConfigTable[];
+#endif
 
 /*****************************************************************************/
 /**
@@ -64,6 +70,7 @@ extern XPrd_Config XPrd_ConfigTable[XPAR_XPRD_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XPrd_Config *XPrd_LookupConfig(u16 DeviceId)
 {
 	XPrd_Config *CfgPtr = NULL;
@@ -79,4 +86,22 @@ XPrd_Config *XPrd_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XPrd_Config *XPrd_LookupConfig(UINTPTR BaseAddress)
+{
+	XPrd_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0; XPrd_ConfigTable[Index].Name != NULL;
+		Index++) {
+		if ((XPrd_ConfigTable[Index].BaseAddress == BaseAddress) ||
+				!BaseAddress) {
+			CfgPtr = &XPrd_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */
