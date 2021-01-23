@@ -95,7 +95,11 @@ static void StubHandler(void *CallBackRef);
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 s32 XIOModule_Initialize(XIOModule * InstancePtr, u16 DeviceId)
+#else
+s32 XIOModule_Initialize(XIOModule * InstancePtr, u32 BaseAddress)
+#endif
 {
 	u8 Id;
 	XIOModule_Config *CfgPtr;
@@ -117,7 +121,7 @@ s32 XIOModule_Initialize(XIOModule * InstancePtr, u16 DeviceId)
 	 * Lookup the device configuration in the CROM table. Use this
 	 * configuration info down below when initializing this component.
 	 */
-	CfgPtr = XIOModule_LookupConfig(DeviceId);
+	CfgPtr = XIOModule_LookupConfig(BaseAddress);
 	if (CfgPtr == NULL) {
 		return XST_DEVICE_NOT_FOUND;
 	}
@@ -567,6 +571,7 @@ static void StubHandler(void *CallBackRef)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XIOModule_Config *XIOModule_LookupConfig(u16 DeviceId)
 {
 	XIOModule_Config *CfgPtr = NULL;
@@ -581,9 +586,23 @@ XIOModule_Config *XIOModule_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XIOModule_Config *XIOModule_LookupConfig(u32 BaseAddress)
+{
+	XIOModule_Config *CfgPtr = NULL;
+	u32 Index;
 
+	for (Index = 0U; XIOModule_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XIOModule_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XIOModule_ConfigTable[Index];
+			break;
+		}
+	}
 
-
+	return CfgPtr;
+}
+#endif
 /*****************************************************************************/
 /**
 *
@@ -822,7 +841,11 @@ void XIOModule_DiscreteWrite(XIOModule * InstancePtr,
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 s32 XIOModule_Timer_Initialize(XIOModule * InstancePtr, u16 DeviceId)
+#else
+s32 XIOModule_Timer_Initialize(XIOModule * InstancePtr, u32 BaseAddress)
+#endif
 {
 	XIOModule_Config *IOModuleConfigPtr;
 	int TimerNumber;
@@ -835,7 +858,7 @@ s32 XIOModule_Timer_Initialize(XIOModule * InstancePtr, u16 DeviceId)
 	 * Lookup the device configuration in the temporary CROM table. Use this
 	 * configuration info down below when initializing this component.
 	 */
-	IOModuleConfigPtr = XIOModule_LookupConfig(DeviceId);
+	IOModuleConfigPtr = XIOModule_LookupConfig(BaseAddress);
 
 	if (IOModuleConfigPtr == (XIOModule_Config *) NULL) {
 		return XST_DEVICE_NOT_FOUND;
