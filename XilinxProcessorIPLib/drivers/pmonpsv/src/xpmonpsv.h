@@ -86,7 +86,11 @@ extern "C" {
  * Monitor device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;			/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;		/**< Device base address */
 } XPmonPsv_Config;
 
@@ -109,7 +113,11 @@ typedef struct {
 /**
  * Functions in xpmonpsv_sinit.c
  */
+#ifndef SDT
 XPmonPsv_Config *XPmonPsv_LookupConfig(u16 DeviceId);
+#else
+XPmonPsv_Config *XPmonPsv_LookupConfig(u32 BaseAddress);
+#endif
 
 /**
  * Functions in xpmonpsv.c

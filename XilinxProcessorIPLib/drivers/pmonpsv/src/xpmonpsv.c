@@ -78,7 +78,9 @@ u32 XPmonPsv_CfgInitialize(XPmonPsv *InstancePtr, const XPmonPsv_Config *ConfigP
 	}
 
 	/* Set the values read from the device config and the base address. */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 
 	/* Indicate the instance is now ready to use, initialized without error */

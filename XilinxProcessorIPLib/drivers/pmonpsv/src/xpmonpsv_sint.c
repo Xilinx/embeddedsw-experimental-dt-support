@@ -29,8 +29,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xpmonpsv.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
@@ -40,7 +42,11 @@
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
+#ifndef SDT
 extern XPmonPsv_Config XPmonPsv_ConfigTable[XPAR_XPMONPSV_NUM_INSTANCES];
+#else
+extern XPmonPsv_Config XPmonPsv_ConfigTable[];
+#endif
 
 /*****************************************************************************/
 /**
@@ -59,6 +65,7 @@ extern XPmonPsv_Config XPmonPsv_ConfigTable[XPAR_XPMONPSV_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XPmonPsv_Config *XPmonPsv_LookupConfig(u16 DeviceId)
 {
 	XPmonPsv_Config *CfgPtr = NULL;
@@ -73,4 +80,21 @@ XPmonPsv_Config *XPmonPsv_LookupConfig(u16 DeviceId)
 
 	return (XPmonPsv_Config *)CfgPtr;
 }
+#else
+XPmonPsv_Config *XpsvPmon_LookupConfig(u32 BaseAddress)
+{
+	XPmonPsv_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index=0U; XPmonPsv_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XPmonPsv_ConfigTable[Index].BaseAddress == BaseAddress) ||
+				!BaseAddress) {
+			CfgPtr = &XPmonPsv_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XPmonPsv_Config *)CfgPtr;
+}
+#endif
 /** @} */
