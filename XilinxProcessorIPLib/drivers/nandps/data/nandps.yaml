@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for SMC controller
+
+maintainers:
+  - Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arm,pl353-smc-r2p1
+  reg:
+    description: Physical base address and size of the SMC controller register map
+  flashbase:
+    description: Physical base address of NAND Flash controller register map
+  nand-bus-width:
+    description: Flash interface connection with controller either x8 or x16
+
+config:
+    - XNandPs_Config 
+ 
+required:
+    - compatible
+    - reg
+    - flashbase
+    - nand-bus-width
+...
