@@ -36,7 +36,9 @@
 
 #include <string.h>
 #include "xmutex.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xil_types.h"
 #include "xil_assert.h"
 
