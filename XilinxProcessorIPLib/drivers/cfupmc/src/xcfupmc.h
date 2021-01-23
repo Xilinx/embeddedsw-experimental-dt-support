@@ -80,8 +80,12 @@ extern "C" {
 * Each CFU core should have a configuration structure associated.
 */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< DeviceId is the unique ID of the
 					*  device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< BaseAddress is the physical base address
 					*  of the device's registers */
 } XCfupmc_Config;
@@ -171,7 +175,11 @@ static inline u32 XCfupmc_ReadStatus(const XCfupmc *InstancePtr)
  */
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 XCfupmc_Config *XCfupmc_LookupConfig(u16 DeviceId);
+#else
+XCfupmc_Config *XCfupmc_LookupConfig(u32 BaseAddress);
+#endif
 s32 XCfupmc_CfgInitialize(XCfupmc *InstancePtr, const XCfupmc_Config *CfgPtr,
 	u32 EffectiveAddr);
 s32 XCfupmc_SelfTest(const XCfupmc *InstancePtr);
