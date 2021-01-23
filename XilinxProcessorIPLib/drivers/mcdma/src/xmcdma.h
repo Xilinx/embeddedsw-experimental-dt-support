@@ -230,7 +230,11 @@ typedef struct {
 } XMcdma_ChanCtrl;
 
 typedef struct {
+#ifndef SDT
 	u32 DeviceId;
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;
 	int AddrWidth;
 	int Has_SingleIntr;
@@ -578,8 +582,12 @@ typedef struct {
 /*@}*/
 
 /************************ Prototypes of functions **************************/
+#ifndef SDT
 XMcdma_Config *XMcdma_LookupConfig(u16 DeviceId);
 XMcdma_Config *XMcdma_LookupConfigBaseAddr(UINTPTR Baseaddr);
+#else
+XMcdma_Config *XMcdma_LookupConfig(UINTPTR BaseAddress);
+#endif
 s32 XMcDma_CfgInitialize(XMcdma *InstancePtr, XMcdma_Config *CfgPtr);
 s32 XMcDma_Initialize(XMcdma *InstancePtr, XMcdma_Config *CfgPtr);
 void XMcDma_Reset(XMcdma *InstancePtr);

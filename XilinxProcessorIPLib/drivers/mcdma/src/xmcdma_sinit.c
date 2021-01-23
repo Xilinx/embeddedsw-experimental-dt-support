@@ -26,7 +26,9 @@
 /***************************** Include Files *********************************/
 
 #include "xmcdma.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -62,6 +64,7 @@
 *
 * @note		None.
 ******************************************************************************/
+#ifndef SDT
 XMcdma_Config *XMcdma_LookupConfig(u16 DeviceId)
 {
 	extern XMcdma_Config XMcdma_ConfigTable[XPAR_XMCDMA_NUM_INSTANCES];
@@ -79,7 +82,23 @@ XMcdma_Config *XMcdma_LookupConfig(u16 DeviceId)
 
 	return (XMcdma_Config *)CfgPtr;
 }
+#else
+XMcdma_Config *XMcdma_LookupConfig(UINTPTR BaseAddress)
+{
+	extern XMcdma_Config XMcdma_ConfigTable[];
+	XMcdma_Config *CfgPtr = NULL;
+	u32 Index;
 
+	/* Checks all the instances */
+	for (Index = (u32)0x0; XMcdma_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XMcdma_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		     !BaseAddress) {
+			CfgPtr = &XMcdma_ConfigTable[Index];
+			break;
+		}
+	}
+}
+#endif
 /*****************************************************************************/
 /**
 *
