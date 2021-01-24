@@ -27,7 +27,9 @@
 /***************************** Include Files *********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xuartpsv.h"
 
 /************************** Constant Definitions *****************************/
@@ -54,6 +56,7 @@
 * @note 	None.
 *
 ******************************************************************************/
+#ifndef SDT
 XUartPsv_Config *XUartPsv_LookupConfig(u16 DeviceId)
 {
 	XUartPsv_Config *CfgPtr = NULL;
@@ -69,4 +72,21 @@ XUartPsv_Config *XUartPsv_LookupConfig(u16 DeviceId)
 
 	return (XUartPsv_Config *)CfgPtr;
 }
+#else
+XUartPsv_Config *XUartPsv_LookupConfig(UINTPTR BaseAddress)
+{
+	XUartPsv_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XUartPsv_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XUartPsv_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XUartPsv_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XUartPsv_Config *)CfgPtr;
+}
+#endif
 /** @} */
