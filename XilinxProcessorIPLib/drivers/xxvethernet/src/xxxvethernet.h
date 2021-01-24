@@ -217,7 +217,11 @@ extern "C" {
  * This typedef contains configuration information for a Xxv Ethernet device.
  */
 typedef struct XXxvEthernet_Config {
+#ifndef SDT
 	u16 DeviceId;	/**< DeviceId is the unique ID  of the device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;/**< BaseAddress is the physical base address of the
 			  *  device's registers
 			  */
@@ -484,8 +488,12 @@ void XXxvEthernet_Reset(XXxvEthernet *InstancePtr);
 /*
  * Initialization functions in xxxvtemac_sinit.c
  */
+#ifndef SDT
 XXxvEthernet_Config *XXxvEthernet_LookupConfig(u16 DeviceId);
 XXxvEthernet_Config *XXxvEthernet_LookupConfigBaseAddr(UINTPTR Baseaddr);
+#else
+XXxvEthernet_Config *XXxvEthernet_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * MAC configuration/control functions in xxxvethernet.c
