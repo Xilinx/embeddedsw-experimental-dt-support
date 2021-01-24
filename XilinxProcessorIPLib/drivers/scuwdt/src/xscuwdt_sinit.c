@@ -49,6 +49,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XScuWdt_Config *XScuWdt_LookupConfig(u16 DeviceId)
 {
 	XScuWdt_Config *CfgPtr = NULL;
@@ -63,4 +64,20 @@ XScuWdt_Config *XScuWdt_LookupConfig(u16 DeviceId)
 
 	return (XScuWdt_Config *)CfgPtr;
 }
+#else
+XScuwdt_Config *XScuWdt_LookupConfig(UINTPTR BaseAddr)
+{
+	XScuwdt_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XScuwdt_ConfigTable[Index].Name != NULL; Index++) {
+		if (XScuwdt_ConfigTable[Index].BaseAddr == BaseAddr) {
+			CfgPtr = &XScuwdt_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XScuwdt_Config *)CfgPtr;
+}
+#endif
 /** @} */

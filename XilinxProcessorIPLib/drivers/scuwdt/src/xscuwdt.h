@@ -129,7 +129,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddr;		/**< Base address of the device */
 } XScuWdt_Config;
 
@@ -339,7 +343,11 @@ extern XScuWdt_Config XScuWdt_ConfigTable[];
 /*
  * Lookup configuration in xscuwdt_sinit.c.
  */
+#ifndef SDT
 XScuWdt_Config *XScuWdt_LookupConfig(u16 DeviceId);
+#else
+XScuWdt_Config *XScuWdt_LookupConfig(UINTPTR BaseAddr);
+#endif
 
 /*
  * Selftest function in xscuwdt_selftest.c
