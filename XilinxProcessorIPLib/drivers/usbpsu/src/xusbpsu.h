@@ -453,7 +453,11 @@ struct XUsbPsu_Ep {
  * @param RefClk: Input clocks
  */
 typedef struct {
+#ifndef SDT
         u16 DeviceId;		/**< Unique ID of controller */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Core register base address */
 	u8 IsCacheCoherent;	/**< Describes whether Cache Coherent or not */
 	u8 EnableSuperSpeed;	/**< Set to enable super speed support */
@@ -902,7 +906,11 @@ void XUsbPsu_Ep0StallRestart(struct XUsbPsu *InstancePtr);
 /*
  * Functions in xusbpsu_sinit.c
  */
+#ifndef SDT
 XUsbPsu_Config *XUsbPsu_LookupConfig(u16 DeviceId);
+#else
+XUsbPsu_Config *XUsbPsu_LookupConfig(u32 BaseAddress);
+#endif
 
 #ifdef __cplusplus
 }

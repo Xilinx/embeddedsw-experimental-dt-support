@@ -25,8 +25,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xusbpsu.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -58,6 +60,7 @@
 * @note none
 *
 ******************************************************************************/
+#ifndef SDT
 XUsbPsu_Config *XUsbPsu_LookupConfig(u16 DeviceId)
 {
 	XUsbPsu_Config *CfgPtr = NULL;
@@ -72,4 +75,21 @@ XUsbPsu_Config *XUsbPsu_LookupConfig(u16 DeviceId)
 
 	return (XUsbPsu_Config *)(CfgPtr);
 }
+#else
+XUsbPsu_Config *XUsbPsu_LookupConfig(u32 BaseAddress)
+{
+	XUsbPsu_Config *CfgPtr = NULL;
+	u32 i;
+
+	for (i = 0U; XUsbPsu_ConfigTable[i].Name != NULL; i++) {
+		if ((XUsbPsu_ConfigTable[i].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XUsbPsu_ConfigTable[i];
+			break;
+		}
+	}
+
+	return (XUsbPsu_Config *)(CfgPtr);
+}
+#endif
 /** @} */
