@@ -32,7 +32,9 @@
 
 #include "lowlevel/xsysmonpsv_hw.h"
 #include "xsysmonpsv.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 
@@ -64,9 +66,13 @@ XSysMonPsv_Config *XSysMonPsv_LookupConfig(void)
 	XSysMonPsv_Config *CfgPtr = NULL;
 	u32 Index;
 
-	for (Index = 0U; Index < (u32)XPAR_XSYSMONPSV_NUM_INSTANCES; Index++) {
-		CfgPtr = &XSysMonPsv_ConfigTable[Index];
-	}
+#ifndef SDT
+        for (Index = 0U; Index < (u32)XPAR_XSYSMONPSV_NUM_INSTANCES; Index++) {
+                        CfgPtr = &XSysMonPsv_ConfigTable[Index];
+        }
+#else
+	CfgPtr = &XSysmonpsv_ConfigTable[0];
+#endif
 
 	return CfgPtr;
 }
