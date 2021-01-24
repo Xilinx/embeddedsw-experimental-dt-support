@@ -27,8 +27,10 @@
 
 /******************************* Include Files *******************************/
 
-#include "xparameters.h"
 #include "xtmrctr.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -40,7 +42,11 @@
 
 /* A table of configuration structures containing the configuration information
  * for each timer core in the system. */
+#ifndef SDT
 extern XTmrCtr_Config XTmrCtr_ConfigTable[XPAR_XTMRCTR_NUM_INSTANCES];
+#else
+extern XTmrCtr_Config XTmrCtr_ConfigTable[];
+#endif
 
 /**************************** Function Definitions ***************************/
 
@@ -59,6 +65,7 @@ extern XTmrCtr_Config XTmrCtr_ConfigTable[XPAR_XTMRCTR_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XTmrCtr_Config *XTmrCtr_LookupConfig(u16 DeviceId)
 {
 	XTmrCtr_Config *CfgPtr = NULL;
@@ -73,5 +80,29 @@ XTmrCtr_Config *XTmrCtr_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XTmrCtr_Config *XTmrCtr_LookupConfig(UINTPTR BaseAddress)
+{
+	extern XTmrCtr_Config XTmrctr_ConfigTable[];
+	XTmrCtr_Config *CfgPtr = NULL;
+	u16 Index;
 
+	for (Index = 0; XTmrCtr_ConfigTable[Index].Name != NULL; Index++) {
+		/*
+		 * If BaseAddress is 0, return Configuration for 0th instance of
+		 * AXI timer device.
+		 * As AXI timer instance base address varies based on designs,
+		 * driver examples can pass base address as 0 , to use avilable
+		 * instance of AXI timer.
+		 */
+		if ((XTmrCtr_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		  !BaseAddress)  {
+			CfgPtr = &XTmrCtr_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */

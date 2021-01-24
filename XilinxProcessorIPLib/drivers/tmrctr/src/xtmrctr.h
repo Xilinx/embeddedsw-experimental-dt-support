@@ -213,7 +213,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u32 SysClockFreqHz;	/**< The AXI bus clock frequency */
 } XTmrCtr_Config;
@@ -283,7 +287,11 @@ void XTmrCtr_PwmEnable(XTmrCtr *InstancePtr);
 void XTmrCtr_PwmDisable(XTmrCtr *InstancePtr);
 
 /* Lookup configuration in xtmrctr_sinit.c */
+#ifndef SDT
 XTmrCtr_Config *XTmrCtr_LookupConfig(u16 DeviceId);
+#else
+XTmrCtr_Config *XTmrCtr_LookupConfig(UINTPTR  BaseAddress);
+#endif
 
 /* Functions for options, in file xtmrctr_options.c */
 void XTmrCtr_SetOptions(XTmrCtr * InstancePtr, u8 TmrCtrNumber, u32 Options);
