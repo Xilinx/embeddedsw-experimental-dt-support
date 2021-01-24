@@ -369,7 +369,11 @@ extern "C" {
  * device.
  */
 typedef struct {
+#ifndef SDT
 	u16  DeviceId;		/**< Unique ID of device */
+#else
+	char *Name;
+#endif
 	UINTPTR  BaseAddress;	/**< Device base address */
 	int  IncludeInterrupt; 	/**< Supports Interrupt driven mode */
 	u8   IpType;		/**< 1 - System Management */
@@ -541,7 +545,11 @@ typedef struct {
 /**
  * Functions in xsysmon_sinit.c
  */
+#ifndef SDT
 XSysMon_Config *XSysMon_LookupConfig(u16 DeviceId);
+#else
+XSysMon_Config *XSysMon_LookupConfig(u32 BaseAddress);
+#endif
 
 /**
  * Functions in xsysmon.c

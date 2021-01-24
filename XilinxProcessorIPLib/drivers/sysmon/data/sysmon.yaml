@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for SYSMON controller
+ 
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+ 
+properties:
+  compatible:
+    items:
+      - const: xlnx,system-management-wiz-1.3
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XSysMon_Config 
+ 
+required:
+    - compatible
+    - reg
+
+examples:
+    xsysmon_intr_example.c:
+        - interrupts
+    xsysmon_intr_printf_example.c:
+        - interrupts
+    xsysmon_single_ch_intr_example.c:
+        - interrupts
+    xsysmon_extmux_example.c:
+        - interrupts
+...
