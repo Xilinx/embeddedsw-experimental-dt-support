@@ -95,7 +95,9 @@ int XUsb_CfgInitialize(XUsb *InstancePtr, XUsb_Config *ConfigPtr,
 	/*
 	 * Initialize the XUsb structure to default values.
 	 */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 	InstancePtr->Config.DmaEnabled = ConfigPtr->DmaEnabled;
 	InstancePtr->Config.AddrWidth = ConfigPtr->AddrWidth;
