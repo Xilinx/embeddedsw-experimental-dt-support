@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for XADCPS controller
+ 
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+ 
+properties:
+  compatible:
+    items:
+      - const: xlnx,zynq-xadc-1.00.a
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XAdcPs_Config 
+ 
+required:
+    - compatible
+    - reg
+examples:
+    xadcps_intr_example.c:
+        - interrupts
+...
