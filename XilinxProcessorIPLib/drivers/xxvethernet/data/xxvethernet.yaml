@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for XXV ETHERNET controller
+
+maintainers:
+    - Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,xxv-ethernet-3.1
+          - xlnx,xxv-ethernet-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,statistics-counters:
+    description: XXV ETHERNET controller is configured with statistics counters enabled
+  axistream-connected:
+    description: Connected Stream IP Type (1-AXI_FIFO 2-AXI_DMA 3-AXI_MCDMA)
+
+config:
+    - XXxvEthernet_Config 
+
+required:
+    - compatible
+    - reg
+    - xlnx,include-statistics-counters
+    - axistream-connected
+
+examples:
+    xxxvethernet_example_intr_mcdma.c:
+        - axistream-connected: 3
+...
