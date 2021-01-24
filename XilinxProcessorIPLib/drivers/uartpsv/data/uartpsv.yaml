@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for UARTPSV controller
+
+maintainers:
+  - Shubhrajyoti Datta <shubhrajyoti.datta@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arm,pl011
+          - arm,sbsa-uart
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,clock-freq:
+    description: Input clock frequency
+  cts-override:
+    description: |
+      Override the CTS modem status signal. This signal will always be reported as active instead of being obtained from the modem status register. Define this if your serial port does not use this pin
+    type: boolean
+
+config:
+    - XUartPsv_Config 
+
+required:
+    - compatible
+    - reg
+    - xlnx,clock-freq
+    - cts-override
+    - interrupts
+    - interrupt-parent
+examples:
+    xuartpsv_intr_example.c:
+        - interrupts
+...

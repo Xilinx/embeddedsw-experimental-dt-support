@@ -231,7 +231,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;				/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;			/**< Base address of device (IPIF) */
 	u32 InputClockHz;			/**< Input clock frequency */
 	s32 ModemPinsConnected; 	/**< Specifies whether modem pins are
@@ -410,7 +414,11 @@ extern XUartPsv_Config XUartPsv_ConfigTable[];	/**< Config structure */
 /************************** Function Prototypes ******************************/
 
 /* Static lookup function implemented in xuartpsv_sinit.c */
+#ifndef SDT
 XUartPsv_Config *XUartPsv_LookupConfig(u16 DeviceId);
+#else
+XUartPsv_Config *XUartPsv_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /* Interface functions implemented in xuartpsv.c */
 s32 XUartPsv_CfgInitialize(XUartPsv *InstancePtr,
