@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for WDTTB controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,axi-timebase-wdt-3.0
+          - xlnx,xps-timebase-wdt-1.00.a
+          - xlnx,versal-wwdt-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,clock-freq:
+    description: Input clock frequency
+
+config:
+    - XWdtTb_Config 
+
+required:
+    - compatible
+    - reg
+    - xlnx,enable-window-wdt
+    - interrupts: 2
+    - interrupt-parent
+
+examples:
+   xwdttb_gwdt_selftest_example.c:
+    - compatible : xlnx,versal-wwdt-1.0
+   xwdttb_gwdt_example.c:
+    - compatible : xlnx,versal-wwdt-1.0
+   xwdttb_gwdt_intr_example.c:
+    - compatible : xlnx,versal-wwdt-1.0
+    - interrupts
+   xwdttb_winwdt_example.c:
+    - compatible : xlnx,versal-wwdt-1.0
+   xwdttb_winwdt_intr_example.c:
+    - compatible : xlnx,versal-wwdt-1.0
+    - interrupts
+   xwdttb_low_level_example.c:
+    - xlnx,enable-window-wdt : 0
+    - compatible : xlnx,axi-timebase-wdt-3.0
+   xwdttb_example.c:
+    - xlnx,enable-window-wdt : 0
+    - compatible : xlnx,axi-timebase-wdt-3.0
+   xwdttb_intr_example.c:
+    - xlnx,enable-window-wdt : 0
+    - compatible : xlnx,axi-timebase-wdt-3.0
+    - interrupts
+   xwdttb_winwdt_example.c:
+    - xlnx,enable-window-wdt : 1
+    - compatible : xlnx,axi-timebase-wdt-3.0
+   xwdttb_winwdt_intr_example.c:
+    - xlnx,enable-window-wdt : 1
+    - compatible : xlnx,axi-timebase-wdt-3.0
+    - interrupts
+
+depends:
+   - clockps
+...

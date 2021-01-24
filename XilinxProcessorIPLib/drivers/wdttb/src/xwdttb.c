@@ -223,7 +223,9 @@ s32 XWdtTb_CfgInitialize(XWdtTb *InstancePtr, const XWdtTb_Config *CfgPtr,
 		Status = (s32)XST_DEVICE_IS_STARTED;
 	}
         else {
+#ifndef SDT
        InstancePtr->Config.DeviceId = CfgPtr->DeviceId;
+#endif
 	InstancePtr->Config.EnableWinWdt = CfgPtr->EnableWinWdt;
 	InstancePtr->Config.MaxCountWidth = CfgPtr->MaxCountWidth;
 	InstancePtr->Config.SstCountWidth = CfgPtr->SstCountWidth;
