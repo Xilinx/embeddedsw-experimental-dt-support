@@ -102,7 +102,11 @@ typedef struct {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR RegBaseAddr;	/**< Register base address */
 	u32 BrkDelayRstValue;	/**< Value of parameter C_BRK_DLEAY_RST_VALUE */
 	u64 MaskRstValue;	/**< Value of parameter C_MASK_RST_VALUE */
@@ -164,8 +168,33 @@ typedef struct {
 /*
  * Initialization functions in xtmr_manager_sinit.c
  */
+#ifndef SDT
 int XTMR_Manager_Initialize(XTMR_Manager *InstancePtr, u16 DeviceId);
 XTMR_Manager_Config *XTMR_Manager_LookupConfig(u16 DeviceId);
+#else
+int XTMR_Manager_Initialize(XTMR_Manager *InstancePtr, UINTPTR BaseAddr);
+XTMR_Manager_Config *XTMR_Manager_LookupConfig(UINTPTR BaseAddr);
+#endif
+
+/*
+ * Required functions, in file xtmr_manager.c
+ */
+int XTMR_Manager_CfgInitialize(XTMR_Manager *InstancePtr,
+				XTMR_Manager_Config *Config,
+				UINTPTR EffectiveAddr);
+
+/*
+ * Functions for recovery, in file xtmr_manager_recover.c
+ */
+void XTMR_Manager_SetRecoveryHandler(XTMR_Manager *InstancePtr,
+				     XTMR_Manager_Handler FuncPtr,
+				     void *CallBackRef);
+
+void XTMR_Manager_SetPreResetHandler(XTMR_Manager *InstancePtr,
+				     XTMR_Manager_Handler FuncPtr,
+				     void *CallBackRef);
+
+void XTMR_Manager_SetPostResetHandler(XTMR_Manager *InstancePtr,
 
 /*
  * Required functions, in file xtmr_manager.c
