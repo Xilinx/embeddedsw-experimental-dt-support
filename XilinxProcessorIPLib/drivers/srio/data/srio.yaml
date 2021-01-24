@@ -1,0 +1,25 @@
+%YAML 1.2
+---
+title: Bindings for SRIO controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,srio-gen2-4.1
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XSrio_Config 
+
+required:
+    - compatible
+    - reg
+
+examples:
+    xsrio_dma_loopback_example.c:
+        - stream-connected: phandle
+...
