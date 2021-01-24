@@ -30,7 +30,9 @@
 /***************************** Include Files *********************************/
 
 #include "xwdttb.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -67,6 +69,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XWdtTb_Config *XWdtTb_LookupConfig(u16 DeviceId)
 {
 	XWdtTb_Config *CfgPtr = NULL;
@@ -87,4 +90,23 @@ XWdtTb_Config *XWdtTb_LookupConfig(u16 DeviceId)
 
 	return (XWdtTb_Config *)CfgPtr;
 }
+#else
+XWdtTb_Config *XWdtTb_LookupConfig(UINTPTR BaseAddress)
+{
+	XWdtTb_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XWdtTb_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XWdtTb_ConfigTable[Index].BaseAddr == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XWdtTb_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XWdtTb_Config *)CfgPtr;
+}
+/** @} */
+
+#endif
 /** @} */
