@@ -536,7 +536,11 @@ typedef struct {
  * XUsbPs_ConfigureDevice() function call
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceID;		/**< Unique ID of controller. */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< Core register base address. */
 } XUsbPs_Config;
 
@@ -1122,7 +1126,11 @@ s32 XUsbPs_EpDataBufferReceive(XUsbPs *InstancePtr, u8 EpNum,
  * Helper functions for static configuration.
  * Implemented in xusbps_sinit.c
  */
+#ifndef SDT
 XUsbPs_Config *XUsbPs_LookupConfig(u16 DeviceId);
+#else
+XUsbPs_Config *XUsbPs_LookupConfig(u32 BaseAddress);
+#endif
 
 #ifdef __cplusplus
 }

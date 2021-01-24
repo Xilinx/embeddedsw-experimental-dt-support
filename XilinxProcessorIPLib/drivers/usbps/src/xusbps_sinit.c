@@ -27,7 +27,9 @@
 
 #include "xstatus.h"
 #include "xusbps.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 
@@ -55,6 +57,7 @@ extern XUsbPs_Config XUsbPs_ConfigTable[];
 *		controller ID was not found.
 *
 ******************************************************************************/
+#ifndef SDT
 XUsbPs_Config *XUsbPs_LookupConfig(u16 DeviceID)
 {
 	XUsbPs_Config *CfgPtr = NULL;
@@ -70,4 +73,22 @@ XUsbPs_Config *XUsbPs_LookupConfig(u16 DeviceID)
 
 	return CfgPtr;
 }
+#else
+XUsbPs_Config *XUsbPs_LookupConfig(u32 BaseAddress)
+{
+	XUsbPs_Config *CfgPtr = NULL;
+
+	int Index;
+
+	for (Index = 0U; XUsbPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XUsbPs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XUsbPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */

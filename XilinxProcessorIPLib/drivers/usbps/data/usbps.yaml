@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for USBPSU controller
+
+maintainers:
+  - Anurag Kumar Vulisha <anurag.kumar.vulisha@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,zynq-usb-2.20a
+          - chipidea,usb2
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XUsbPs_Config 
+
+required:
+    - compatible
+    - reg
+    - interrupts
+    - interrupt-parent
+
+examples:
+        xusbps_intr_example.c:
+        - interrupts
+
+        xusbps_audio_example.c:
+        - interrupts
+...
