@@ -180,7 +180,11 @@ typedef struct {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR RegBaseAddr;	/**< Register base address */
 	u32 BaudRate;		/**< Fixed baud rate */
 	u8  UseParity;		/**< Parity generator enabled when TRUE */
@@ -217,8 +221,13 @@ typedef struct {
 /*
  * Initialization functions in xuartlite_sinit.c
  */
+#ifndef SDT
 int XUartLite_Initialize(XUartLite *InstancePtr, u16 DeviceId);
 XUartLite_Config *XUartLite_LookupConfig(u16 DeviceId);
+#else
+int XUartLite_Initialize(XUartLite *InstancePtr, UINTPTR BaseAddress);
+XUartLite_Config *XUartLite_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Required functions, in file xuart.c
