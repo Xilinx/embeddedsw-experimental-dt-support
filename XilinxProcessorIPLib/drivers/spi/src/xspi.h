@@ -385,7 +385,11 @@ typedef struct {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Base address of the device */
 	int HasFifos;		/**< Does device have FIFOs? */
 	u32 SlaveOnly;		/**< Is the device slave only? */
@@ -792,8 +796,13 @@ typedef struct {
 /*
  * Initialization functions in xspi_sinit.c
  */
+#ifndef SDT
 int XSpi_Initialize(XSpi *InstancePtr, u16 DeviceId);
 XSpi_Config *XSpi_LookupConfig(u16 DeviceId);
+#else
+int XSpi_Initialize(XSpi *InstancePtr, UINTPTR BaseAddress);
+XSpi_Config *XSpi_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Functions, in xspi.c
