@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for  controller
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,sysmon-psv-1.0
+          - xlnx,versal-sysmon
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XSysMonPsv_Config 
+
+required:
+    - reg
+    - child,required:
+        - reg
+
+optional:
+    - child,required:
+        - xlnx,name
+...
