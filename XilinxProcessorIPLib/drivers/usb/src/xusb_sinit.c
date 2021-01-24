@@ -31,7 +31,9 @@
 /***************************** Include Files ********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xusb.h"
 
 /************************** Constant Definitions ****************************/
@@ -60,6 +62,7 @@ extern XUsb_Config XUsb_ConfigTable[];
 *		- NULL if the specified device ID was not found.
 *
 ******************************************************************************/
+#ifndef SDT
 XUsb_Config *XUsb_LookupConfig(u16 DeviceId)
 {
 	XUsb_Config *CfgPtr = NULL;
@@ -74,4 +77,21 @@ XUsb_Config *XUsb_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XUsb_Config *XUsb_LookupConfig(u32 BaseAddress)
+{
+	XUsb_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XUsb_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XUsb_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XUsb_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */

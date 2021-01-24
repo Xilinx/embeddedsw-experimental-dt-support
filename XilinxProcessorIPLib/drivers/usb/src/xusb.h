@@ -314,7 +314,11 @@ typedef struct {
  * XUsb_ConfigureDevice() function call.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of device. */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Core register base address. */
 	u8 DmaEnabled;		/**< DMA support Enabled */
 	u8 AddrWidth;		/**< DMA Address Width */
@@ -452,7 +456,11 @@ void XUsb_UlpiIntrSetHandler(XUsb *InstancePtr, void *CallBackFunc,
  * Implemented in xusb_sinit.c
  */
 
+#ifndef SDT
 XUsb_Config *XUsb_LookupConfig(u16 DeviceId);
+#else
+XUsb_Config *XUsb_LookupConfig(u32 BaseAddress);
+#endif
 
 #ifdef __cplusplus
 }
