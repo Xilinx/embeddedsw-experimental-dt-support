@@ -50,7 +50,9 @@
 /***************************** Include Files *********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xtmrctr.h"
 #include "xtmrctr_i.h"
 
