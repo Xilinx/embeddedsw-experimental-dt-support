@@ -60,7 +60,9 @@ int XSrio_CfgInitialize(XSrio *InstancePtr,
 	/* Setup the instance */
 	memset(InstancePtr, 0, sizeof(XSrio));
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
+#ifndef SDT
 	InstancePtr->Config.DeviceId = Config->DeviceId;
+#endif
 		
 	/* Port width for the Device */
 	Portwidth = XSrio_ReadReg(InstancePtr->Config.BaseAddress,
