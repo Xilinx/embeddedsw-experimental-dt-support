@@ -380,7 +380,11 @@ typedef void (*XSpiPs_StatusHandler) (const void *CallBackRef, u32 StatusEvent,
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	u32 BaseAddress;	/**< Base address of the device */
 	u32 InputClockHz;	/**< Input clock frequency */
 } XSpiPs_Config;
@@ -636,7 +640,11 @@ typedef struct {
 /*
  * Initialization function, implemented in xspips_sinit.c
  */
+#ifndef SDT
 XSpiPs_Config *XSpiPs_LookupConfig(u16 DeviceId);
+#else
+XSpiPs_Config *XSpiPs_LookupConfig(u32 BaseAddress);
+#endif
 
 /*
  * Functions implemented in xspips.c
