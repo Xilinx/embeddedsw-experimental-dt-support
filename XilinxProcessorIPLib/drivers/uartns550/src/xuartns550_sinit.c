@@ -29,7 +29,9 @@
 /***************************** Include Files ********************************/
 
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xuartns550_i.h"
 
 /************************** Constant Definitions ****************************/
@@ -64,6 +66,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XUartNs550_Config *XUartNs550_LookupConfig(u16 DeviceId)
 {
 	XUartNs550_Config *CfgPtr = NULL;
@@ -78,7 +81,23 @@ XUartNs550_Config *XUartNs550_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XUartNs550_Config *XUartNs550_LookupConfig(UINTPTR BaseAddress)
+{
+	XUartNs550_Config *CfgPtr = NULL;
+	u32 Index;
 
+	for (Index = 0U; XUartNs550_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XUartNs550_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XUartNs550_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /****************************************************************************/
 /**
 *
@@ -108,7 +127,11 @@ XUartNs550_Config *XUartNs550_LookupConfig(u16 DeviceId)
 * @note		None.
 *
 *****************************************************************************/
+#ifndef SDT
 int XUartNs550_Initialize(XUartNs550 *InstancePtr, u16 DeviceId)
+#else
+int XUartNs550_Initialize(XUartNs550 *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	XUartNs550_Config *ConfigPtr;
 
@@ -121,7 +144,11 @@ int XUartNs550_Initialize(XUartNs550 *InstancePtr, u16 DeviceId)
 	 * Lookup the device configuration in the temporary CROM table. Use this
 	 * configuration info down below when initializing this component
 	 */
+#ifndef SDT
 	ConfigPtr = XUartNs550_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XUartNs550_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == (XUartNs550_Config *)NULL) {
 		return XST_DEVICE_NOT_FOUND;
 	}

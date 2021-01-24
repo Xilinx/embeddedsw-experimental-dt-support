@@ -291,7 +291,11 @@ extern "C" {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Base address of device */
 	u32 InputClockHz;	/**< Input clock frequency */
 	u32 DefaultBaudRate;	/**< Baud Rate in bps, ie 1200 */
@@ -381,8 +385,13 @@ typedef struct {
 /*
  * Initialization functions in xuartns550_sinit.c
  */
+#ifndef SDT
 int XUartNs550_Initialize(XUartNs550 *InstancePtr, u16 DeviceId);
 XUartNs550_Config *XUartNs550_LookupConfig(u16 DeviceId);
+#else
+int XUartNs550_Initialize(XUartNs550 *InstancePtr, UINTPTR BaseAddress);
+XUartNs550_Config *XUartNs550_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * Required functions in xuartns550.c
