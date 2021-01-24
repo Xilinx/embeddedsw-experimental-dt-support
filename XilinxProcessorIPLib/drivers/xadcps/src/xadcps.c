@@ -94,7 +94,9 @@ int XAdcPs_CfgInitialize(XAdcPs *InstancePtr, XAdcPs_Config *ConfigPtr,
 	/*
 	 * Set the values read from the device config and the base address.
 	 */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 
 	/* Write Unlock value to Device Config Unlock register */

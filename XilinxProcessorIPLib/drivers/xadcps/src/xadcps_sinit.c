@@ -30,8 +30,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xadcps.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -61,6 +63,7 @@ extern XAdcPs_Config XAdcPs_ConfigTable[];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XAdcPs_Config *XAdcPs_LookupConfig(u16 DeviceId)
 {
 	XAdcPs_Config *CfgPtr = NULL;
@@ -75,4 +78,21 @@ XAdcPs_Config *XAdcPs_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XAdcPs_Config *XAdcPs_LookupConfig(u32 BaseAddress)
+{
+	XAdcPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index=0; XAdcPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XAdcPs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+				!BaseAddress) {
+			CfgPtr = &XAdcPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */
