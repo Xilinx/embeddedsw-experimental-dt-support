@@ -28,7 +28,9 @@
 
 #include "xstatus.h"
 #include "xspips.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -39,7 +41,11 @@
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
+#ifndef SDT
 extern XSpiPs_Config XSpiPs_ConfigTable[XPAR_XSPIPS_NUM_INSTANCES];
+#else
+extern XSpiPs_Config XSpiPs_ConfigTable[];
+#endif
 
 /*****************************************************************************/
 /**
@@ -58,6 +64,7 @@ extern XSpiPs_Config XSpiPs_ConfigTable[XPAR_XSPIPS_NUM_INSTANCES];
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XSpiPs_Config *XSpiPs_LookupConfig(u16 DeviceId)
 {
 	XSpiPs_Config *CfgPtr = NULL;
@@ -71,4 +78,21 @@ XSpiPs_Config *XSpiPs_LookupConfig(u16 DeviceId)
 	}
 	return (XSpiPs_Config *)CfgPtr;
 }
+#else
+XSpiPs_Config *XSpiPs_LookupConfig(u32 BaseAddress)
+{
+	XSpiPs_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = (u32)0x0; XSpiPs_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XSpiPs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XSpiPs_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XSpiPs_Config *)CfgPtr;
+}
+#endif
 /** @} */
