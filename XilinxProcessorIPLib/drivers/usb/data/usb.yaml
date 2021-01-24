@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for USBPSU controller
+
+maintainers:
+  - Anurag Kumar Vulisha <anurag.kumar.vulisha@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,axi-usb2-device-5.0
+          - xlnx,usb2-device-4.00.a
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,has-builtin-dma:
+    description: Present if dma support Enabled
+    type: boolean
+  xlnx,axi_addr_width:
+    description: Present if dma operations are coherent
+    type: unsigned int
+
+config:
+    - XUsb_Config 
+
+required:
+    - compatible
+    - reg
+    - xlnx,has-builtin-dma
+    - xlnx,axi_addr_width
+    - interrupts
+    - interrupt-parent
+
+examples:
+        xusb_dma_intr_storage.c:
+        - interrupts
+
+        xusb_microphone.c:
+        - interrupts
+
+        xusb_keyboard.c:
+        - interrupts
+
+        xusb_mouse.c:
+        - interrupts
+
+        xusb_phy_read_write.c:
+        - interrupts
+
+        xusb_storage.c:
+        - interrupts
+...
