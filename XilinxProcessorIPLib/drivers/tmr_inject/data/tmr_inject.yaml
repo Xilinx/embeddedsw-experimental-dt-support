@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for tmr_inject controller
+
+maintainers:
+  - Mubin Sayyed <mubin.usman.sayyed@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,tmr-inject-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XTMR_Inject_Config 
+
+required:
+    - compatible
+    - reg
+    - interrupts
+    - interrupt-parent
+...
