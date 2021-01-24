@@ -150,7 +150,11 @@ extern "C" {
  * This typedef contains the configuration information for the device.
  */
 typedef struct XSrio_Config {
+#ifndef SDT
 	u16 DeviceId;		/**< Device Id */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Base Address */
 } XSrio_Config;
 
@@ -1520,7 +1524,11 @@ typedef struct XSrio {
  */
 int XSrio_CfgInitialize(XSrio * InstancePtr,
 			XSrio_Config *Config, UINTPTR EffectiveAddress);
+#ifndef SDT
 XSrio_Config *XSrio_LookupConfig(u32 DeviceId);
+#else
+XSrio_Config *XSrio_LookupConfig(u32 BaseAddress);
+#endif
 int XSrio_GetPortStatus(XSrio *InstancePtr);
 int XSrio_GetPEType(XSrio *InstancePtr);
 int XSrio_IsOperationSupported(XSrio * InstancePtr, u8 Operation, u8 Direction);

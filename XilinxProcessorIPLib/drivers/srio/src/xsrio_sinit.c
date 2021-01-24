@@ -26,8 +26,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xsrio.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /*****************************************************************************/
 /**
@@ -44,6 +46,7 @@
  * @note	None
  *
  ******************************************************************************/
+#ifndef SDT
 XSrio_Config *XSrio_LookupConfig(u32 DeviceId)
 {
 	extern XSrio_Config XSrio_ConfigTable[];
@@ -62,4 +65,24 @@ XSrio_Config *XSrio_LookupConfig(u32 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XSrio_Config *XSrio_LookupConfig(u32 BaseAddress)
+{
+	extern XSrio_Config XSrio_ConfigTable[];
+	XSrio_Config *CfgPtr;
+	u32 Index;
+
+	CfgPtr = NULL;
+
+	for (Index = 0; XSrio_ConfigTable[Index].Name != NULL; Index++) {
+		if ((XSrio_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		    !BaseAddress) {
+			CfgPtr = &XSrio_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return CfgPtr;
+}
+#endif
 /** @} */
