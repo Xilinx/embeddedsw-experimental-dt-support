@@ -33,8 +33,6 @@ required:
     - reg
     - xlnx,clock-freq
     - cts-override
-    - interrupts
-    - interrupt-parent
     - ref-clk
 
 examples:

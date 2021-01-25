@@ -277,7 +277,7 @@ typedef struct {
 	u32 InputClockHz;/**< Input clock frequency */
 	s32 ModemPinsConnected; /** Specifies whether modem pins are connected
 				 *  to MIO or FMIO */
-#if defined  (XCLOCKING)
+#if defined  (XCLOCKING) || defined(SDT)
 	u32 RefClk;		/**< Input clock frequency */
 #endif
 } XUartPs_Config;
