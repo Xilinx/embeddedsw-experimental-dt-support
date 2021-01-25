@@ -36,7 +36,4 @@ required:
     - xlnx,has-emio
     - dma-coherent
     - ref-clk
-
-optional:
-    - interrupts
 ...
