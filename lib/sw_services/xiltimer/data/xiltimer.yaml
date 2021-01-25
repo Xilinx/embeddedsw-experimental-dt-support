@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for lwip library
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  reg:
+    description: Physical base address and size of the controller register map
+
+depends:
+  - tmrctr
+  - ttcps
+
+required:
+    tmrctr:
+        - reg
+    ttcps:
+        - reg
+...
