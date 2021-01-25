@@ -1,7 +1,6 @@
 ###############################################################################
 # Copyright (C) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-#
 ###############################################################################
 #
 # Modification History
@@ -10,7 +9,6 @@
 # ----- ---- -------- -----------------------------------------------
 # 1.0   adk   24/11/21 First release
 # 	adk   20/12/21 Fix TTC Device ID handling.
-#
 ##############################################################################
 
 set sleep_timer_is_ttc 0
@@ -45,7 +43,6 @@ proc xtimer_drc {lib_handle} {
 	set ttcps_dir "src/core/ttcps/"
 	set axitmr_dir "src/core/axi_timer/"
 	set scutimer_dir "src/core/scutimer/"
-
 
 	if {$sleep_timer_is_ttc != 0} {
 		foreach entry [glob -nocomplain -types f [file join $ttcps_dir *]] {

@@ -27,6 +27,9 @@
 #include "xiltimer.h"
 
 #ifdef XTIMER_IS_DEFAULT_TIMER
+#ifdef SDT
+#include "xmicroblaze_config.h"
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -66,7 +69,11 @@ static void XMicroblaze_ModifyInterval(XTimer *InstancePtr, u32 delay,
 				       XTimer_DelayType DelayType)
 {
 	(void)InstancePtr;
+#ifndef SDT
         u32 CpuFreq = XPAR_CPU_CORE_CLOCK_FREQ_HZ;
+#else
+        u32 CpuFreq = XGet_CpuFreq();
+#endif
         u32 iterpersec = CpuFreq / 4;
 	u32 iters = iterpersec / DelayType;
 

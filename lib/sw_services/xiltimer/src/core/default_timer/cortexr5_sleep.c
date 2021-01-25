@@ -76,7 +76,11 @@ static void XCortexr5_ModifyInterval(XTimer *InstancePtr, u32 delay,
 	/* For the CortexR5 PMU cycle counter. As boot code is setting up "D"
 	 * bit in PMCR, cycle counter increments on every 64th bit of processor cycle
 	 */
+#ifndef SDT
 	u32 frequency = XPAR_CPU_CORTEXR5_0_CPU_CLK_FREQ_HZ/64;
+#else
+	u32 frequency = XGet_CpuFreq()/64;
+#endif
 
 #if defined (__GNUC__)
 	TimeLowVal1 = Xpm_ReadCycleCounterVal();
