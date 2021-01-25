@@ -195,7 +195,12 @@ typedef struct {
  * functions.
  */
 typedef struct {
+#ifndef SDT
 	XClockPs_Config Config;          /**< Hardware Configuration */
+#else
+	UINTPTR BaseAddress;	/**< BaseAddress is the physical base address
+				  *  of the device's registers */
+#endif
 } XClock;
 
 /* Type of clock nodes */
