@@ -21,6 +21,4 @@ config:
 required:
     - compatible
     - reg
-    - interrupts: 2 
-    - interrupt-parent
 ...
