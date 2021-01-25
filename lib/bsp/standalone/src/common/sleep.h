@@ -77,14 +77,6 @@ extern "C" {
 
 void usleep(unsigned long useconds);
 void sleep(unsigned int seconds);
-int usleep_R5(unsigned long useconds);
-unsigned sleep_R5(unsigned int seconds);
-int usleep_MB(unsigned long useconds);
-unsigned sleep_MB(unsigned int seconds);
-int usleep_A53(unsigned long useconds);
-unsigned sleep_A53(unsigned int seconds);
-int usleep_A9(unsigned long useconds);
-unsigned sleep_A9(unsigned int seconds);
 
 #ifdef __cplusplus
 }
