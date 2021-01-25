@@ -301,6 +301,10 @@ typedef struct {
 	u8 DmaType;		/**< Type of DMA */
 	u8 IsCacheCoherent; /**< Describes whether Cache Coherent or not;
                               * Applicable only to A53 in EL1 NS mode */
+	u16 IntrId;		/** Bits[11:0] Interrupt-id Bits[15:12]
+				 * trigger type and level flags */
+	UINTPTR IntrParent; 	/** Bit[0] Interrupt parent type Bit[64/32:1]
+				 * Parent base address */
 } XZDma_Config;
 
 /******************************************************************************/

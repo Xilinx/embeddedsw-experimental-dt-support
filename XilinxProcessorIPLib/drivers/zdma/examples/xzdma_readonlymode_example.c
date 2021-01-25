@@ -32,13 +32,11 @@
 
 #include "xzdma.h"
 #include "xparameters.h"
-#include "xscugic.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Function Prototypes ******************************/
 
 int XZDma_SimpleReadOnlyExample(u16 DeviceId);
-static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
-				XZDma *InstancePtr, u16 IntrId);
 static void DoneHandler(void *CallBackRef);
 
 /************************** Constant Definitions ******************************/
@@ -62,7 +60,6 @@ static void DoneHandler(void *CallBackRef);
 /************************** Variable Definitions *****************************/
 
 XZDma ZDma;		/**<Instance of the ZDMA Device */
-XScuGic Intc;		/**< XIntc Instance */
 u32 SrcBuf[256];	/**< Source buffer */
 u8 Done = 0;		/**< Done flag */
 
@@ -162,8 +159,9 @@ int XZDma_SimpleReadOnlyExample(u16 DeviceId)
 	/*
 	 * Connect to the interrupt controller.
 	 */
-	Status = SetupInterruptSystem(&Intc, &(ZDma),
-			ZDMA_INTR_DEVICE_ID);
+	Status = XSetupInterruptSystem(&ZDma, &XZDma_IntrHandler,
+				       Config->IntrId, Config->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 			return XST_FAILURE;
 	}
@@ -208,85 +206,6 @@ int XZDma_SimpleReadOnlyExample(u16 DeviceId)
 
 	return XST_SUCCESS;
 
-}
-
-/*****************************************************************************/
-/**
-* This function sets up the interrupt system so interrupts can occur for the
-* ZDMA. This function is application-specific. The user should modify this
-* function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the INTC.
-* @param	InstancePtr contains a pointer to the instance of the ZDMA
-*		driver which is going to be connected to the interrupt
-*		controller.
-* @param	IntrId is the interrupt Id and is typically
-*		XPAR_<ZDMA_instance>_INTR value from xparameters.h.
-*
-* @return
-*		- XST_SUCCESS if successful
-*		- XST_FAILURE if failed
-*
-* @note		None.
-
-*
-****************************************************************************/
-static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
-				XZDma *InstancePtr, u16 IntrId)
-{
-	int Status;
-
-#ifndef TESTAPP_GEN
-	XScuGic_Config *IntcConfig; /* Config for interrupt controller */
-
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	IntcConfig = XScuGic_LookupConfig(ZDMA_INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the
-	 * hardware interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-				IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect a device driver handler that will be called when an
-	 * interrupt for the device occurs, the device driver handler
-	 * performs the specific interrupt processing for the device
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-			(Xil_ExceptionHandler) XZDma_IntrHandler,
-				  (void *) InstancePtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Enable the interrupt for the device
-	 */
-	XScuGic_Enable(IntcInstancePtr, IntrId);
-
-
-	/*
-	 * Enable interrupts
-	 */
-	Xil_ExceptionEnableMask(XIL_EXCEPTION_IRQ);
-
-
-	return XST_SUCCESS;
 }
 
 /*****************************************************************************/

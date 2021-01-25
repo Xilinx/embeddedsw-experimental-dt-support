@@ -42,13 +42,8 @@
 
 #include "xzdma.h"
 #include "xparameters.h"
+#include "xinterrupt_wrap.h"
 #include "xil_cache.h"
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
-#endif
 
 /************************** Constant Definitions ******************************/
 
@@ -58,16 +53,6 @@
  * change all the needed parameters in one place.
  */
 #define ZDMA_DEVICE_ID		XPAR_XZDMA_0_DEVICE_ID /* ZDMA device Id */
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC		XIntc
-#define ZDMA_INTC_DEVICE_ID	XPAR_INTC_0_DEVICE_ID
-#define ZDMA_INTR_DEVICE_ID	XPAR_INTC_0_ZDMA_0_VEC_ID /**< ZDMA Interrupt Id */
-#else
-#define INTC		XScuGic
-#define ZDMA_INTC_DEVICE_ID	XPAR_SCUGIC_SINGLE_DEVICE_ID
-					/**< SCUGIC Device ID */
-#define ZDMA_INTR_DEVICE_ID	XPAR_XADMAPS_0_INTR /**< ZDMA Interrupt Id */
-#endif
 
 #ifndef TESTAPP_GEN
 #define SIZE		1000000 /**< Size of the data to be transferred */
@@ -81,10 +66,8 @@
 
 /************************** Function Prototypes ******************************/
 
-int XZDma_SimpleExample(INTC *IntcInstPtr, XZDma *ZdmaInstPtr,
-			u16 DeviceId, u16 IntrId);
-static int SetupInterruptSystem(INTC *IntcInstancePtr,
-				XZDma *InstancePtr, u16 IntrId);
+int XZDma_SimpleExample(XZDma *ZdmaInstPtr,
+			u16 DeviceId);
 static void DoneHandler(void *CallBackRef);
 static void ErrorHandler(void *CallBackRef, u32 Mask);
 
@@ -93,7 +76,6 @@ static void ErrorHandler(void *CallBackRef, u32 Mask);
 
 #ifndef TESTAPP_GEN
 XZDma ZDma;		/**<Instance of the ZDMA Device */
-static INTC Intc;	/**< XIntc Instance */
 #endif
 
 #if defined(__ICCARM__)
@@ -126,8 +108,7 @@ int main(void)
 	int Status;
 
 	/* Run the simple example */
-	Status = XZDma_SimpleExample(&Intc, &ZDma, (u16)ZDMA_DEVICE_ID,
-				     ZDMA_INTR_DEVICE_ID);
+	Status = XZDma_SimpleExample(&ZDma, (u16)ZDMA_DEVICE_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("ZDMA Simple Example Failed\r\n");
 		return XST_FAILURE;
@@ -158,8 +139,7 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
-int XZDma_SimpleExample(INTC *IntcInstPtr, XZDma *ZdmaInstPtr,
-			u16 DeviceId, u16 IntrId)
+int XZDma_SimpleExample(XZDma *ZdmaInstPtr, u16 DeviceId)
 {
 	int Status;
 	XZDma_Config *Config;
@@ -218,8 +198,9 @@ int XZDma_SimpleExample(INTC *IntcInstPtr, XZDma *ZdmaInstPtr,
 	/*
 	 * Connect to the interrupt controller.
 	 */
-	Status = SetupInterruptSystem(IntcInstPtr, ZdmaInstPtr,
-				      IntrId);
+	Status = XSetupInterruptSystem(ZdmaInstPtr, &XZDma_IntrHandler,
+				       Config->IntrId, Config->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -274,133 +255,6 @@ int XZDma_SimpleExample(INTC *IntcInstPtr, XZDma *ZdmaInstPtr,
 	}
 
 	Done = 0;
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
-* This function sets up the interrupt system so interrupts can occur for the
-* ZDMA. This function is application-specific. The user should modify this
-* function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the INTC.
-* @param	InstancePtr contains a pointer to the instance of the ZDMA
-*		driver which is going to be connected to the interrupt
-*		controller.
-* @param	IntrId is the interrupt Id and is typically
-*		XPAR_<ZDMA_instance>_INTR value from xparameters.h.
-*
-* @return
-*		- XST_SUCCESS if successful
-*		- XST_FAILURE if failed
-*
-* @note		None.
-
-*
-****************************************************************************/
-int SetupInterruptSystem(INTC *IntcInstancePtr,
-				XZDma *InstancePtr,
-				u16 IntrId)
-{
-	int Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#ifndef TESTAPP_GEN
-	/* Initialize the interrupt controller and connect the ISRs */
-	Status = XIntc_Initialize(IntcInstancePtr, ZDMA_INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS)
-	{
-
-		xil_printf("Failed init intc\r\n");
-		return XST_FAILURE;
-	}
-#endif
-	/*
-	 * Connect the driver interrupt handler
-	 */
-	Status = XIntc_Connect(IntcInstancePtr, IntrId,
-				(XInterruptHandler)XZDma_IntrHandler, InstancePtr);
-	if (Status != XST_SUCCESS)
-	{
-
-		xil_printf("Failed connect intc\r\n");
-		return XST_FAILURE;
-	}
-#ifndef TESTAPP_GEN
-	/*
-	 * Start the interrupt controller such that interrupts are enabled for
-	 * all devices that cause interrupts.
-	 */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS)
-	{
-		return XST_FAILURE;
-	}
-#endif
-
-	/*
-	 * Enable the interrupt for the ZDMA device.
-	 */
-	XIntc_Enable(IntcInstancePtr, IntrId);
-#ifndef TESTAPP_GEN
-	Xil_ExceptionInit();
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)XIntc_InterruptHandler,
-				(void *)IntcInstancePtr);
-#endif
-#else
-#ifndef TESTAPP_GEN
-	XScuGic_Config *IntcConfig; /* Config for interrupt controller */
-
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	IntcConfig = XScuGic_LookupConfig(ZDMA_INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the
-	 * hardware interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-				IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect a device driver handler that will be called when an
-	 * interrupt for the device occurs, the device driver handler
-	 * performs the specific interrupt processing for the device
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-			(Xil_ExceptionHandler) XZDma_IntrHandler,
-				  (void *) InstancePtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Enable the interrupt for the device
-	 */
-	XScuGic_Enable(IntcInstancePtr, IntrId);
-#endif
-#ifndef TESTAPP_GEN
-
-	/*
-	 * Enable interrupts
-	 */
-	Xil_ExceptionEnableMask(XIL_EXCEPTION_IRQ);
-#endif
-
 
 	return XST_SUCCESS;
 }
