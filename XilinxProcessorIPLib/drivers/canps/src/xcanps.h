@@ -234,6 +234,10 @@ typedef struct {
 	char *Name;		/**< Unique name of the device */
 #endif
 	UINTPTR BaseAddr;	/**< Register base address */
+	u16 IntrId;		/** Bits[11:0] Interrupt-id Bits[15:12]
+				 * trigger type and level flags */
+	UINTPTR IntrParent; 	/** Bit[0] Interrupt parent type Bit[64/32:1]
+				 * Parent base address */
 } XCanPs_Config;
 
 /******************************************************************************/
