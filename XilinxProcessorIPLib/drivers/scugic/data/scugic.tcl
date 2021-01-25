@@ -1378,7 +1378,6 @@ proc is_interrupt { IP_NAME } {
 		return false;
 }
 
-
 #
 # Get handles for all ports driving the interrupt pin of a peripheral
 #
