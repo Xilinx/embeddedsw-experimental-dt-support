@@ -107,6 +107,7 @@ proc generate {drv_handle} {
     xdefine_zynq_config_file $drv_handle "xscugic_g.c" "XScuGic" "DEVICE_ID" "C_S_AXI_BASEADDR" "C_DIST_BASEADDR"
     xdefine_zynq_canonical_xpars $drv_handle "xparameters.h" "ScuGic" "DEVICE_ID" "C_S_AXI_BASEADDR" "C_S_AXI_HIGHADDR" "C_DIST_BASEADDR"
 
+    generate_ipdefine $drv_handle "xparameters.h"
 }
 
 #
@@ -1323,4 +1324,10 @@ proc is_interrupt { IP_NAME } {
 		}
 		#puts "return $IP_NAME\n\r"
 		return false;
+}
+
+proc generate_ipdefine {drv_handle file_name} {
+    set file_handle [::hsi::utils::open_include_file $file_name]
+    puts $file_handle "\#define XPAR_SCUGIC"
+    close $file_handle
 }
