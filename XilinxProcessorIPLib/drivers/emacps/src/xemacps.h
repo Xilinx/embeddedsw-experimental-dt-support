@@ -516,15 +516,21 @@ typedef struct {
 	UINTPTR BaseAddress;/**< Physical base address of IPIF registers */
 	u8 IsCacheCoherent; /**< Applicable only to A53 in EL1 mode;
 				* describes whether Cache Coherent or not */
-#if defined  (XCLOCKING)
+	u16 IntrId;		/** Bits[11:0] Interrupt-id Bits[15:12]
+				 * trigger type and level flags */
+	UINTPTR IntrParent; 	/** Bit[0] Interrupt parent type Bit[64/32:1]
+				 * Parent base address */
+#if defined  (XCLOCKING) || defined (SDT)
 	u32 RefClk;	/**< Input clock */
 #endif
+#ifndef SDT
 	u8 S1GDiv0;	/**< 1Gbps Clock Divider 0 */
 	u8 S1GDiv1;	/**< 1Gbps Clock Divider 1 */
 	u8 S100MDiv0;	/**< 100Mbps Clock Divider 0 */
 	u8 S100MDiv1;	/**< 100Mbps Clock Divider 1 */
 	u8 S10MDiv0;	/**< 10Mbps Clock Divider 0 */
 	u8 S10MDiv1;	/**< 10Mbps Clock Divider 1 */
+#endif
 } XEmacPs_Config;
 
 
