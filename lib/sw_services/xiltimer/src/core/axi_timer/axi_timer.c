@@ -157,7 +157,11 @@ static void XAxiTimer_TickInterval(XTimer *InstancePtr, u32 Delay)
 	static u8 IsTickTimerStarted = FALSE;
 
 	if (FALSE == IsTickTimerStarted) {
+#ifdef SDT
+		XAxiTimer_Init(InstancePtr, XTICKTIMER_BASEADDRESS,
+#else
 		XAxiTimer_Init(InstancePtr, XTICKTIMER_DEVICEID,
+#endif
 				&InstancePtr->AxiTimer_TickInst);
 		IsTickTimerStarted = TRUE;
 	}
@@ -257,6 +261,7 @@ static void XTickTimer_ClearAxiTimerInterrupt(XTimer *InstancePtr)
 static void XAxiTimer_ModifyInterval(XTimer *InstancePtr, u32 delay,
 				     XTimer_DelayType DelayType)
 {
+	u32 Status = XST_FAILURE;
 	XTmrCtr *AxiTimerInstPtr = &InstancePtr->AxiTimer_SleepInst;
 	u64 tEnd = 0U;
 	u64 tCur = 0U;
@@ -266,7 +271,11 @@ static void XAxiTimer_ModifyInterval(XTimer *InstancePtr, u32 delay,
 	static u8 IsSleepTimerStarted = FALSE;
 
 	if (FALSE == IsSleepTimerStarted) {
+#ifdef SDT
+		XAxiTimer_Init(InstancePtr, XSLEEPTIMER_BASEADDRESS,
+#else
 		XAxiTimer_Init(InstancePtr, XSLEEPTIMER_DEVICEID,
+#endif
 				&InstancePtr->AxiTimer_SleepInst);
 		IsSleepTimerStarted = TRUE;
 	}

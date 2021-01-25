@@ -124,7 +124,11 @@ static void XCortexr5_ModifyInterval(XTimer *InstancePtr, u32 delay,
 	 * bit in PMCR, cycle counter increments on every 64th bit of processor cycle
 	 */
 #if !defined (ARMR52)
+#ifndef SDT
 	u32 frequency = XPAR_CPU_CORTEXR5_0_CPU_CLK_FREQ_HZ/64;
+#else
+	u32 frequency = XGet_CpuFreq()/64;
+#endif
 #endif
 #if defined (ARMR52)
 	static u8 IsSleepTimerStarted = FALSE;
