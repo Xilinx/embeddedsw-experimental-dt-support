@@ -33,7 +33,6 @@ required:
     - xlnx,ipi-bitmask
     - xlnx,ipi-id
     - interrupts
-    - interrupt-parent
     - xlnx,ipi-target-count
     - child,required:
         - xlnx,ipi-bitmask
