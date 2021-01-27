@@ -26,6 +26,8 @@
 #ifndef XIPIPSU_HW_H_	/**< prevent circular inclusions */
 #define XIPIPSU_HW_H_	/**< by using protection macros */
 
+#include "bspconfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,7 +48,11 @@ extern "C" {
 #define XIPIPSU_BUFFER_OFFSET_RESPONSE		(32U) /**< Buffer offset for response */
 
 /* Number of IPI slots enabled on the device */
-#define XIPIPSU_MAX_TARGETS	XPAR_XIPIPSU_NUM_TARGETS /**< Maximum number of targets */
+#if defined (versal)
+#define XIPIPSU_MAX_TARGETS    10U /**< Maximum number of targets */
+#else
+#define XIPIPSU_MAX_TARGETS    7U /**< Maximum number of targets */
+#endif
 
 /* Register Offsets for each member  of IPI Register Set */
 #define XIPIPSU_TRIG_OFFSET 0x00U /**< Offset for Trigger register */

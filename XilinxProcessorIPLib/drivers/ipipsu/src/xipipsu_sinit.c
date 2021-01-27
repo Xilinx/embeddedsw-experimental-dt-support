@@ -26,10 +26,10 @@
 
 /***************************** Include Files *********************************/
 #include "xil_types.h"
+#include "xipipsu.h"
 #ifndef SDT
 #include "xparameters.h"
 #endif
-#include "xipipsu.h"
 
 /*****************************************************************************/
 

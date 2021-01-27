@@ -337,6 +337,7 @@ XStatus XIpiPsu_WriteMessage(XIpiPsu *InstancePtr, u32 DestCpuMask, u32 *MsgPtr,
 * 			use cases, this is not needed.
 *
 ******************************************************************************/
+#ifndef SDT
 void XIpiPsu_SetConfigTable(u32 DeviceId, XIpiPsu_Config *ConfigTblPtr)
 {
 	u32 Index;
@@ -352,4 +353,5 @@ void XIpiPsu_SetConfigTable(u32 DeviceId, XIpiPsu_Config *ConfigTblPtr)
 		}
 	}
 }
+#endif
 /** @} */
