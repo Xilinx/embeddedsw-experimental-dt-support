@@ -26,7 +26,9 @@
 /***************************** Include Files *********************************/
 
 #include "xemacps_hw.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
