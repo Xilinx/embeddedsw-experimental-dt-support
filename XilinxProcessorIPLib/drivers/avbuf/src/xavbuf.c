@@ -371,7 +371,9 @@ void XAVBuf_CfgInitialize(XAVBuf *InstancePtr, u32 BaseAddr)
 {
 	Xil_AssertVoid(InstancePtr != NULL);
 
+#ifndef SDT
 	InstancePtr->Config.DeviceId = DeviceId;
+#endif
 	InstancePtr->Config.BaseAddr = BaseAddr;
 }
 
