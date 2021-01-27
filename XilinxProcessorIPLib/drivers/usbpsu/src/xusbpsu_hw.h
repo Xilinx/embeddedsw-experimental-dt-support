@@ -31,12 +31,16 @@
 #ifndef XUSBPSU_HW_H	/* Prevent circular inclusions */
 #define XUSBPSU_HW_H	/**< by using protection macros  */
 
+#include "xstatus.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /***************************** Include Files ********************************/
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 
