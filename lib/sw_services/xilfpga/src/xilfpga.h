@@ -101,7 +101,10 @@ extern "C" {
 #include "xil_assert.h"
 #include "xil_printf.h"
 #include "xil_util.h"
+#include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xfpga_config.h"
 /**************************** Type Definitions *******************************/
 /**
