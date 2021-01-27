@@ -1143,7 +1143,11 @@ extern "C" {
 #define XDPPSU_DISPID_TDT_TOP2_VLOC_H_MASK	0x3
 /* @} */
 
+#ifndef SDT
 #define XDPPSU_0_LANE_COUNT			XPAR_PSU_DP_LANE_COUNT
+#else
+#define XDPPSU_0_LANE_COUNT			4
+#endif
 #define XDPPSU_0_LINK_RATE			20
 #define XDPPSU_0_MAX_BITS_PER_COLOR		12
 #define XDPPSU_0_QUAD_PIXEL_ENABLE		0
