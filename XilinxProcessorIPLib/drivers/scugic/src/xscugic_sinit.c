@@ -31,10 +31,10 @@
 
 #include "xil_types.h"
 #include "xil_assert.h"
+#include "xscugic.h"
 #ifndef SDT
 #include "xparameters.h"
 #endif
-#include "xscugic.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -45,8 +45,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Variable Definitions *****************************/
-
+#ifndef SDT
 extern XScuGic_Config XScuGic_ConfigTable[XPAR_SCUGIC_NUM_INSTANCES];
+#else
+extern XScuGic_Config XScuGic_ConfigTable[];
+#endif
 
 /************************** Function Prototypes ******************************/
 
