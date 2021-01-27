@@ -27,7 +27,10 @@
 /***************************** Include Files *********************************/
 
 #include "xcanps_hw.h"
+#include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
