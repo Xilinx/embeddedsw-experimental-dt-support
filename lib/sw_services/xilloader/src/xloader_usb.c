@@ -42,8 +42,14 @@
 #include "xloader_ddr.h"
 
 /************************** Constant Definitions ****************************/
+#ifndef SDT
 #define XLOADER_USB_DEVICE_ID		(XPAR_XUSBPSU_0_DEVICE_ID)
 #define XLOADER_USB2_REG_CTRL_OFFSET	(0x60U)
+#else
+#define XLOADER_USB_DEVICE_ID		(XPAR_XUSBPSU_0_BASEADDR)
+#define XLOADER_USB2_REG_CTRL_OFFSET	(0x60U)
+#endif
+#define XLOADER_DOWNLOAD_COMPLETE	(2U)
 
 /************************** Function Prototypes ******************************/
 
