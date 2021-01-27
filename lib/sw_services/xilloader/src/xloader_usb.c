@@ -35,7 +35,11 @@
 #include "xloader.h"
 
 /************************** Constant Definitions ****************************/
+#ifndef SDT
 #define XLOADER_USB_DEVICE_ID		(XPAR_XUSBPSU_0_DEVICE_ID)
+#else
+#define XLOADER_USB_DEVICE_ID		(XPAR_XUSBPSU_0_BASEADDR)
+#endif
 #define XLOADER_DOWNLOAD_COMPLETE	(2U)
 
 /************************** Function Prototypes ******************************/

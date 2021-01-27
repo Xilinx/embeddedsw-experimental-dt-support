@@ -77,7 +77,11 @@ int XLoader_CframeInit(void)
 	 * look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XCframe_LookupConfig((u16)XPAR_XCFRAME_0_DEVICE_ID);
+#else
+	Config = XCframe_LookupConfig((0);
+#endif
 	if (NULL == Config) {
 		Status = XPlmi_UpdateStatus(XLOADER_ERR_CFRAME_LOOKUP, 0);
 		goto END;

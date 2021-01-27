@@ -201,7 +201,11 @@ int XLoader_OspiInit(u32 DeviceFlags)
 	/*
 	 * Initialize the OSPI driver so that it's ready to use
 	 */
+#ifndef SDT
 	OspiConfig = XOspiPsv_LookupConfig(XLOADER_OSPI_DEVICE_ID);
+#else
+	OspiConfig = XOspiPsv_LookupConfig(0);
+#endif
 	if (NULL == OspiConfig) {
 		Status = XPlmi_UpdateStatus(XLOADER_ERR_OSPI_INIT, 0);
 		XLoader_Printf(DEBUG_GENERAL,"XLOADER_ERR_OSPI_INIT\r\n");
