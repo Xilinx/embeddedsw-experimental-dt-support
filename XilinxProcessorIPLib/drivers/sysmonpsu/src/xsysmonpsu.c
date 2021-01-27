@@ -1901,7 +1901,9 @@ void XSysMonPsu_InitInstance(XSysMonPsu *InstancePtr,
 	Xil_AssertVoid(ConfigPtr != NULL);
 
 	/* Set the values read from the device config and the base address.*/
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = ConfigPtr->BaseAddress;
 
 	/* Indicate the instance is now ready to use */
