@@ -268,7 +268,11 @@ int XDpDma_PlayAudio(XDpDma *InstancePtr, XDpDma_AudioBuffer *Buffer,
  * A table of configuration structures containing the configuration information
  * for each DisplayPort TX core in the system.
  */
+#ifndef SDT
 extern XDpDma_Config XDpDma_ConfigTable[XPAR_XDPDMA_NUM_INSTANCES];
+#else
+extern XDpDma_Config XDpDma_ConfigTable[];
+#endif
 
 #ifdef __cplusplus
 }
