@@ -64,6 +64,7 @@
 #ifndef SDT
 #include "xparameters.h"
 #endif
+#include "xmem_config.h"
 
 	.globl  MMUTableL0
 	.globl  MMUTableL1
@@ -112,6 +113,9 @@ MMUTableL1:
 #ifdef XPAR_PSU_DDR_1_S_AXI_BASEADDR
 .set DDR_1_START, XPAR_PSU_DDR_1_S_AXI_BASEADDR
 .set DDR_1_END, XPAR_PSU_DDR_1_S_AXI_HIGHADDR
+#elif defined (XPAR_PSU_DDR_1_BASEADDRESS)
+.set DDR_1_START, XPAR_PSU_DDR_1_BASEADDRESS
+.set DDR_1_END, XPAR_PSU_DDR_1_HIGHADDRESS
 .set DDR_1_SIZE, (DDR_1_END - DDR_1_START)+1
 .if DDR_1_SIZE > 0x800000000
 /* If DDR size is larger than 32GB, truncate to 32GB */
@@ -163,6 +167,9 @@ MMUTableL2:
 #ifdef XPAR_PSU_DDR_0_S_AXI_BASEADDR
 .set DDR_0_START, XPAR_PSU_DDR_0_S_AXI_BASEADDR
 .set DDR_0_END, XPAR_PSU_DDR_0_S_AXI_HIGHADDR
+#elif defined(XPAR_PSU_DDR_0_BASEADDRESS)
+.set DDR_0_START, XPAR_PSU_DDR_0_BASEADDRESS
+.set DDR_0_END, XPAR_PSU_DDR_0_HIGHADDRESS
 .set DDR_0_SIZE, (DDR_0_END - DDR_0_START)+1
 .if DDR_0_SIZE > 0x80000000
 /* If DDR size is larger than 2GB, truncate to 2GB */
