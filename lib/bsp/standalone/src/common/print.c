@@ -24,7 +24,7 @@ void print(const char8 *ptr)
 #if defined (__aarch64__) && (HYP_GUEST == 1) && (EL1_NONSECURE == 1) && defined (XEN_USE_PV_CONSOLE)
 	XPVXenConsole_Write(ptr);
 #else
-#ifdef STDOUT_BASEADDRESS
+#ifdef STDOUT_BASEADDRESS || defined(SDT)
   while (*ptr != (char8)0) {
     outbyte (*ptr);
 	ptr++;
