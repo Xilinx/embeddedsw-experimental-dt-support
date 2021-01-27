@@ -33,7 +33,11 @@
 /**************************** Type Definitions *******************************/
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 static u32 XIpiPs_Init(XMailbox *InstancePtr, u8 DeviceId);
+#else
+static u32 XIpiPs_Init(XMailbox *InstancePtr, UINTPTR BaseAddress);
+#endif
 static u32 XIpiPs_Send(XMailbox *InstancePtr, u8 Is_Blocking);
 static u32 XIpiPs_SendData(XMailbox *InstancePtr, void *MsgBufferPtr,
 			   u32 MsgLen, u8 BufferType, u8 Is_Blocking);
@@ -57,7 +61,11 @@ static void XIpiPs_IntrHandler(void *XMailboxPtr);
  * 		XST_FAILURE in case of failure
  */
 /****************************************************************************/
+#ifndef SDT
 u32 XMailbox_Initialize(XMailbox *InstancePtr, u8 DeviceId)
+#else
+u32 XMailbox_Initialize(XMailbox *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	u32 Status = XST_FAILURE;
 
@@ -70,7 +78,11 @@ u32 XMailbox_Initialize(XMailbox *InstancePtr, u8 DeviceId)
 	InstancePtr->XMbox_IPI_Send = XIpiPs_Send;
 	InstancePtr->XMbox_IPI_Recv = XIpiPs_RecvData;
 
+#ifndef SDT
 	Status = XIpiPs_Init(InstancePtr, DeviceId);
+#else
+	Status = XIpiPs_Init(InstancePtr, BaseAddress);
+#endif
 	return Status;
 }
 
@@ -85,14 +97,22 @@ u32 XMailbox_Initialize(XMailbox *InstancePtr, u8 DeviceId)
  * 		XST_FAILURE in case of failure
  */
 /****************************************************************************/
+#ifndef SDT
 static u32 XIpiPs_Init(XMailbox *InstancePtr, u8 DeviceId)
+#else
+static u32 XIpiPs_Init(XMailbox *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	u32 Status = XST_FAILURE;
 	XIpiPsu_Config *CfgPtr;
 	XMailbox_Agent *DataPtr = &InstancePtr->Agent;
 	XIpiPsu *IpiInstancePtr = &DataPtr->IpiInst;
 
+#ifndef SDT
 	CfgPtr = XIpiPsu_LookupConfig(DeviceId);
+#else
+	CfgPtr = XIpiPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == CfgPtr) {
 		return Status;
 	}
@@ -254,7 +274,11 @@ static XStatus XIpiPs_RegisterIrq(XScuGic *IntcInstancePtr,
 	XScuGic_Config *IntcConfigPtr;
 
 	/* Initialize the interrupt controller driver */
+#ifndef SDT
 	IntcConfigPtr = XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
+#else
+	IntcConfigPtr = XScuGic_LookupConfig(0);
+#endif
 	if (NULL == IntcConfigPtr) {
 		return XST_FAILURE;
 	}

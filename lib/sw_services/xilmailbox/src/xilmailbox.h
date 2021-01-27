@@ -95,7 +95,11 @@ typedef enum {
 } XMailbox_Handler;
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 u32 XMailbox_Initialize(XMailbox *InstancePtr, u8 DeviceId);
+#else
+u32 XMailbox_Initialize(XMailbox *InstancePtr, UINTPTR BaseAddress);
+#endif
 u32 XMailbox_Send(XMailbox *InstancePtr, u32 RemoteId, u8 Is_Blocking);
 u32 XMailbox_SendData(XMailbox *InstancePtr, u32 RemoteId,
 		      void *BufferPtr, u32 MsgLen, u8 BufferType, u8 Is_Blocking);
