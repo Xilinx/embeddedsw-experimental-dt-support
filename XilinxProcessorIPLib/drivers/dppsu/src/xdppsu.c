@@ -1346,7 +1346,9 @@ void XDpPsu_CfgInitialize(XDpPsu *InstancePtr, XDpPsu_Config *ConfigPtr,
 	Xil_AssertVoid(ConfigPtr != NULL);
 	Xil_AssertVoid(EffectiveAddr != 0x0);
 
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddr = EffectiveAddr;
 	/* TODO: Read from the clock framework */
 	InstancePtr->SAxiClkHz = XDPPSU_0_S_AXI_ACLK;
