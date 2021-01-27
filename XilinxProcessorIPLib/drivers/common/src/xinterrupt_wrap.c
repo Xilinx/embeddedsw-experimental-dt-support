@@ -52,7 +52,7 @@ int XConfigInterruptCntrl(UINTPTR IntcParent) {
 	if (XGet_IntcType(IntcParent) == XINTC_TYPE_IS_SCUGIC) 
 	{
 	#if defined (XPAR_SCUGIC)
-		XScugic_Config *CfgPtr = NULL;
+		XScuGic_Config *CfgPtr = NULL;
 		if (XScuGicInstance.IsReady != XIL_COMPONENT_IS_READY) {
 			CfgPtr = XScuGic_LookupConfig(BaseAddr);
 			Status = XScuGic_CfgInitialize(&XScuGicInstance, CfgPtr, 0);
