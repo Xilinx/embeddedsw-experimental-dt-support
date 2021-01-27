@@ -159,7 +159,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Variable Definitions *****************************/
+#ifndef SDT
 static u32 CpuId = XPAR_CPU_ID; /**< CPU Core identifier */
+#else
+static u32 CpuId; /**< CPU Core identifier */
+#endif
 
 /************************** Function Prototypes ******************************/
 

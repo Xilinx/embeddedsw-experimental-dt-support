@@ -91,7 +91,9 @@
 #include "xil_types.h"
 #include "xil_assert.h"
 #include "xscugic.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -108,7 +110,6 @@ static void CPUInit(const XScuGic_Config *Config);
 static XScuGic_Config *LookupConfigByBaseAddress(u32 CpuBaseAddress);
 
 /************************** Variable Definitions *****************************/
-
 
 /*****************************************************************************/
 /**

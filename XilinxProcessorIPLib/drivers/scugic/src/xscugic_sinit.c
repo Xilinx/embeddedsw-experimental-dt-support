@@ -33,10 +33,10 @@
 
 #include "xil_types.h"
 #include "xil_assert.h"
+#include "xscugic.h"
 #ifndef SDT
 #include "xparameters.h"
 #endif
-#include "xscugic.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -47,7 +47,6 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Variable Definitions *****************************/
-
 
 /************************** Function Prototypes ******************************/
 
