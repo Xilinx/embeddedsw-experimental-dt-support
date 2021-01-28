@@ -44,7 +44,11 @@ extern "C" {
 
 #define PM_IPI_TIMEOUT		(~0U)
 
+#ifndef SDT
 #define IPI_PMU_PM_INT_MASK	XPAR_XIPIPS_TARGET_PSU_PMU_0_CH0_MASK
+#else
+#define IPI_PMU_PM_INT_MASK	0x00010000U
+#endif
 
 #define BIT32(n)				((u32)1U << (n))
 
