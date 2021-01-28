@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 2.8.9)
+
+
+add_subdirectory(common)
+if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
+	OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53")
+	OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53-32")
+	OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64"))
+add_subdirectory(apu)
+else()
+add_subdirectory(rpu)
+endif()
