@@ -687,7 +687,11 @@ u32 XSecure_MemCopy(void * DestPtr, void * SrcPtr, u32 Size)
 	Xil_AssertNonvoid(Size != 0x0U);
 
 	XSecure_SssInitialize(&SssInstance);
+#ifndef SDT
 	Status = XSecure_SssDmaLoopBack(&SssInstance, CsuDma.Config.DeviceId);
+#else
+	Status = XSecure_SssDmaLoopBack(&SssInstance, 0);
+#endif
 	if(Status != (u32)XST_SUCCESS){
 		goto ENDF;
 	}

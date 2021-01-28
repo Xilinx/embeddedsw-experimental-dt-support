@@ -55,6 +55,9 @@ extern "C" {
 #include "xsecure_aes.h"
 #include "xsecure_rsa.h"
 #include "xsecure_sha.h"
+#ifdef SDT
+#include "xsecure_config.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 

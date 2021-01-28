@@ -519,8 +519,13 @@ static u32 XSecure_Sha3DmaTransfer(XSecure_Sha3 *InstancePtr, const u8 *Data,
 	Xil_AssertNonvoid(InstancePtr != NULL);
 
 	/* Configure the SSS for SHA3 hashing. */
+#ifndef SDT
 	Status = XSecure_SssSha(&(InstancePtr->SssInstance),
 				InstancePtr->CsuDmaPtr->Config.DeviceId);
+#else
+	Status = XSecure_SssSha(&(InstancePtr->SssInstance),
+				0);
+#endif
 	if (Status != (u32)XST_SUCCESS){
 		goto ENDF;
 	}
