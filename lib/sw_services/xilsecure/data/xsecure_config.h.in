@@ -1,0 +1,6 @@
+#ifndef XSECURE_CONFIG_H
+#define XSECURE_CONFIG_H
+
+#cmakedefine XSECURE_TRUSTED_ENVIRONMENT
+
+#endif /* XSECURE_CONFIG_H */
