@@ -101,6 +101,9 @@ extern "C" {
 #endif
 #endif
 #include "xstatus.h"
+#ifdef SDT
+#include "xilskey_config.h"
+#endif
 #include "xil_util.h"
 
 /************************** Constant Definitions ****************************/
@@ -145,10 +148,18 @@ extern "C" {
 #endif
 
 #ifdef XSK_ZYNQ_ULTRA_MP_PLATFORM
+#ifndef SDT
 #define XSYSMON_PSU_DEVICE_ID	XPAR_XSYSMONPSU_0_DEVICE_ID
+#else
+#define XSYSMON_PSU_DEVICE_ID	XPAR_XSYSMONPSU_0_BASEADDR
+#endif
 
 /* ZynqMp efusePs ps Ref Clk frequency */
+#ifndef SDT
 #define XSK_ZYNQMP_EFUSEPS_PS_REF_CLK_FREQ	XPAR_PSU_PSS_REF_CLK_FREQ_HZ
+#else
+#define XSK_ZYNQMP_EFUSEPS_PS_REF_CLK_FREQ	33330000U /* FIX ME */
+
 #endif
 
 #ifdef XSK_MICROBLAZE_PLATFORM
