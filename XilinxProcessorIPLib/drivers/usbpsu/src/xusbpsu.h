@@ -72,17 +72,7 @@ extern "C" {
 #include "xil_clocking.h"
 #endif
 
-/*
- * The header sleep.h and API usleep() can only be used with an arm design.
- * MB_Sleep() is used for microblaze design.
- */
-#if defined (__arm__) || defined (__aarch64__) || (__ICCARM__)
 #include "sleep.h"
-#endif
-
-#ifdef __MICROBLAZE__
-#include "microblaze_sleep.h"
-#endif
 #include "xil_cache.h"
 
 /************************** Constant Definitions ****************************/
