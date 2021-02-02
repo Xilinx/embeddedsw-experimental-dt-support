@@ -24,6 +24,9 @@
 
 /***************************** Include Files *********************************/
 #include "xuartpsv_hw.h"
+#ifdef SDT
+#include "xuartpsv_config.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -100,4 +103,17 @@ void XUartPsv_ResetHw(UINTPTR BaseAddress)
 {
 	(void) BaseAddress;
 }
+
+#ifdef SDT
+#ifdef XPAR_STDIN_IS_UARTPSV
+void outbyte(char c) {
+         XUartPsv_SendByte(STDOUT_BASEADDRESS, c);
+}
+
+char inbyte(void) {
+         return XUartPsv_RecvByte(STDIN_BASEADDRESS);
+}
+#endif
+#endif
+/** @} */
 /** @} */
