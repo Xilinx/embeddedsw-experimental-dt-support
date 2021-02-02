@@ -124,7 +124,9 @@ s32 XMcDma_Initialize(XMcdma *InstancePtr, XMcdma_Config *CfgPtr)
 	memset(InstancePtr, 0, sizeof(XMcdma));
 
 	InstancePtr->Config.BaseAddress = CfgPtr->BaseAddress;
+#ifndef SDT
 	InstancePtr->Config.DeviceId = CfgPtr->DeviceId;
+#endif
 	InstancePtr->Config.AddrWidth = CfgPtr->AddrWidth;
 	InstancePtr->Config.Has_SingleIntr = CfgPtr->Has_SingleIntr;
 	InstancePtr->Config.HasMM2S = CfgPtr->HasMM2S;
