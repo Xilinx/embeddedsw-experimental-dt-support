@@ -317,9 +317,14 @@ extern "C" {
 /*@}*/
 
 #define XIOMODULE_STANDARD_VECTOR_ADDRESS_WIDTH	32U
+
+#ifdef SDT
+#define XPAR_IOMODULE_INTC_MAX_INTR_SIZE  16U
+#endif
 /**
  *@endcond
  */
+
 /**************************** Type Definitions *******************************/
 
 /**

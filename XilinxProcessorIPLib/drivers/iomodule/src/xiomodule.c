@@ -214,7 +214,11 @@ int XIOModule_Initialize(XIOModule * InstancePtr, u32 BaseAddress)
 	/*
 	 * Initialize all Programmable Interrupt Timers
 	 */
+#ifndef SDT
         XIOModule_Timer_Initialize(InstancePtr, DeviceId);
+#else
+        XIOModule_Timer_Initialize(InstancePtr, BaseAddress);
+#endif
 
 	/*
 	 * Initialize all UART related status
