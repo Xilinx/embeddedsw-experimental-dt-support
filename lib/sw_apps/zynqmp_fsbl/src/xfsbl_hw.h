@@ -46,12 +46,17 @@ extern "C" {
 #include "xparameters.h"
 #include "xil_types.h"
 #include "sleep.h"
+#include "xstatus.h"
 
 #include "xfsbl_config.h"
 #include "xfsbl_debug.h"
 #include "xfsbl_error.h"
 #include "xfsbl_hooks.h"
 #include "xfsbl_misc.h"
+
+#ifdef SDT
+#include "xpm_config.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
