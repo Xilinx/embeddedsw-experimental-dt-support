@@ -61,7 +61,6 @@ extern "C" {
 
 #if defined __MICROBLAZE__
 #  include "mb_interface.h"
-#  include "xparameters.h"   /* XPAR constants used below in MB section */
 
 #elif defined __PPC__
 #  include "sleep.h"

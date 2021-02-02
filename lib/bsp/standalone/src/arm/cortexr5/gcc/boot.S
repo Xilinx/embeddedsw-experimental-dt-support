@@ -67,8 +67,10 @@
 * </pre>
 *
 ******************************************************************************/
-
+#include "bspconfig.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 
 .global _prestart
