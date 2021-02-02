@@ -68,8 +68,6 @@ required:
     - xlnx,micro-dma
     - xlnx,addrwidth
     - xlnx,sg-length-width
-    - interrupts: 2
-    - interrupt-parent
 
 examples:
     xaxidma_example_simple_poll.c:

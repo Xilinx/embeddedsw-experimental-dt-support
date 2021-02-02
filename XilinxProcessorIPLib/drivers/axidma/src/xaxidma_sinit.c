@@ -106,7 +106,7 @@ XAxiDma_Config *XAxiDma_LookupConfigBaseAddr(UINTPTR Baseaddr)
 #else
 XAxiDma_Config *XAxiDma_LookupConfig(UINTPTR BaseAddress)
 {
-	extern XAxiDma_Config XAxidma_ConfigTable[];
+	extern XAxiDma_Config XAxiDma_ConfigTable[];
 	XAxiDma_Config *CfgPtr;
 	u32 Index;
 
