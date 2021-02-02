@@ -1318,6 +1318,7 @@ void XCanFd_AcceptFilterGet(XCanFd *InstancePtr, u32 FilterIndex,
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XCanFd_Config *XCanFd_GetConfig(unsigned int InstanceIndex)
 {
 	XCanFd_Config *CfgPtr;
@@ -1331,6 +1332,7 @@ XCanFd_Config *XCanFd_GetConfig(unsigned int InstanceIndex)
 
 	return CfgPtr;
 }
+#endif
 
 /******************************************************************************/
 /**
