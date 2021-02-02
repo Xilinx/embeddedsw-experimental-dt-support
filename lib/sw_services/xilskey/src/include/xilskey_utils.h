@@ -89,6 +89,8 @@ extern "C" {
 
 /***************************** Include Files ********************************/
 #include "xparameters.h"
+#include "bspconfig.h"
+
 #ifdef XPAR_XSK_MICROBLAZE_PLATFORM
 #include "xsysmon.h"
 #include "xtmrctr.h"
@@ -100,10 +102,13 @@ extern "C" {
 #include "xadcps.h"
 #endif
 #endif
+
 #include "xstatus.h"
+
 #ifdef SDT
 #include "xilskey_config.h"
 #endif
+
 #include "xil_util.h"
 
 /************************** Constant Definitions ****************************/
@@ -118,7 +123,6 @@ extern "C" {
 #else
 #define XSK_ZYNQ_PLATFORM
 #endif
-
 #endif
 
 /* Definitions for Ultrascale and Ultrascale plus */
@@ -153,13 +157,13 @@ extern "C" {
 #else
 #define XSYSMON_PSU_DEVICE_ID	XPAR_XSYSMONPSU_0_BASEADDR
 #endif
+#endif
 
 /* ZynqMp efusePs ps Ref Clk frequency */
 #ifndef SDT
 #define XSK_ZYNQMP_EFUSEPS_PS_REF_CLK_FREQ	XPAR_PSU_PSS_REF_CLK_FREQ_HZ
 #else
 #define XSK_ZYNQMP_EFUSEPS_PS_REF_CLK_FREQ	33330000U /* FIX ME */
-
 #endif
 
 #ifdef XSK_MICROBLAZE_PLATFORM
