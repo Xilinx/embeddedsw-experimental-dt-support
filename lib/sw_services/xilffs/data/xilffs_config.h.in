@@ -3,7 +3,7 @@
 
 #include "xparameters.h"
 
-#if (defined XPAR_SDPS_0_BASEADDR)
+#if (defined XPAR_XSDPS_0_BASEADDR)
 #cmakedefine FILE_SYSTEM_INTERFACE_SD @FILE_SYSTEM_INTERFACE_SD@
 #endif
 
