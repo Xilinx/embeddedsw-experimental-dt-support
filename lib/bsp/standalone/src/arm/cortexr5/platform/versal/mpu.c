@@ -39,7 +39,13 @@
 #include "xreg_cortexr5.h"
 #include "xil_mpu.h"
 #include "xpseudo_asm.h"
+#include "bspconfig.h"
+
+#ifndef SDT
 #include "xparameters.h"
+#else
+#include "xmem_config.h"
+#endif
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
@@ -137,9 +143,15 @@ void Init_MPU(void)
 	Xil_DisableMPURegions();
 
 	Addr = 0x00000000U;
+#ifndef SDT
 #ifdef	XPAR_AXI_NOC_DDR_LOW_0_BASEADDR
 	/* If the DDR is present, configure region as per DDR size */
 	size = (XPAR_AXI_NOC_DDR_LOW_0_HIGHADDR - XPAR_AXI_NOC_DDR_LOW_0_BASEADDR) + 1;
+#else
+#ifdef XPAR_AXI_NOC_0_BASEADDRESS
+	size = (XPAR_AXI_NOC_0_BASEADDRESS - XPAR_AXI_NOC_0_HIGHADDRESS) + 1;
+#endif
+#endif
 	if (size < 0x80000000) {
 		/* Lookup the size.  */
 		for (i = 0; i < sizeof region_size / sizeof region_size[0]; i++) {

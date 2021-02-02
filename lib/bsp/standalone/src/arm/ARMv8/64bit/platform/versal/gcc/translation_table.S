@@ -75,8 +75,13 @@
 *
 *
 ******************************************************************************/
-#include "xparameters.h"
 #include "bspconfig.h"
+
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xmem_config.h"
+#endif
 
 	.globl  MMUTableL0
 	.globl  MMUTableL1
@@ -150,6 +155,7 @@ MMUTableL1:
 .endr
 
 .set UNDEF_START, 0
+#ifndef SDT
 #ifdef XPAR_AXI_NOC_DDR_LOW_1_BASEADDR
 .set DDR_1_START, XPAR_AXI_NOC_DDR_LOW_1_BASEADDR
 .set DDR_1_END, XPAR_AXI_NOC_DDR_LOW_1_HIGHADDR
@@ -158,6 +164,17 @@ MMUTableL1:
 .set UNDEF_START, (DDR_1_START - DDR_LOW_1_REGION_START_ADDR)
 .set UNDEF_START, (UNDEF_START)/0x40000000
 .endif
+#else
+#ifdef XPAR_AXI_NOC_0_BASEADDRESS
+.set DDR_1_START, XPAR_AXI_NOC_0_BASEADDRESS
+.set DDR_1_END, XPAR_AXI_NOC_0_HIGHADDRESS
+
+.if DDR_1_START > DDR_LOW_1_REGION_START_ADDR
+.set UNDEF_START, (DDR_1_START - DDR_LOW_1_REGION_START_ADDR)
+.set UNDEF_START, (UNDEF_START)/0x40000000
+.endif
+#endif
+#endif
 
 .set DDR_1_SIZE, (DDR_1_END - DDR_1_START)+1
 .if DDR_1_SIZE > 0x800000000

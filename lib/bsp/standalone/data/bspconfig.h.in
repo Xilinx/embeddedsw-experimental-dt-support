@@ -14,5 +14,6 @@
 #cmakedefine VERSAL_PLM @VERSAL_PLM@
 #cmakedefine PLATFORM_MB @PLATFORM_MB@
 #define SDT
+#define XPAR_CPU_ID 0
 
 #endif /* BSPCONFIG_H */

@@ -1,1 +1,5 @@
-add_subdirectory(${MACHINE})
+if("${CMAKE_MACHINE}" STREQUAL "Versal")
+add_subdirectory(versal)
+else()
+add_subdirectory(ZynqMP)
+endif()
