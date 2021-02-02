@@ -69,7 +69,7 @@ XSysMonPsv_Config *XSysMonPsv_LookupConfig(void)
 			CfgPtr = &XSysMonPsv_ConfigTable[Index];
 	}
 #else
-	CfgPtr = &XSysmonpsv_ConfigTable[0];
+	CfgPtr = &XSysMonPsv_ConfigTable[0];
 #endif
 
 	return CfgPtr;
