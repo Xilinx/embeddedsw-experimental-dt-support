@@ -76,6 +76,7 @@
 #include "diskio.h"
 #include "ff.h"
 #include "xil_types.h"
+#include "xilffs_config.h"
 
 #ifdef FILE_SYSTEM_INTERFACE_SD
 #include "xsdps.h"		/* SD device driver */
