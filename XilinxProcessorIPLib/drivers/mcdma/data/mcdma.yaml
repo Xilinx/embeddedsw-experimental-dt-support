@@ -60,8 +60,6 @@ required:
     - xlnx,sg-include-stscntrl-strm
     - xlnx,sg-use-stsapp-length
     - dma-coherent
-    - interrupts: 32
-    - interrupt-parent
 
 examples:
     xmcdma_interrupt_example.c:
