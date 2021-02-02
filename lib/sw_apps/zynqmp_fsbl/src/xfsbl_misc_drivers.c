@@ -45,8 +45,14 @@
 /**
  * Include IPI driver only if IPI device is present
  */
+#ifndef SDT
 #ifdef XPAR_XIPIPSU_0_DEVICE_ID
 #include "xipipsu.h"
+#else
+#ifdef XPAR_XIPIPSU_0_BASEADDR
+#include "xipipsu.h"
+#endif
+#endif
 #endif
 
 #ifdef XPAR_XILPM_ENABLED
@@ -60,9 +66,14 @@
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
+#ifndef SDT
 #define IPI_DEVICE_ID			XPAR_XIPIPSU_0_DEVICE_ID
 #define IPI_PMU_PM_INT_MASK		XPAR_XIPIPS_TARGET_PSU_PMU_0_CH0_MASK
+#else
+#define IPI_DEVICE_ID			XPAR_XIPIPSU_0_BASEADDR
+#define IPI_PMU_PM_INT_MASK		0x00010000U	
+#endif
 #define PM_INIT				21U
 #endif
 #define PM_INIT_COMPLETED_KEY		0x5A5A5A5AU

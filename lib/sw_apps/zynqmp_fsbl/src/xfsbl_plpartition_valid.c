@@ -59,7 +59,7 @@
 /***************************** Include Files *********************************/
 
 #include "xfsbl_plpartition_valid.h"
-#include "xtime_l.h"
+#include "xiltimer.h"
 
 /************************** Constant Definitions ****************************/
 

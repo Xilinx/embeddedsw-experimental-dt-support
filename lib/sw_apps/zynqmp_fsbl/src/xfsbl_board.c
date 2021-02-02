@@ -592,7 +592,11 @@ static u32 XFsbl_BoardConfig(void)
 #endif
 
 	/* Initialize the IIC0 driver so that it is ready to use */
+#ifndef SDT
 	I2c0CfgPtr = XIicPs_LookupConfig(XPAR_XIICPS_0_DEVICE_ID);
+#else
+	I2c0CfgPtr = XIicPs_LookupConfig(XPAR_XIICPS_0_BASEADDR);
+#endif
 	if (I2c0CfgPtr == NULL) {
 		UStatus = XFSBL_ERROR_I2C_INIT;
 		XFsbl_Printf(DEBUG_GENERAL, "XFSBL_ERROR_I2C_INIT\r\n");
@@ -609,7 +613,11 @@ static u32 XFsbl_BoardConfig(void)
 
 #if defined(XPS_BOARD_ZCU216) || defined(XPS_BOARD_ZCU208)
 	/* Initialize the IIC1 driver so that it is ready to use */
+#ifndef SDT
 	I2c1CfgPtr = XIicPs_LookupConfig(XPAR_XIICPS_1_DEVICE_ID);
+#else
+	I2c1CfgPtr = XIicPs_LookupConfig(XPAR_XIICPS_1_BASEADDR);
+#endif
 	if (I2c1CfgPtr == NULL) {
 		UStatus = XFSBL_ERROR_I2C_INIT;
 		XFsbl_Printf(DEBUG_GENERAL, "XFSBL_ERROR_I2C_INIT\r\n");

@@ -40,7 +40,7 @@ extern "C" {
 #include "xfsbl_misc_drivers.h"
 #include "xfsbl_hw.h"
 #include "xplatform_info.h"
-#include "xtime_l.h"
+#include "xiltimer.h"
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
