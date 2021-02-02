@@ -99,6 +99,8 @@ XMcdma_Config *XMcdma_LookupConfig(UINTPTR BaseAddress)
 	}
 }
 #endif
+
+#ifndef SDT
 /*****************************************************************************/
 /**
 *
@@ -131,4 +133,5 @@ XMcdma_Config *XMcdma_LookupConfigBaseAddr(UINTPTR Baseaddr)
 
 	return CfgPtr;
 }
+#endif
 /** @} */
