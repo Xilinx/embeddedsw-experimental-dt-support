@@ -69,7 +69,6 @@
 /***************************** Include Files *********************************/
 
 
-#include "xparameters.h"
 #include "xiomodule.h"
 #include "xil_types.h"
 #include "xil_assert.h"
@@ -158,8 +157,13 @@ void XIOModule_InterruptHandler(XIOModule * InstancePtr)
 	/* Use the instance's device ID to call the main interrupt handler.
 	 * (the casts are to avoid a compiler warning)
 	 */
+#ifndef SDT
 	XIOModule_DeviceInterruptHandler((void *)
 			         ((UINTPTR) (InstancePtr->CfgPtr->DeviceId)));
+#else
+	XIOModule_DeviceInterruptHandler((void *)
+			         ((UINTPTR) (InstancePtr->CfgPtr->BaseAddress)));
+#endif
 }
 
 
