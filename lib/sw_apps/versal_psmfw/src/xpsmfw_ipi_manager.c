@@ -27,7 +27,7 @@
 #include "xpsmfw_ipi_manager.h"
 #include "ipi.h"
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#ifdef XPAR_XIPIPSU_0_BASEADDR
 /* Instance of IPI Driver */
 static XIpiPsu IpiInst;
 static XIpiPsu *IpiInstPtr = &IpiInst;
@@ -38,7 +38,11 @@ XStatus XPsmfw_IpiManagerInit(void)
 	XIpiPsu_Config *IpiCfgPtr;
 
 	/* Load Config for PSM IPI */
+#ifndef SDT
 	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_DEVICE_ID);
+#else
+	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+#endif
 
 	if (IpiCfgPtr == NULL) {
 		Status = XST_FAILURE;
