@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 #include "xparameters.h"
+#include "bspconfig.h"
 
 /************* User Configurable Options ***************/
 
@@ -51,8 +52,10 @@ extern "C" {
 #endif
 
 /* PMU clock frequency in Hz */
+#ifndef SDT
 #ifndef XPFW_CFG_PMU_CLK_FREQ
 #define XPFW_CFG_PMU_CLK_FREQ XPAR_CPU_CORE_CLOCK_FREQ_HZ
+#endif
 #endif
 
 /* Let the MB sleep when it is Idle in Main Loop */

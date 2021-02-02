@@ -9,9 +9,12 @@
 /**
  * PMU PIT Clock Frequency and Tick Calculation
  */
+#ifndef SDT
 #define PMU_PIT_CLK_FREQ	XPFW_CFG_PMU_CLK_FREQ
-#define TICK_MILLISECONDS	10U
 #define COUNT_PER_TICK ((PMU_PIT_CLK_FREQ / 1000U)* TICK_MILLISECONDS )
+#endif
+
+#define TICK_MILLISECONDS	10U
 
 /**
  * Microblaze IOModule PIT Register Offsets
@@ -88,6 +91,10 @@ done:
 XStatus XPfw_SchedulerStart(XPfw_Scheduler_t *SchedPtr)
 {
 	XStatus Status;
+#ifdef SDT
+	u32 CpuFreq = XGet_CpuFreq();
+	u32 CountPerTick = (CpuFreq / 1000U) * TICK_MILLISECONDS ;
+#endif
 
 	if (SchedPtr == NULL) {
 		Status = XST_FAILURE;
@@ -96,8 +103,13 @@ XStatus XPfw_SchedulerStart(XPfw_Scheduler_t *SchedPtr)
 
 	SchedPtr->Enabled = (u32)TRUE;
 
+#ifndef SDT
 	XPfw_Write32(SchedPtr->PitBaseAddr + PIT_PRELOAD_OFFSET,
 			COUNT_PER_TICK);
+#else
+	XPfw_Write32(SchedPtr->PitBaseAddr + PIT_PRELOAD_OFFSET,
+			CountPerTick);
+#endif
 	XPfw_Write32(SchedPtr->PitBaseAddr + PIT_CONTROL_OFFSET, 3U);
 	Status = XST_SUCCESS;
 

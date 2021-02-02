@@ -11,7 +11,7 @@
 #include "pm_common.h"
 #include "xpfw_config.h"
 #include "xparameters.h"
-#ifdef XPAR_XQSPIPSU_0_DEVICE_ID
+#ifdef XPAR_XQSPIPSU_0_BASEADDR
 	#include <xqspipsu.h>
 #else
 	#error "ENABLE_POS_QSPI is defined but qspi device is not available"
