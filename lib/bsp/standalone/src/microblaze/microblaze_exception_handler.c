@@ -25,9 +25,7 @@
 
 /***************************** Include Files *********************************/
 #include "microblaze_exceptions_i.h"
-#include "microblaze_exceptions_g.h"
 
-#ifdef MICROBLAZE_EXCEPTIONS_ENABLED                    /* If exceptions are enabled in the processor */
 /************************** Constant Definitions *****************************/
 
 
@@ -63,5 +61,3 @@ void microblaze_register_exception_handler(u32 ExceptionId, Xil_ExceptionHandler
    MB_ExceptionVectorTable[ExceptionId].Handler = Handler;
    MB_ExceptionVectorTable[ExceptionId].CallBackRef = DataPtr;
 }
-
-#endif  /* MICROBLAZE_EXCEPTIONS_ENABLED */

@@ -26,6 +26,7 @@
 
 #include "xil_types.h"
 #include "xil_exception.h"
+#include "mb_interface.h"
 
 #include "microblaze_exceptions_g.h"
 #include "microblaze_interrupts_i.h"
@@ -61,6 +62,8 @@ typedef struct {
  */
 
 /************************** Variable Definitions *****************************/
+static XMicroblaze_Config *CfgPtr = XGet_CpuCfgPtr();
+
 extern MB_ExceptionVectorTableEntry MB_ExceptionVectorTable[XIL_EXCEPTION_ID_INT];
 extern MB_InterruptVectorTableEntry MB_InterruptVectorTable[MB_INTERRUPT_VECTOR_TABLE_ENTRIES];
 
@@ -174,6 +177,55 @@ void Xil_ExceptionRemoveHandler(u32 Id)
 		MB_ExceptionVectorTable[Id].CallBackRef = NULL;
 #endif
 	}
+}
+
+void microblaze_enable_exceptions(void) {
+	UINTPTR val=0;
+
+	if (CfgPtr->UseMsrInstr) {
+                msrset(XIL_EXCEPTION_MASK);
+        } else {
+                val = mfmsr();
+                mtmsr(val | (XIL_EXCEPTION_MASK));
+        }
+
+}
+
+void microblaze_disable_exceptions(void) {
+        UINTPTR val=0;
+
+        if (CfgPtr->UseMsrInstr) {
+                msrclr(XIL_EXCEPTION_MASK);
+        } else {
+                val = mfmsr();
+                mtmsr(val & (~XIL_EXCEPTION_MASK));
+        }
+
+}
+
+void microblaze_enable_interrupts(void) {
+	UINTPTR val=0;
+
+	if (CfgPtr->UseMsrInstr) {
+                msrset(XIL_INTERRUPTS_MASK);
+        } else {
+                val = mfmsr();
+                mtmsr(val | (XIL_INTERRUPTS_MASK));
+        }
+
+}
+
+
+void microblaze_disable_interrupts(void) {
+        UINTPTR val=0;
+
+        if (CfgPtr->UseMsrInstr) {
+                msrclr(XIL_INTERRUPTS_MASK);
+        } else {
+                val = mfmsr();
+                mtmsr(val | (~XIL_INTERRUPTS_MASK));
+        }
+
 }
 /**
 * @} End of "addtogroup microblaze_exception_apis".

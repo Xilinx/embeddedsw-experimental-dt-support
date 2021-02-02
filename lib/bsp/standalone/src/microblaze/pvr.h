@@ -37,7 +37,6 @@
 
 #include "xil_types.h"
 #include "xil_assert.h"
-#include "xparameters.h"
 #include "mb_interface.h"
 #include "bspconfig.h"
 

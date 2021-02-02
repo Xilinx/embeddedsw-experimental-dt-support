@@ -30,6 +30,7 @@
 #include "xil_types.h"
 #include "xil_assert.h"
 #include "xil_exception.h"
+#include "xmicroblaze_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -436,6 +437,44 @@ extern void microblaze_init_dcache_range (s32 , s32 )  __attribute__((deprecated
                                     mb_fpex_op_b;                       \
                                 })
 
+
+#define mtwdcflush(val)   ({  __asm__ __volatile__ (      \
+                                "wdc.flush \t%0,r0\n\tnop\n" :: "d" (val)     \
+                            );                                      \
+                        })
+
+#define mtwdcclear(val1, val2)   ({  __asm__ __volatile__ (      \
+                                "wdc.clear \t%0,%1\n\tnop\n" :: "d" (val1), "d" (val2)     \
+                            );                                      \
+                        })
+
+#define mtwdcextflush(val)   ({  __asm__ __volatile__ (      \
+                                "wdc.ext.flush \t%0,r0\n\tnop\n" :: "d" (val)     \
+                            );                                      \
+                        })
+#define mtwdcextclear(val)   ({  __asm__ __volatile__ (      \
+                                "wdc.ext.clear \t%0,r0\n\tnop\n" :: "d" (val)     \
+                            );                                      \
+                        })
+#define mtwdc(val)   ({  __asm__ __volatile__ (      \
+                                "wdc \t%0,r0\n\tnop\n" :: "d" (val)     \
+                            );                                      \
+                        })
+
+#define mtwic(val)   ({  __asm__ __volatile__ (      \
+                                "wic \t%0,r0\n\tnop\n" :: "d" (val)     \
+                            );                                      \
+                        })
+
+#define msrclr(mask) ({ __asm__ __volatile__ ("	 msrclr	r0, %0;"	\
+				        "nop;"			\
+			            : : "i" (mask) : "memory"); \
+				     })
+#define msrset(mask) ({ __asm__ __volatile__ ("	 msrset	r0, %0;"	\
+				        "nop;"			\
+			            : : "i" (mask) : "memory"); \
+				     })
+
 /* Deprecated MicroBlaze FSL macros */
 #define microblaze_bread_datafsl(val, id)       getfsl(val,id)
 #define microblaze_bwrite_datafsl(val, id)      putfsl(val,id)
@@ -445,6 +484,9 @@ extern void microblaze_init_dcache_range (s32 , s32 )  __attribute__((deprecated
 #define microblaze_bwrite_cntlfsl(val, id)      cputfsl(val,id)
 #define microblaze_nbread_cntlfsl(val, id)      ncgetfsl(val,id)
 #define microblaze_nbwrite_cntlfsl(val, id)     ncputfsl(val,id)
+
+#define XMICROBLAZE_DCACHE_MASK 0x80U
+#define XMICROBLAZE_ICACHE_MASK 0x20U
 
 #ifdef __cplusplus
 }

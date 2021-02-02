@@ -52,7 +52,6 @@
 
 #include "mb_interface.h"
 #include "xil_types.h"
-#include "xparameters.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,26 +118,6 @@ extern "C" {
 #define Xil_L2CacheInvalidateRange(Addr, Len) \
 		microblaze_invalidate_cache_ext_range((Addr), (Len))
 
-/****************************************************************************/
-/**
-* @brief   Flush the L1 data cache for the given address range.
-*          If the bytes specified by the address (Addr) are cached by the
-*          data cache, and is modified (dirty), the cacheline will be written
-*          to system memory.The cacheline will also be invalidated.
-*
-* @param    Addr: the starting address of the range to be flushed.
-* @param    Len: length in byte to be flushed.
-*
-* @return   None.
-*
-****************************************************************************/
-#if (XPAR_MICROBLAZE_DCACHE_USE_WRITEBACK == 1)
-#   define Xil_L1DCacheFlushRange(Addr, Len) \
-		microblaze_flush_dcache_range((Addr), (Len))
-#else
-#   define Xil_L1DCacheFlushRange(Addr, Len) \
-		microblaze_invalidate_dcache_range((Addr), (Len))
-#endif /* XPAR_MICROBLAZE_DCACHE_USE_WRITEBACK */
 
 /****************************************************************************/
 /**
@@ -155,21 +134,6 @@ extern "C" {
 ****************************************************************************/
 #define Xil_L2CacheFlushRange(Addr, Len) \
 		microblaze_flush_cache_ext_range((Addr), (Len))
-
-/****************************************************************************/
-/**
-* @brief    Flush the entire L1 data cache. If any cacheline is dirty, the
-*           cacheline will be written to system memory. The entire data cache
-*           will be invalidated.
-*
-* @return   None.
-*
-****************************************************************************/
-#if (XPAR_MICROBLAZE_DCACHE_USE_WRITEBACK == 1)
-#   define Xil_L1DCacheFlush() microblaze_flush_dcache()
-#else
-#   define Xil_L1DCacheFlush() microblaze_invalidate_dcache()
-#endif /* XPAR_MICROBLAZE_DCACHE_USE_WRITEBACK */
 
 /****************************************************************************/
 /**
@@ -269,6 +233,7 @@ extern "C" {
 *
 ****************************************************************************/
 #define Xil_DCacheEnable() Xil_L1DCacheEnable()
+
 
 /****************************************************************************/
 /**
