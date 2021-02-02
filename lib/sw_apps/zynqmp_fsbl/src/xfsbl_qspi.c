@@ -54,7 +54,11 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define QSPI_DEVICE_ID		XPAR_XQSPIPSU_0_DEVICE_ID
+#else
+#define QSPI_DEVICE_ID		XPAR_XQSPIPSU_0_BASEADDR
+#endif
 #define XFSBL_SIXTY_FOUR_BYTE_MASK	(0x3FU)
 #define XFSBL_SIXTY_FOUR_BYTE_VAL	(64U)
 

@@ -157,7 +157,7 @@ SECTIONS
 .got2 : {
    *(.got2)
 } > psu_ocm_ram_0_S_AXI_BASEADDR
-/*
+
 .ctors (ALIGN(64)): {
    __CTOR_LIST__ = .;
    ___CTORS_LIST___ = .;
@@ -168,8 +168,8 @@ SECTIONS
    __CTOR_END__ = .;
    ___CTORS_END___ = .;
 } > psu_ocm_ram_0_S_AXI_BASEADDR
-*/
-/*
+
+
 .dtors (ALIGN(64)): {
    __DTOR_LIST__ = .;
    ___DTORS_LIST___ = .;
@@ -180,7 +180,7 @@ SECTIONS
    __DTOR_END__ = .;
    ___DTORS_END___ = .;
 } > psu_ocm_ram_0_S_AXI_BASEADDR
-*/
+
 .fixup : {
    __fixup_start = .;
    *(.fixup)
@@ -200,22 +200,22 @@ SECTIONS
    KEEP (*(.preinit_array))
    __preinit_array_end = .;
 } > psu_ocm_ram_0_S_AXI_BASEADDR
-/*
+
 .init_array (ALIGN(64)): {
    __init_array_start = .;
    KEEP (*(SORT(.init_array.*)))
    KEEP (*(.init_array))
    __init_array_end = .;
 } > psu_ocm_ram_0_S_AXI_BASEADDR
-*/
-/*
+
+
 .fini_array (ALIGN(64)): {
    __fini_array_start = .;
    KEEP (*(SORT(.fini_array.*)))
    KEEP (*(.fini_array))
    __fini_array_end = .;
 } > psu_ocm_ram_0_S_AXI_BASEADDR
-*/
+
 .ARM.attributes : {
    __ARM.attributes_start = .;
    *(.ARM.attributes)
@@ -299,6 +299,14 @@ _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
    __el2_stack = .;
    __el1_stack = .;
    __el0_stack = .;
+} > psu_ocm_ram_0_S_AXI_BASEADDR
+
+.drvcfg_sec : {
+    . = ALIGN(8);
+     __drvcfgsecdata_start = .;
+    KEEP (*(.drvcfg_sec))
+    __drvcfgsecdata_end = .;
+    __drvcfgsecdata_size = __drvcfgsecdata_end - __drvcfgsecdata_start;
 } > psu_ocm_ram_0_S_AXI_BASEADDR
 
 .dup_data (ALIGN(64)): {
