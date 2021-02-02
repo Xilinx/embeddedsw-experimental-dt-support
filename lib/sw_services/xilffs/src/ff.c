@@ -33,6 +33,12 @@
 *                     (< 512 bytes) in f_read().
 ******************************************************************************/
 #include "xparameters.h"
+#include "xstatus.h"
+
+#ifdef SDT
+#include "xilffs_config.h"
+#endif
+
 #if (defined FILE_SYSTEM_INTERFACE_SD) || (defined FILE_SYSTEM_INTERFACE_RAM)
 #include "ff.h"			/* Declarations of FatFs API */
 #include "diskio.h"		/* Declarations of device I/O functions */
