@@ -12,7 +12,6 @@
 * PVR routines
 *
 ******************************************************************************/
-#include "xparameters.h"
 #include "pvr.h"
 #include <string.h>
 

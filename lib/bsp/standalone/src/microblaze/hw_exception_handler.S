@@ -14,7 +14,6 @@
  *******************************************************************************/
 
 #include "microblaze_exceptions_g.h"
-#include "xparameters.h"
 #include "microblaze_instructions.h"
 
 /* 64-bit definitions */
@@ -127,11 +126,21 @@
 #define ESR_DS_MASK             0x00001000
 #define ESR_LONG_MASK           0x00002000
 
+/* Exception offsets */
+#define UNALIGNED_EXCEPTION_OFFSET	0x0U
+#define IOPB_EXCEPTION_OFFSET	0x4U
+#define FPU_EXCEPTION_OFFSET	0x8U
+#define FSL_EXCEPTION_OFFSET	0xCU
+#define DIV_ZERO_EXCEPTION_OFFSET	0x10U
+#define DOPB_BUS_EXCEPTION_OFFSET	0x14U
+#define ILL_OPCODE_EXCEPTION_OFFSET	0x18U
+#define USE_STACK_PROTECTION_OFFSET	0x1CU
+#define EXCEPTIONS_IN_DELAY_SLOTS_OFFSET	0x20U
+#define PRECODE_FPU_EXCEPTION_OFFSET	0x8U
+
 /* Extern declarations */
 .extern XNullHandler
-
-
-#ifdef MICROBLAZE_EXCEPTIONS_ENABLED                    /* If exceptions are enabled in the processor */
+.extern XMicroblaze_ConfigTable
 
 /*
  * hw_exception_handler - Handler for unaligned exceptions
@@ -179,7 +188,12 @@
 .type _hw_exception_handler, @function
 _hw_exception_handler:
 
-#if defined(XPAR_MICROBLAZE_USE_STACK_PROTECTION) && (XPAR_MICROBLAZE_USE_STACK_PROTECTION == 1)
+	addi r3, r0, XMicroblaze_ConfigTable			/* get base address of structure */
+	lbui r7, r3, USE_STACK_PROTECTION_OFFSET		/* Check if stack protection is enabled */
+	bnei r7, check_sp_exception
+	BRI ex_handler_sp_exception_disabled;
+
+check_sp_exception:
 	/* Immediately halt for stack protection violation exception without using any stack       */
 	SI	r3, r0, mb_sp_save_r3;			/* Save temporary register                 */
 	mfs	r3, resr;				/* Extract ESR[DS]                         */
@@ -190,26 +204,36 @@ ex_handler_sp_violation:
 	bri	0;					/* Halt here if stack protection violation */
 ex_handler_not_sp_violation:
 	LI	r3, r0, mb_sp_save_r3;			/* Restore temporary register              */
-#endif /* defined(XPAR_MICROBLAZE_USE_STACK_PROTECTION) && (XPAR_MICROBLAZE_USE_STACK_PROTECTION == 1) */
 
+ex_handler_sp_exception_disabled:
         ADDIK   r1, r1, -(EX_HANDLER_STACK_SIZ);        /* Create stack frame */
         PUSH_REG(3);
         PUSH_REG(4);
         PUSH_REG(5);
         PUSH_REG(6);
-#ifdef MICROBLAZE_CAN_HANDLE_EXCEPTIONS_IN_DELAY_SLOTS
+	addi r3, r0, XMicroblaze_ConfigTable
+	lbui r7, r3, EXCEPTIONS_IN_DELAY_SLOTS_OFFSET
+	bnei r7, ex_handler_ds
+	BRI ex_handler_no_ds;
+
+ex_handler_ds:
         mfs     r6, resr;
         andi    r6, r6, ESR_DS_MASK;
         BEQI    r6, ex_handler_no_ds;
         mfs     r17, rbtr;
 ex_handler_no_ds:
-#endif
         PUSH_R17;
         PUSH_MSR_AND_ENABLE_EXC;                        /* Exceptions enabled here. This will allow nested exceptions */
 
         mfs     r3, resr;
         andi    r5, r3, ESR_EXC_MASK;                   /* Extract ESR[EXC]                     */
-#ifndef NO_UNALIGNED_EXCEPTIONS
+
+	addi r3, r0, XMicroblaze_ConfigTable
+	lbui r7, r3, UNALIGNED_EXCEPTION_OFFSET
+	bnei r7, ex_handler_unaligned
+	BRI handle_ex_regular;
+	
+ex_handler_unaligned:	
         xori    r6, r5, 1;                              /* 00001 = Unaligned Exception          */
         BNEI    r6, handle_ex_regular;
 
@@ -224,12 +248,15 @@ ex_handler_no_ds:
         BEQI    r6, handle_unaligned_ex ;
 
 handle_ex_regular:
-#endif  /* ! NO_UNALIGNED_EXCEPTIONS */
-
-#if defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE)
+	addi r3, r0, XMicroblaze_ConfigTable;
+	lbui r7, r3, UNALIGNED_EXCEPTION_OFFSET;
+	bnei r7, handle_fpu_exception;
+	BRI handle_other_ex;
+handle_fpu_exception:	
+	lbui r7, r3, PRECODE_FPU_EXCEPTION_OFFSET;
+	blei r7, handle_other_ex;
         xori   r6, r5, 6;                               /* 00110 = FPU exception */
         BEQI   r6, handle_fp_ex;                        /* Go and decode the FP exception */
-#endif  /* defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE) */
 
 handle_other_ex:                                        /* Handle Other exceptions here         */
         ori     r6, r0, 20;
@@ -276,7 +303,6 @@ handle_other_ex_tail:
 
         BRI     ex_handler_done;                        /* Complete exception handling       */
 
-#ifndef NO_UNALIGNED_EXCEPTIONS
 handle_unaligned_ex:
         andi    r6, r3, ESR_REG_MASK;                   /* Mask and extract the register operand */
         srl     r6, r6;                                 /* r6 >> 5 */
@@ -403,9 +429,7 @@ ex_shw:
         sbi     r3, r4, 1;
 ex_sw_end:                                              /* Exception handling of store word, ends. */
         BRI     ex_handler_done;
-#endif  /* !NO_UNALIGNED_EXCEPTIONS */
 
-#if defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE)
 handle_fp_ex:
         ADDIK   r3, r17, -4;                            /* r17 contains (addr of exception causing FP instruction + 4) */
         lw      r4, r0, r3;                             /* We might find ourselves in a spot here. Unguaranteed load   */
@@ -452,7 +476,6 @@ handle_fp_ex_done:
 
 fp_ex_unhandled:
         bri     0;
-#endif  /* defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE) */
 
 ex_handler_done:
         POP_R17;
@@ -469,8 +492,6 @@ ex_handler_done:
 ex_handler_unhandled:
         bri 0                                           /* UNHANDLED. TRAP HERE */
 .end _hw_exception_handler
-
-#ifndef NO_UNALIGNED_EXCEPTIONS
 
 /*
  * hw_exception_handler Jump Table
@@ -574,9 +595,6 @@ ex_tmp_data_loc_7:
 ex_reg_op:
         .byte 0
 
-#endif /* ! NO_UNALIGNED_EXCEPTIONS */
-
-#if defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE)
 /*
  * FP exception decode jump table.
  * - Contains code snippets for each register that could have been a source operand for an excepting FP instruction
@@ -655,9 +673,7 @@ opb_r29: FP_EX_OPB_SAVE (29);
 opb_r30: FP_EX_OPB_SAVE (30);
 opb_r31: FP_EX_OPB_SAVE (31);
 
-#endif  /* defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE) */
 
-#if defined(MICROBLAZE_FP_EXCEPTION_ENABLED) && defined(MICROBLAZE_FP_EXCEPTION_DECODE)
 /* This is where we store the opA and opB of the last excepting FP instruction */
 .section .data
 .align DATAALIGN
@@ -667,15 +683,12 @@ mb_fpex_op_a:
         INTPTR_DATAITEM 0
 mb_fpex_op_b:
         INTPTR_DATAITEM 0
-#endif /* defined (MICROBLAZE_FP_EXCEPTION_ENABLED) && defined (MICROBLAZE_FP_EXCEPTION_DECODE) */
 
-#if defined(XPAR_MICROBLAZE_USE_STACK_PROTECTION) && (XPAR_MICROBLAZE_USE_STACK_PROTECTION == 1)
 /* This is where we store the register used to check which exception occurred */
 	.section .data
 	.align DATAALIGN
 mb_sp_save_r3:
         INTPTR_DATAITEM 0
-#endif /* defined(XPAR_MICROBLAZE_USE_STACK_PROTECTION) && (XPAR_MICROBLAZE_USE_STACK_PROTECTION == 1) */
 
 /* The exception vector table */
 .section .data
@@ -698,15 +711,3 @@ MB_ExceptionVectorTable:
     INTPTR_DATAITEM 6                       /* --         FPU  Exception         -- */
     INTPTR_DATAITEM XNullHandler
     INTPTR_DATAITEM 7                       /* --         MMU  Exceptions        -- */
-
-#else                                       /* Dummy exception handler, in case exceptions are not present in the processor */
-
-.global _hw_exception_handler
-.section .text
-.align 2
-.ent _hw_exception_handler
-_hw_exception_handler:
-        bri     0;
-.end _hw_exception_handler
-
-#endif  /* MICROBLAZE_EXCEPTIONS_ENABLED */
