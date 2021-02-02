@@ -22,7 +22,6 @@
 ******************************************************************************/
 
 #include "microblaze_interrupts_i.h"
-#include "xparameters.h"
 
 
 /* extern void XNullHandler (void *NullParameter) */
@@ -31,7 +30,7 @@
 * The interrupt handler table for microblaze processor
 */
 
-MB_InterruptVectorTableEntry MB_InterruptVectorTable[MB_INTERRUPT_VECTOR_TABLE_ENTRIES] =
+MB_InterruptVectorTableEntry MB_InterruptVectorTable[] =
 {
    {XNullHandler,
     (void*)XNULL}
