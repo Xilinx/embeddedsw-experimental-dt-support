@@ -178,6 +178,7 @@ typedef void (*XTtcPs_StatusHandler) (const void *CallBackRef, u32 StatusEvent);
  #define XTTCPS_MAX_INTERVAL_COUNT 0xFFFFFFFFU
  #endif
 
+#define XTTCPS_NUM_COUNTERS	3U
 /** @name Configuration options
  *
  * Options for the device. Each of the options is bit field, so more than one
@@ -207,6 +208,8 @@ typedef struct {
 #endif
 	u32 BaseAddress;  /**< Base address for device */
 	u32 InputClockHz; /**< Input clock frequency */
+	u16 IntrId[XTTCPS_NUM_COUNTERS];		/** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent;		/** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XTtcPs_Config;
 
 /**

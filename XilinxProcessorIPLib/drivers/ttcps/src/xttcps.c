@@ -100,6 +100,7 @@ s32 XTtcPs_CfgInitialize(XTtcPs *InstancePtr, XTtcPs_Config *ConfigPtr,
 {
 	s32 Status;
 	u32 IsStartResult;
+	u16 Count;
 	/*
 	 * Assert to validate input arguments.
 	 */
@@ -115,6 +116,11 @@ s32 XTtcPs_CfgInitialize(XTtcPs *InstancePtr, XTtcPs_Config *ConfigPtr,
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 	InstancePtr->Config.InputClockHz = ConfigPtr->InputClockHz;
 	InstancePtr->StatusHandler = StubStatusHandler;
+
+	for (Count=0; Count<XTTCPS_NUM_COUNTERS; Count++) {
+		InstancePtr->Config.IntrId[Count] = ConfigPtr->IntrId[Count];
+	}
+	InstancePtr->Config.IntrParent = ConfigPtr->IntrParent;
 
 	IsStartResult = XTtcPs_IsStarted(InstancePtr);
 	/*
