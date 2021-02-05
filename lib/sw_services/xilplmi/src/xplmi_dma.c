@@ -67,7 +67,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 static int XPlmi_DmaDrvInit(XPmcDma *DmaPtr, u32 DeviceId);
+#else
+static int XPlmi_DmaDrvInit(XPmcDma *DmaPtr, u32 BaseAddress);
+#endif
 static void XPlmi_SSSCfgDmaDma(u32 Flags);
 static void XPlmi_SSSCfgDmaPzm(u32 Flags);
 static void XPlmi_SSSCfgSbiDma(u32 Flags);
@@ -93,7 +97,11 @@ static XPmcDma_Configure DmaCtrl = {0x40U, 0U, 0U, 0U, 0xFFEU, 0x80U,
  * @return	XST_SUCCESS on success and error code on failure
  *
 *****************************************************************************/
+#ifndef SDT
 static int XPlmi_DmaDrvInit(XPmcDma *DmaPtr, u32 DeviceId)
+#else
+static int XPlmi_DmaDrvInit(XPmcDma *DmaPtr, u32 BaseAddress)
+#endif
 {
 	int Status = XST_FAILURE;
 	XPmcDma_Config *Config;
@@ -103,7 +111,11 @@ static int XPlmi_DmaDrvInit(XPmcDma *DmaPtr, u32 DeviceId)
 	 * look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XPmcDma_LookupConfig((u16)DeviceId);
+#else
+	Config = XPmcDma_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		Status = XPlmi_UpdateStatus(XPLMI_ERR_DMA_LOOKUP, 0);
 		goto END;

@@ -72,7 +72,7 @@
 #include "xplmi_hw.h"
 #include "xil_util.h"
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#ifdef XPAR_XIPIPSU_0_BASEADDR
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
@@ -140,7 +140,11 @@ int XPlmi_IpiInit(XPlmi_SubsystemHandler SubsystemHandler)
 	XPlmi_TaskNode *Task = NULL;
 
 	/* Load Config for Processor IPI Channel */
+#ifndef SDT
 	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_DEVICE_ID);
+#else
+	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+#endif
 	if (IpiCfgPtr == NULL) {
 		Status = XST_FAILURE;
 		goto END;

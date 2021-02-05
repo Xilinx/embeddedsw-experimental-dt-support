@@ -59,7 +59,11 @@ extern "C" {
  */
 
 /************************** Constant Definitions *****************************/
+#ifndef SDT
 #define IOMODULE_DEVICE_ID XPAR_IOMODULE_0_DEVICE_ID
+#else
+#define IOMODULE_DEVICE_ID XPAR_XIOMODULE_0_BASEADDR
+#endif
 #define MB_IOMODULE_GPO1_PIT1_PRESCALE_SRC_MASK	(0x2U)
 
 /* PMC IRO Frequency related macros */
