@@ -70,6 +70,7 @@ static XStatus I2CInitialize(XIicPs *Iic)
 		goto done;
 	}
 
+#ifndef SDT
 	Device = XPmDevice_GetById(PM_DEV_I2C_PMC);
 	if (NULL == Device) {
 		Status = XPM_PM_INVALID_NODE;
@@ -97,6 +98,9 @@ static XStatus I2CInitialize(XIicPs *Iic)
 	}
 
 	Config = XIicPs_LookupConfig(I2CDeviceId);
+#else
+	Config = XIicPs_LookupConfig(0xF1000000);
+#endif
 	if (NULL == Config) {
 		goto done;
 	}
