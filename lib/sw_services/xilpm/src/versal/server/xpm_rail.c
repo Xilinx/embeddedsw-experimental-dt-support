@@ -66,7 +66,11 @@ static XStatus I2CInitialize(XIicPs *Iic)
 		goto done;
 	}
 
+#ifndef SDT
 	Config = XIicPs_LookupConfig(XPAR_PSV_PMC_I2C_0_DEVICE_ID);
+#else
+	Config = XIicPs_LookupConfig(0xF1000000);
+#endif
 	if (NULL == Config) {
 		goto done;
 	}

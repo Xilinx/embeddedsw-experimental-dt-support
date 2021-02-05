@@ -198,7 +198,11 @@ static XStatus PldCfuInit(void)
 	 * look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XCfupmc_LookupConfig((u16)XPAR_XCFUPMC_0_DEVICE_ID);
+#else
+	Config = XCfupmc_LookupConfig(XPAR_XCFUPMC_0_BASEADDR);
+#endif
 	if (NULL == Config) {
 		DbgErr = XPM_INT_ERR_DEVICE_LOOKUP;
                 Status = XST_FAILURE;
@@ -239,7 +243,11 @@ static XStatus PldCframeInit(void)
 	 * look up the configuration in the config table,
          * then initialize it.
          */
+#ifndef SDT
 	Config = XCframe_LookupConfig((u16)XPAR_XCFRAME_0_DEVICE_ID);
+#else
+	Config = XCframe_LookupConfig((u16)XPAR_XCFRAME_0_BASEADDR);
+#endif
 	if (NULL == Config) {
 		DbgErr = XPM_INT_ERR_DEVICE_LOOKUP;
                 Status = XST_FAILURE;
