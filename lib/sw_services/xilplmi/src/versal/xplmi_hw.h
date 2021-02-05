@@ -100,6 +100,7 @@ extern "C" {
 #include "xparameters.h"
 #include "xil_io.h"
 #include "xil_hw.h"
+#include "xstatus.h"
 
 /**@cond xplmi_internal
  * @{
@@ -671,10 +672,17 @@ static inline void XPlmi_OutByte64(u64 Addr, u8 Data)
 
 #define XPLMI_IPI_BASEADDR		(0xFF320000U)
 
+#ifndef SDT
 #if defined(XPAR_XIPIPSU_0_DEVICE_ID) && (XPAR_XIPIPSU_0_BASE_ADDRESS == XPLMI_IPI_BASEADDR)
 #define XPLMI_IPI_DEVICE_ID		XPAR_XIPIPSU_0_DEVICE_ID
 #elif defined(XPAR_XIPIPSU_1_DEVICE_ID) && (XPAR_XIPIPSU_1_BASE_ADDRESS == XPLMI_IPI_BASEADDR)
 #define XPLMI_IPI_DEVICE_ID		XPAR_XIPIPSU_1_DEVICE_ID
+#endif
+#else
+#if defined(XPAR_XIPIPSU_0_BASEADDR) && (XPAR_XIPIPSU_0_BASEADDR == XPLMI_IPI_BASEADDR)
+#define XPLMI_IPI_DEVICE_ID		XPAR_XIPIPSU_0_BASEADDR
+#elif defined(XPAR_XIPIPSU_1_BASEADDR) && (XPAR_XIPIPSU_1_BASEADDR == XPLMI_IPI_BASEADDR)
+#define XPLMI_IPI_DEVICE_ID		XPAR_XIPIPSU_1_BASEADDR
 #endif
 
 /*

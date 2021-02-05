@@ -86,7 +86,6 @@
 #include "xil_util.h"
 
 #ifdef XPLMI_IPI_DEVICE_ID
-
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
