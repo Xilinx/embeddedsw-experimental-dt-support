@@ -65,6 +65,7 @@ extern "C" {
 #include "xplmi_config.h"
 #include "xparameters.h"
 #include "xil_io.h"
+#include "xstatus.h"
 
 /************************** Constant Definitions *****************************/
 

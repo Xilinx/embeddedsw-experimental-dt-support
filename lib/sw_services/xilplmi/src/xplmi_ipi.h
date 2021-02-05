@@ -52,7 +52,7 @@ extern "C" {
 #include "xplmi_modules.h"
 #include "xplmi_cmd.h"
 #include "xil_assert.h"
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#ifdef XPAR_XIPIPSU_0_BASEADDR
 #include "xipipsu.h"
 
 /************************** Constant Definitions *****************************/

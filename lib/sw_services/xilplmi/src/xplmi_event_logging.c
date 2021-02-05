@@ -47,7 +47,12 @@
 #include "xplmi.h"
 #include "xplmi_util.h"
 
+
 /************************** Constant Definitions *****************************/
+#ifdef SDT
+#define XPAR_RAM_INSTR_CNTLR_0_S_AXI_BASEADDR 0xF0200000
+#define XPAR_RAM_DATA_CNTLR_0_S_AXI_HIGHADDR 0xF025FFFF 
+#endif
 
 /**************************** Type Definitions *******************************/
 

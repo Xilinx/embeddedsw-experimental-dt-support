@@ -89,8 +89,12 @@ int XPlmi_InitUart(void)
 	XUartPsv UartPsvIns;
 	XUartPsv_Config *Config;
 
+#ifndef SDT
 	for (Index = 0U; Index < (u8)XPAR_XUARTPSV_NUM_INSTANCES; Index++) {
+#else
+	for (Index = 0U; XUartPsv_ConfigTable[Index].Name != NULL; Index++) {
 
+#endif
 		Status = XPlmi_MemSetBytes(&UartPsvIns, sizeof(XUartPsv),
 				0U, sizeof(XUartPsv));
 		if (Status != XST_SUCCESS) {
@@ -98,7 +102,11 @@ int XPlmi_InitUart(void)
 			goto END;
 		}
 
+#ifndef SDT
 		Config = XUartPsv_LookupConfig(Index);
+#else
+		Config = XUartPsv_LookupConfig(XUartPsv_ConfigTable[Index].BaseAddress);
+#endif
 		if (NULL == Config) {
 			Status = XPlmi_UpdateStatus(XPLMI_ERR_UART_LOOKUP, (int)Index);
 			goto END;
