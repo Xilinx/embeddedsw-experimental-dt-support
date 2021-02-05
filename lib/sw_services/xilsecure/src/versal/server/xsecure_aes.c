@@ -2181,7 +2181,11 @@ static int XSecure_AesPmcDmaCfgByteSwap(const XSecure_Aes *InstancePtr,
 	int Status = XST_FAILURE;
 
 	/* Configure the SSS for AES. */
+#ifndef SDT
 	if (InstancePtr->PmcDmaPtr->Config.DeviceId == (u16)PMCDMA_0_DEVICE_ID) {
+#else
+	if (InstancePtr->PmcDmaPtr->Config.BaseAddress == XPAR_XCSUDMA_0_BASEADDR) {
+#endif
 		Status = XSecure_SssAes(&InstancePtr->SssInstance,
 				XSECURE_SSS_DMA0, XSECURE_SSS_DMA0);
 	}

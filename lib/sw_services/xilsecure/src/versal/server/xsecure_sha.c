@@ -569,8 +569,13 @@ static int XSecure_Sha3DmaTransfer(const XSecure_Sha3 *InstancePtr,
 	XSecure_AssertNonvoid(InstancePtr != NULL);
 
 	/* Configure the SSS for SHA3 hashing. */
+#ifndef SDT
 	Status = XSecure_SssSha(&(InstancePtr->SssInstance),
 				InstancePtr->DmaPtr->Config.DeviceId);
+#else
+	Status = XSecure_SssSha(&(InstancePtr->SssInstance),
+				InstancePtr->DmaPtr->Config.DmaType - 1);
+#endif
 	if (Status != XST_SUCCESS) {
 		goto ENDF;
 	}
