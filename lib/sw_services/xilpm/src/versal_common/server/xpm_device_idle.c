@@ -78,7 +78,11 @@ XStatus NodeQspiIdle(u16 DeviceId, u32 BaseAddress)
 	const XQspiPsu_Config *ConfigPtr;
 	XQspiPsu QspiInst = {0};
 
+#ifndef SDT
 	ConfigPtr = XQspiPsu_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XQspiPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == ConfigPtr) {
 		goto done;
 	}
@@ -111,7 +115,11 @@ XStatus NodeOspiIdle(u16 DeviceId, u32 BaseAddress)
 	/* Warning Fix */
 	(void)(BaseAddress);
 
+#ifndef SDT
 	ConfigPtr = XOspiPsv_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XOspiPsv_LookupConfig(BaseAddress);
+#endif
 	if (NULL == ConfigPtr) {
 		goto done;
 	}
@@ -141,7 +149,11 @@ XStatus NodeSdioIdle(u16 DeviceId, u32 BaseAddress)
 	XSdPs_Config *ConfigPtr;
 	XSdPs SdioInst = {0};
 
+#ifndef SDT
 	ConfigPtr = XSdPs_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XSdPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == ConfigPtr) {
 		goto done;
 	}
@@ -171,7 +183,11 @@ XStatus NodeUsbIdle(u16 DeviceId, u32 BaseAddress)
 	XUsbPsu_Config *ConfigPtr;
 	static struct XUsbPsu UsbInst;
 
+#ifndef SDT
 	ConfigPtr = XUsbPsu_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XUsbPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == ConfigPtr) {
 		goto done;
 	}
