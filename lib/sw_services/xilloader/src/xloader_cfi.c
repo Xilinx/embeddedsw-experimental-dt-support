@@ -80,7 +80,7 @@ int XLoader_CframeInit(void)
 #ifndef SDT
 	Config = XCframe_LookupConfig((u16)XPAR_XCFRAME_0_DEVICE_ID);
 #else
-	Config = XCframe_LookupConfig((0);
+	Config = XCframe_LookupConfig(0);
 #endif
 	if (NULL == Config) {
 		Status = XPlmi_UpdateStatus(XLOADER_ERR_CFRAME_LOOKUP, 0);
