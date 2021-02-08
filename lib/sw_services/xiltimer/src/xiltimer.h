@@ -99,7 +99,7 @@ typedef struct XTimerTag {
 } XTimer;
 
 typedef u64 XTime;
-XTimer TimerInst;
+static XTimer TimerInst;
 
 u32 XilSleepTimer_Init(XTimer *InstancePtr);
 u32 XilTickTimer_Init(XTimer *InstancePtr);
