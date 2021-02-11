@@ -32,4 +32,12 @@ required:
 examples:
     xcsudma_intr_example.c:
         - interrupts
+
+tapp:
+   xcsudma_selftest_example.c:
+        declaration: XCsuDma_SelfTestExample
+   xcsudma_intr_example.c:
+        declaration: XCsuDma_IntrExample
+        hwproperties:
+            - interrupts
 ...
