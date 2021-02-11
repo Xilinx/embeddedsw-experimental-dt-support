@@ -43,4 +43,12 @@ examples:
         - interrupts
     xzdma_writeonlymode_example.c:
         - interrupts
+
+tapp:
+   xzdma_selftest_example.c:
+        declaration: XZDma_SelfTestExample
+   xzdma_simple_example.c:
+        declaration: XZDma_SimpleExample
+        hwproperties:
+            - interrupts
 ...
