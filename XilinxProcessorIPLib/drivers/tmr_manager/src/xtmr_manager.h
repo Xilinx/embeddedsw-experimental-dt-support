@@ -191,26 +191,6 @@ XTMR_Manager_Config *XTMR_Manager_LookupConfig(UINTPTR BaseAddr);
 int XTMR_Manager_CfgInitialize(XTMR_Manager *InstancePtr,
 				XTMR_Manager_Config *Config,
 				UINTPTR EffectiveAddr);
-
-/*
- * Functions for recovery, in file xtmr_manager_recover.c
- */
-void XTMR_Manager_SetRecoveryHandler(XTMR_Manager *InstancePtr,
-				     XTMR_Manager_Handler FuncPtr,
-				     void *CallBackRef);
-
-void XTMR_Manager_SetPreResetHandler(XTMR_Manager *InstancePtr,
-				     XTMR_Manager_Handler FuncPtr,
-				     void *CallBackRef);
-
-void XTMR_Manager_SetPostResetHandler(XTMR_Manager *InstancePtr,
-
-/*
- * Required functions, in file xtmr_manager.c
- */
-int XTMR_Manager_CfgInitialize(XTMR_Manager *InstancePtr,
-				XTMR_Manager_Config *Config,
-				UINTPTR EffectiveAddr);
 void XTMR_Manager_Configure_BrkDelay(XTMR_Manager *InstancePtr,
 				     u32 BrkDelay);
 
