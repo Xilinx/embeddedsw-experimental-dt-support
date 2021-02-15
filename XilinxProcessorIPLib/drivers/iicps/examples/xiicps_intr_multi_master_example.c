@@ -28,9 +28,9 @@
 /***************************** Include Files **********************************/
 #include "xparameters.h"
 #include "xiicps.h"
-#include "xscugic.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions ******************************/
 
@@ -40,8 +40,6 @@
  * change all the needed parameters in one place.
  */
 #define IIC_DEVICE_ID		XPAR_XIICPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define IIC_INT_VEC_ID		XPAR_XIICPS_0_INTR
 
 /*
  * The slave address to send to and receive from.
@@ -62,14 +60,12 @@
 /************************** Function Prototypes *******************************/
 
 s32 IicPsMultiMasterIntrExample(u16 DeviceId);
-static s32 SetupInterruptSystem(XIicPs *IicPsPtr);
 
 void Handler(void *CallBackRef, u32 Event);
 
 /************************** Variable Definitions ******************************/
 
 XIicPs Iic;			/* Instance of the IIC Device */
-XScuGic InterruptController;	/* Instance of the Interrupt Controller */
 
 /*
  * The following buffers are used in this example to send and receive data
@@ -180,7 +176,10 @@ s32 IicPsMultiMasterIntrExample(u16 DeviceId)
 	 * Connect the IIC to the interrupt subsystem such that interrupts can
 	 * occur. This function is application specific.
 	 */
-	Status = SetupInterruptSystem(&Iic);
+        Status = XSetupInterruptSystem(&Iic, XIicPs_MasterInterruptHandler,
+                                        Config->IntrId,
+                                        Config->IntrParent,
+                                        XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -341,78 +340,4 @@ void Handler(void *CallBackRef, u32 Event)
 		 */
 		TotalErrorCount++;
 	}
-}
-
-/******************************************************************************/
-/**
-*
-* This function setups the interrupt system such that interrupts can occur
-* for the IIC.  This function is application specific since the actual
-* system may or may not have an interrupt controller.  The IIC could be
-* directly connected to a processor without an interrupt controller.  The
-* user should modify this function to fit the application.
-*
-* @param	IicPsPtr contains a pointer to the instance of the Iic
-*		which is going to be connected to the interrupt controller.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-*******************************************************************************/
-static s32 SetupInterruptSystem(XIicPs *IicPsPtr)
-{
-	s32 Status;
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(&InterruptController, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				&InterruptController);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(&InterruptController, IIC_INT_VEC_ID,
-			(Xil_InterruptHandler)XIicPs_MasterInterruptHandler,
-			(void *)IicPsPtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the Iic device.
-	 */
-	XScuGic_Enable(&InterruptController, IIC_INT_VEC_ID);
-
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
 }

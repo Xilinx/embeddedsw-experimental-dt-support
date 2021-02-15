@@ -51,10 +51,10 @@
 #include "xparameters.h"
 #include "sleep.h"
 #include "xiicps.h"
-#include "xscugic.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
 #include "xplatform_info.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -64,7 +64,6 @@
  * change all the needed parameters in one place.
  */
 
-#define INTC_DEVICE_ID	XPAR_SCUGIC_SINGLE_DEVICE_ID
 
 /*
  * The following constant defines the address of the IIC Slave device on the
@@ -107,12 +106,11 @@ int IicPsEepromIntrExample(void);
 static int EepromWriteData(XIicPs *IicInstance, u16 ByteCount);
 static int EepromReadData(XIicPs *IicInstance, u8 *BufferPtr, u16 ByteCount);
 static void Handler(void *CallBackRef, u32 Event);
-static int IicPsSlaveMonitor(u16 Address, u16 DeviceId, u32 Int_Id);
-static int SetupInterruptSystem(XIicPs *IicPsPtr, u32 Int_Id);
+static int IicPsSlaveMonitor(u16 Address, u16 DeviceId);
 static int MuxInitChannel(u16 MuxIicAddr, u8 WriteBuffer);
 static int FindEepromDevice(u16 Address);
 static int IicPsFindEeprom(u16 *Eeprom_Addr, u32 *PageSize);
-static int IicPsConfig(u16 DeviceId, u32 Int_Id);
+static int IicPsConfig(u16 DeviceId);
 static int IicPsFindDevice(u16 addr, u16 DeviceId);
 static int FindEepromPageSize(u16 EepromAddr, u32 *PageSize_ptr);
 /************************** Variable Definitions *****************************/
@@ -389,77 +387,6 @@ static int EepromReadData(XIicPs *IicInstance, u8 *BufferPtr, u16 ByteCount)
 	return XST_SUCCESS;
 }
 
-/******************************************************************************/
-/**
-*
-* This function setups the interrupt system such that interrupts can occur
-* for the IIC.
-*
-* @param	IicPsPtr contains a pointer to the instance of the Iic
-*		which is going to be connected to the interrupt controller.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-*******************************************************************************/
-static int SetupInterruptSystem(XIicPs *IicPsPtr, u32 Int_Id)
-{
-	int Status;
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(&InterruptController, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				&InterruptController);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(&InterruptController, Int_Id,
-			(Xil_InterruptHandler)XIicPs_MasterInterruptHandler,
-			(void *)IicPsPtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the Iic device.
-	 */
-	XScuGic_Enable(&InterruptController, Int_Id);
-
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}
-
 /*****************************************************************************/
 /**
 *
@@ -558,7 +485,7 @@ static int MuxInitChannel(u16 MuxIicAddr, u8 WriteBuffer)
 * @note		None.
 *
 ****************************************************************************/
-static int IicPsConfig(u16 DeviceId, u32 Int_Id)
+static int IicPsConfig(u16 DeviceId)
 {
 	int Status;
 	XIicPs_Config *ConfigPtr;	/* Pointer to configuration data */
@@ -580,7 +507,10 @@ static int IicPsConfig(u16 DeviceId, u32 Int_Id)
 	/*
 	 * Setup the Interrupt System.
 	 */
-	Status = SetupInterruptSystem(&IicInstance, Int_Id);
+	Status = XSetupInterruptSystem(&IicInstance, XIicPs_MasterInterruptHandler,
+			ConfigPtr->IntrId,
+			ConfigPtr->IntrParent,
+			XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -605,13 +535,13 @@ static int IicPsFindDevice(u16 addr, u16 DeviceId)
 	int Status;
 
 	if (DeviceId == 0){
-		Status = IicPsSlaveMonitor(addr,DeviceId,XPAR_XIICPS_0_INTR);
+		Status = IicPsSlaveMonitor(addr,DeviceId);
 		if (Status == XST_SUCCESS) {
 			return XST_SUCCESS;
 		}
 	}
 	else if (DeviceId == 1) {
-		Status = IicPsSlaveMonitor(addr,DeviceId,XPAR_XIICPS_1_INTR);
+		Status = IicPsSlaveMonitor(addr,DeviceId);
 		if (Status == XST_SUCCESS) {
 			return XST_SUCCESS;
 		}
@@ -808,7 +738,7 @@ static int FindEepromPageSize(u16 EepromAddr, u32 *PageSize_ptr)
 * @note 	None.
 *
 *******************************************************************************/
-static int IicPsSlaveMonitor(u16 Address, u16 DeviceId, u32 Int_Id)
+static int IicPsSlaveMonitor(u16 Address, u16 DeviceId)
 {
 	u32 Index;
 	int Status;
@@ -818,7 +748,7 @@ static int IicPsSlaveMonitor(u16 Address, u16 DeviceId, u32 Int_Id)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
-	Status = IicPsConfig(DeviceId,Int_Id);
+	Status = IicPsConfig(DeviceId);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
