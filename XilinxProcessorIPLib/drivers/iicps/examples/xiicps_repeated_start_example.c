@@ -57,7 +57,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define IIC_DEVICE_ID	XPAR_XIICPS_0_DEVICE_ID
+#endif
 
 /*
  * The following constant defines the address of the IIC Slave device on the
@@ -180,7 +182,11 @@ int IicPsRepeatedStartExample(void)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
+#ifndef SDT
 	ConfigPtr = XIicPs_LookupConfig(IIC_DEVICE_ID);
+#else
+	ConfigPtr = XIicPs_LookupConfig(XPAR_XIICPS_0_BASEADDR);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
