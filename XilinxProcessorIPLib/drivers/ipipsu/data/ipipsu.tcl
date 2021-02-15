@@ -188,6 +188,7 @@ proc ipi_generate_params {file_name iszynqmp} {
 		puts $file_handle [format "/* Canonical definitions for peripheral %s */" $ipi_inst]
 		puts $file_handle [format "#define  XPAR_%s_%s_%s	XPAR_%s_%s" [string toupper $drv_string] $idx "DEVICE_ID" [string toupper $ipi_inst] "DEVICE_ID"]
 		puts $file_handle [format "#define  XPAR_%s_%s_%s	XPAR_%s_%s" [string toupper $drv_string] $idx "BASE_ADDRESS" [string toupper $ipi_inst] "S_AXI_BASEADDR"]
+		puts $file_handle [format "#define  XPAR_%s_%s_%s	XPAR_%s_%s" [string toupper $drv_string] $idx "BASEADDR" [string toupper $ipi_inst] "S_AXI_BASEADDR"]
 		puts $file_handle [format "#define  XPAR_%s_%s_%s	XPAR_%s_%s" [string toupper $drv_string] $idx "BIT_MASK" [string toupper $ipi_inst] "BIT_MASK"]
 		puts $file_handle [format "#define  XPAR_%s_%s_%s	XPAR_%s_%s" [string toupper $drv_string] $idx "BUFFER_INDEX" [string toupper $ipi_inst] "BUFFER_INDEX"]
 		puts $file_handle [format "#define  XPAR_%s_%s_%s	XPAR_%s_%s" [string toupper $drv_string] $idx "INT_ID" [string toupper $ipi_inst] "INT_ID"]
