@@ -37,7 +37,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define CSUDMA_DEVICE_ID  XPAR_XCSUDMA_0_DEVICE_ID /* CSU DMA device Id */
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -47,7 +49,11 @@
 /************************** Function Prototypes ******************************/
 
 
+#ifndef SDT
 int XCsuDma_SelfTestExample(u16 DeviceId);
+#else
+int XCsuDma_SelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -71,7 +77,11 @@ int main(void)
 	int Status;
 
 	/* Run the selftest example */
+#ifndef SDT
 	Status = XCsuDma_SelfTestExample((u16)CSUDMA_DEVICE_ID);
+#else
+	Status = XCsuDma_SelfTestExample(XPAR_CSUDMA_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CSU_DMA Selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -98,7 +108,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XCsuDma_SelfTestExample(u16 DeviceId)
+#else
+int XCsuDma_SelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XCsuDma_Config *Config;
@@ -108,7 +122,11 @@ int XCsuDma_SelfTestExample(u16 DeviceId)
 	 * look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XCsuDma_LookupConfig(DeviceId);
+#else
+	Config = XCsuDma_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
