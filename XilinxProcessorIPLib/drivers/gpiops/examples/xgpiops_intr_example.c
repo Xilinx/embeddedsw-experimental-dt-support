@@ -73,7 +73,9 @@
  * were created in the EDK XPS system.  They are defined here such that
  * the user can easily change all the needed device IDs in one place.
  */
+#ifndef SDT
 #define GPIO_DEVICE_ID		XPAR_XGPIOPS_0_DEVICE_ID
+#endif
 
 /* The following constants define the GPIO banks that are used. */
 #ifdef versal
@@ -88,7 +90,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 static int GpioIntrExample(XGpioPs *Gpio, u16 DeviceId);
+#else
+static int GpioIntrExample(XGpioPs *Gpio, UINTPTR BaseAddress);
+#endif
 static void IntrHandler(void *CallBackRef, u32 Bank, u32 Status);
 
 /************************** Variable Definitions *****************************/
@@ -127,7 +133,11 @@ int main(void)
 	 * Run the GPIO interrupt example, specify the parameters that
 	 * are generated in xparameters.h.
 	 */
+#ifndef SDT
 	Status = GpioIntrExample(&Gpio, GPIO_DEVICE_ID);
+#else
+	Status = GpioIntrExample(&Gpio, XPAR_XGPIOPS_0_BASEADDR);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("GPIO Interrupt Example Test Failed\r\n");
@@ -158,14 +168,22 @@ int main(void)
 * @note		None
 *
 *****************************************************************************/
+#ifndef SDT
 int GpioIntrExample(XGpioPs *Gpio, u16 DeviceId)
+#else
+int GpioIntrExample(XGpioPs *Gpio, UINTPTR BaseAddress)
+#endif
 {
 	XGpioPs_Config *ConfigPtr;
 	int Status;
 	int Type_of_board;
 
 	/* Initialize the Gpio driver. */
+#ifndef SDT
 	ConfigPtr = XGpioPs_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XGpioPs_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
