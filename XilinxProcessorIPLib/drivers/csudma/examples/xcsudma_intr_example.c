@@ -44,11 +44,7 @@
 #include "xcsudma.h"
 #include "xparameters.h"
 #include "xil_exception.h"
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
-#endif
+#include "xinterrupt_wrap.h"
 
 /************************** Function Prototypes ******************************/
 
@@ -110,11 +106,7 @@ u32 SrcBuf[SIZE] __attribute__ ((aligned (64)));	/**< Source buffer */
 
 /************************** Function Prototypes ******************************/
 
-int XCsuDma_IntrExample(INTC *IntcInstancePtr, XCsuDma *CsuDmaInstance,
-			u16 DeviceId, u16 IntrId);
-static int SetupInterruptSystem(INTC *IntcInstancePtr,
-				XCsuDma *CsuDmaInstance,
-				u16 CsuDmaIntrId);
+int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, u16 DeviceId);
 void IntrHandler(void *CallBackRef);
 
 static void SrcHandler(void *CallBackRef, u32 Event);
@@ -124,7 +116,6 @@ static void DstHandler(void *CallBackRef, u32 Event);
 
 #ifndef TESTAPP_GEN
 XCsuDma CsuDma;		/**<Instance of the Csu_Dma Device */
-static INTC Intc;	/* Instance of the Interrupt Controller */
 #endif
 volatile u32 DstDone = 0;
 
@@ -146,8 +137,7 @@ int main(void)
 	int Status;
 
 	/* Run the selftest example */
-	Status = XCsuDma_IntrExample(&Intc, &CsuDma, (u16)CSUDMA_DEVICE_ID,
-				     INTG_CSUDMA_INTR_DEVICE_ID);
+	Status = XCsuDma_IntrExample(&CsuDma, (u16)CSUDMA_DEVICE_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("CSU_DMA Interrupt Example Failed\r\n");
 		return XST_FAILURE;
@@ -178,8 +168,7 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
-int XCsuDma_IntrExample(INTC *IntcInstancePtr, XCsuDma *CsuDmaInstance,
-			u16 DeviceId, u16 IntrId)
+int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, u16 DeviceId)
 {
 	int Status;
 	XCsuDma_Config *Config;
@@ -220,8 +209,10 @@ int XCsuDma_IntrExample(INTC *IntcInstancePtr, XCsuDma *CsuDmaInstance,
 	/*
 	 * Connect to the interrupt controller.
 	 */
-	Status = SetupInterruptSystem(IntcInstancePtr, CsuDmaInstance,
-				      IntrId);
+	Status = XSetupInterruptSystem(CsuDmaInstance, &IntrHandler,
+			               CsuDmaInstance->Config.IntrId,
+				       CsuDmaInstance->Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -287,136 +278,6 @@ int XCsuDma_IntrExample(INTC *IntcInstancePtr, XCsuDma *CsuDmaInstance,
 
 	return XST_SUCCESS;
 }
-
-/*****************************************************************************/
-/**
-* This function sets up the interrupt system so interrupts can occur for the
-* CSU DMA. This function is application-specific. The user should modify this
-* function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the INTC.
-* @param	InstancePtr contains a pointer to the instance of the CSU DMA
-*		driver which is going to be connected to the interrupt
-*		controller.
-* @param	IntrId is the interrupt Id and is typically
-*		XPAR_<CSUDMA_instance>_INTR value from xparameters.h.
-*
-* @return
-*		- XST_SUCCESS if successful
-*		- XST_FAILURE if failed
-*
-* @note		None.
-
-*
-****************************************************************************/
-static int SetupInterruptSystem(INTC *IntcInstancePtr,
-				XCsuDma *InstancePtr,
-				u16 IntrId)
-{
-	int Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#ifndef TESTAPP_GEN
-	/* Initialize the interrupt controller and connect the ISRs */
-	Status = XIntc_Initialize(IntcInstancePtr, INTG_INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS)
-	{
-
-		xil_printf("Failed init intc\r\n");
-		return XST_FAILURE;
-	}
-#endif
-	/*
-	 * Connect the driver interrupt handler
-	 */
-	Status = XIntc_Connect(IntcInstancePtr, IntrId,
-				(XInterruptHandler)IntrHandler, InstancePtr);
-	if (Status != XST_SUCCESS)
-	{
-
-		xil_printf("Failed connect intc\r\n");
-		return XST_FAILURE;
-	}
-#ifndef TESTAPP_GEN
-	/*
-	 * Start the interrupt controller such that interrupts are enabled for
-	 * all devices that cause interrupts.
-	 */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS)
-	{
-		return XST_FAILURE;
-	}
-#endif
-
-	/*
-	 * Enable the interrupt for the CSUDMA device.
-	 */
-	XIntc_Enable(IntcInstancePtr, IntrId);
-#ifndef TESTAPP_GEN
-	Xil_ExceptionInit();
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)XIntc_InterruptHandler,
-				(void *)IntcInstancePtr);
-#endif
-#else
-#ifndef TESTAPP_GEN
-	XScuGic_Config *IntcConfig; /* Config for interrupt controller */
-
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTG_INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the
-	 * hardware interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-				IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect a device driver handler that will be called when an
-	 * interrupt for the device occurs, the device driver handler
-	 * performs the specific interrupt processing for the device
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-			(Xil_ExceptionHandler) IntrHandler,
-				  (void *) InstancePtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Enable the interrupt for the device
-	 */
-	XScuGic_Enable(IntcInstancePtr, IntrId);
-#endif
-#ifndef TESTAPP_GEN
-
-
-	/*
-	 * Enable interrupts
-	 */
-	Xil_ExceptionEnableMask(XIL_EXCEPTION_IRQ);
-#endif
-
-
-	return XST_SUCCESS;
-}
-
-
 
 /*****************************************************************************/
 /**

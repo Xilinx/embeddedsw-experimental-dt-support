@@ -155,18 +155,6 @@ proc gen_testfunc_call {swproj mhsinst} {
    }"
 
 	if {$isintr ==1 } {
-            if {
-                $proc == "microblaze"
-            } then {
-                    set intr_id "XPAR_${intcname}_${ipname}_${intr_pin_name}_INTR"
-            } else {
-		if {[string is integer -strict $index]} {
-			set intr_id "XPAR_${ip_name}_${index}_INTR"
-		} else {
-			set intr_id "XPAR_${ip_name}_INTR"
-		}
-	    }
-	    set intr_id [string toupper $intr_id]
 
       append testfunc_call "
    {
@@ -174,9 +162,7 @@ proc gen_testfunc_call {swproj mhsinst} {
 
       print(\"\\r\\n Running Interrupt Test  for ${ipname}...\\r\\n\");
 
-      Status = XCsuDma_IntrExample(&${intcvar}, &${ipname}, \\
-                                 ${deviceid}, \\
-                                 ${intr_id});
+      Status = XCsuDma_IntrExample(&${ipname}, ${deviceid});
 
       if (Status == 0) {
          print(\"CSUDMA Interrupt Example PASSED\\r\\n\");
