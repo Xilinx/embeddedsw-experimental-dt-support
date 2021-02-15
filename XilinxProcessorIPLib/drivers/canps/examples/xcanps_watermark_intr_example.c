@@ -40,6 +40,7 @@
 #include "xscugic.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -49,8 +50,6 @@
  * change all the needed parameters in one place.
  */
 #define CAN_DEVICE_ID		XPAR_XCANPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define CAN_INTR_VEC_ID		XPAR_XCANPS_0_INTR
 
 /*
  * Maximum CAN frame length in words.
@@ -100,10 +99,8 @@
 
 /************************** Function Prototypes ******************************/
 
-int CanPsWatermarkIntrExample(XScuGic *IntcInstPtr,
-				XCanPs *CanInstPtr,
-				u16 CanDeviceId,
-				u16 CanIntrId);
+int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
+			      u16 CanDeviceId);
 
 static void Config(XCanPs *InstancePtr);
 static void SendFrame(XCanPs *InstancePtr);
@@ -114,15 +111,10 @@ static void RecvHandler(void *CallBackRef);
 static void ErrorHandler(void *CallBackRef, u32 ErrorMask);
 static void EventHandler(void *CallBackRef, u32 Mask);
 
-static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
-				XCanPs *CanInstancePtr,
-				u16 CanIntrId);
-
 
 /************************** Variable Definitions *****************************/
 
 static XCanPs CanInstance;   /* Instance of the Can driver */
-static XScuGic IntcInstance; /* Instance of the Interrupt Controller driver */
 
 
 /*
@@ -164,8 +156,8 @@ int main(void)
 	/*
 	 * Run the Can Rx Watermark interrupt example.
 	 */
-	Status = CanPsWatermarkIntrExample(&IntcInstance, &CanInstance,
-					    CAN_DEVICE_ID, CAN_INTR_VEC_ID);
+	Status = CanPsWatermarkIntrExample(&CanInstance,
+					    CAN_DEVICE_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("CAN Watermark Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -197,8 +189,8 @@ int main(void)
 *		an infinite loop and will never return to the caller.
 *
 ******************************************************************************/
-int CanPsWatermarkIntrExample(XScuGic *IntcInstPtr, XCanPs *CanInstPtr,
-				u16 CanDeviceId, u16 CanIntrId)
+int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
+			      u16 CanDeviceId)
 {
 	int Status;
 	XCanPs_Config *ConfigPtr;
@@ -255,9 +247,10 @@ int CanPsWatermarkIntrExample(XScuGic *IntcInstPtr, XCanPs *CanInstPtr,
 	/*
 	 * Connect to the interrupt controller.
 	 */
-	Status =  SetupInterruptSystem(IntcInstPtr,
-					CanInstPtr,
-					CanIntrId);
+	Status = XSetupInterruptSystem(CanInstPtr,&XCanPs_IntrHandler,
+				       ConfigPtr->IntrId,
+				       ConfigPtr->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -694,86 +687,4 @@ static void EventHandler(void *CallBackRef, u32 IntrMask)
 		 * Interrupt should be put here.
 		 */
 	}
-}
-
-/*****************************************************************************/
-/**
-*
-* This function sets up the interrupt system so interrupts can occur for the
-* CAN. This function is application-specific since the actual system may or
-* may not have an interrupt controller. The CAN could be directly connected
-* to a processor without an interrupt controller. The user should modify this
-* function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of ScuGic driver.
-* @param	CanInstancePtr contains a pointer to the instance of the CAN
-*		which is going to be connected to the interrupt controller.
-* @param	CanIntrId is the interrupt Id and is typically
-*		XPAR_<CANPS_instance>_INTR value from xparameters.h.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-****************************************************************************/
-static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
-				XCanPs *CanInstancePtr,
-				u16 CanIntrId)
-{
-	int Status;
-
-#ifndef TESTAPP_GEN
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, CanIntrId,
-				(Xil_InterruptHandler)XCanPs_IntrHandler,
-				(void *)CanInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the CAN device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, CanIntrId);
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-#endif
-	return XST_SUCCESS;
 }
