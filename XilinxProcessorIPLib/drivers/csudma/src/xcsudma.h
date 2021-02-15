@@ -360,6 +360,10 @@ typedef struct {
 				 * 0 -- CSUDMA
 				 * 1 -- PMC DMA 0
 				 * 2 -- PMC DMA 1 */
+	u16 IntrId;		/** Bits[11:0] Interrupt-id Bits[15:12]
+				 * trigger type and level flags */
+	UINTPTR IntrParent; 	/** Bit[0] Interrupt parent type Bit[64/32:1]
+				 * Parent base address */
 } XCsuDma_Config;
 
 

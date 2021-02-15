@@ -11,13 +11,7 @@
 #include "xstatus.h"
 
 int XCsuDma_SelfTestExample(u16 DeviceId);
-#ifdef XPAR_SCUGIC_0_DEVICE_ID
-int XCsuDma_IntrExample(XScuGic *IntcInstancePtr, XCsuDma *CsuDmaInstance,
-			u16 DeviceId, u16 IntrId);
-#else
-#ifdef XPAR_INTC_0_DEVICE_ID
-int XCsuDma_IntrExample(XIntc *IntcInstancePtr, XCsuDma *CsuDmaInstance,
-			u16 DeviceId, u16 IntrId);
-#endif
+#if defined(XPAR_SCUGIC_0_DEVICE_ID) || defined(XPAR_INTC_0_DEVICE_ID)
+int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, u16 DeviceId);
 #endif
 #endif
