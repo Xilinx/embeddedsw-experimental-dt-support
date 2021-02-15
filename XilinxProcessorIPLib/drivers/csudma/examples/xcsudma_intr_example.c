@@ -53,6 +53,7 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define CSUDMA_DEVICE_ID  XPAR_XCSUDMA_0_DEVICE_ID /* CSU DMA device Id */
 #ifdef XPAR_INTC_0_DEVICE_ID
 #define INTC		XIntc
@@ -106,7 +107,11 @@ u32 SrcBuf[SIZE] __attribute__ ((aligned (64)));	/**< Source buffer */
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, u16 DeviceId);
+#else
+int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, UINTPTR BaseAddress);
+#endif
 void IntrHandler(void *CallBackRef);
 
 static void SrcHandler(void *CallBackRef, u32 Event);
@@ -137,7 +142,11 @@ int main(void)
 	int Status;
 
 	/* Run the selftest example */
+#ifndef SDT
 	Status = XCsuDma_IntrExample(&CsuDma, (u16)CSUDMA_DEVICE_ID);
+#else
+	Status = XCsuDma_IntrExample(&CsuDma, XPAR_XCSUDMA_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CSU_DMA Interrupt Example Failed\r\n");
 		return XST_FAILURE;
@@ -168,7 +177,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, u16 DeviceId)
+#else
+int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XCsuDma_Config *Config;
@@ -183,7 +196,11 @@ int XCsuDma_IntrExample(XCsuDma *CsuDmaInstance, u16 DeviceId)
 	 * look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XCsuDma_LookupConfig(DeviceId);
+#else
+	Config = XCsuDma_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
