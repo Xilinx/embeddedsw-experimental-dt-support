@@ -40,7 +40,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define CAN_DEVICE_ID	XPAR_XCANPS_0_DEVICE_ID
+#endif
 
 /*
  * Maximum CAN frame length in words.
@@ -87,7 +89,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int CanPsPolledExample(u16 DeviceId);
+#else
+int CanPsPolledExample(UINTPTR BaseAddress);
+#endif
 static int SendFrame(XCanPs *InstancePtr);
 static int RecvFrame(XCanPs *InstancePtr);
 
@@ -128,7 +134,11 @@ int main(void)
 	 * Run the Can Polled example, specify the Device ID that is generated
 	 * in xparameters.h .
 	 */
+#ifndef SDT
 	Status = CanPsPolledExample(CAN_DEVICE_ID);
+#else
+	Status = CanPsPolledExample(XPAR_XCANPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CAN Polled Mode Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -157,7 +167,11 @@ int main(void)
 * loop and will never return to the caller.
 *
 ******************************************************************************/
+#ifndef SDT
 int CanPsPolledExample(u16 DeviceId)
+#else
+int CanPsPolledExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XCanPs *CanInstPtr = &Can;
@@ -166,7 +180,11 @@ int CanPsPolledExample(u16 DeviceId)
 	/*
 	 * Initialize the Can device.
 	 */
+#ifndef SDT
 	ConfigPtr = XCanPs_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XCanPs_LookupConfig(BaseAddress);
+#endif
 	if (CanInstPtr == NULL) {
 		return XST_FAILURE;
 	}
