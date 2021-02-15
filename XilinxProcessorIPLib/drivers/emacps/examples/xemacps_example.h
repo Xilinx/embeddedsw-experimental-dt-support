@@ -49,11 +49,7 @@
 #include "xil_cache.h"
 #include "xil_printf.h"
 #include "xemacps.h"		/* defines XEmacPs API */
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
-#endif
+#include "xinterrupt_wrap.h"
 
 #ifndef __MICROBLAZE__
 #include "sleep.h"

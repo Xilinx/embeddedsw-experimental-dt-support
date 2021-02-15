@@ -132,15 +132,7 @@
 #define XPS_SYS_CTRL_BASEADDR	XPAR_PS7_SLCR_0_S_AXI_BASEADDR
 #endif
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC		XIntc
 #define EMACPS_DEVICE_ID	XPAR_XEMACPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#else
-#define INTC		XScuGic
-#define EMACPS_DEVICE_ID	XPAR_XEMACPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#endif
 
 #define ZYNQ_EMACPS_0_BASEADDR 0xE000B000
 #define ZYNQ_EMACPS_1_BASEADDR 0xE000C000
@@ -253,9 +245,6 @@ volatile s32 DeviceErrors;	/* Number of errors detected in the device */
 
 u32 TxFrameLength;
 
-#ifndef TESTAPP_GEN
-static INTC IntcInstance;
-#endif
 
 #ifdef __ICCARM__
 #pragma data_alignment = 64
@@ -275,8 +264,7 @@ u32 GemVersion;
 /*
  * Example
  */
-LONG EmacPsDmaIntrExample(INTC *IntcInstancePtr,
-			  XEmacPs *EmacPsInstancePtr,
+LONG EmacPsDmaIntrExample(XEmacPs *EmacPsInstancePtr,
 			  u16 EmacPsDeviceId);
 
 LONG EmacPsDmaSingleFrameIntrExample(XEmacPs * EmacPsInstancePtr);
@@ -284,14 +272,6 @@ LONG EmacPsDmaSingleFrameIntrExample(XEmacPs * EmacPsInstancePtr);
 /*
  * Interrupt setup and Callbacks for examples
  */
-
-static LONG EmacPsSetupIntrSystem(INTC * IntcInstancePtr,
-				  XEmacPs * EmacPsInstancePtr,
-				  u16 EmacPsIntrId);
-
-static void EmacPsDisableIntrSystem(INTC * IntcInstancePtr,
-				     u16 EmacPsIntrId);
-
 static void XEmacPsSendHandler(void *Callback);
 static void XEmacPsRecvHandler(void *Callback);
 static void XEmacPsErrorHandler(void *Callback, u8 direction, u32 word);
@@ -300,7 +280,7 @@ static void XEmacPsErrorHandler(void *Callback, u8 direction, u32 word);
  * Utility routines
  */
 static LONG EmacPsResetDevice(XEmacPs * EmacPsInstancePtr);
-void XEmacPsClkSetup(XEmacPs *EmacPsInstancePtr, u16 EmacPsIntrId);
+void XEmacPsClkSetup(XEmacPs *EmacPsInstancePtr);
 void XEmacPs_SetMdioDivisor(XEmacPs *InstancePtr, XEmacPs_MdcDiv Divisor);
 /****************************************************************************/
 /**
@@ -324,8 +304,7 @@ int main(void)
 	 * Call the EmacPs DMA interrupt example , specify the parameters
 	 * generated in xparameters.h
 	 */
-	Status = EmacPsDmaIntrExample(&IntcInstance,
-				       &EmacPsInstance,
+	Status = EmacPsDmaIntrExample(&EmacPsInstance,
 				       EMACPS_DEVICE_ID);
 
 	if (Status != XST_SUCCESS) {
@@ -356,14 +335,12 @@ int main(void)
 * @note		None.
 *
 *****************************************************************************/
-LONG EmacPsDmaIntrExample(INTC * IntcInstancePtr,
-			  XEmacPs * EmacPsInstancePtr,
+LONG EmacPsDmaIntrExample(XEmacPs * EmacPsInstancePtr,
 			  u16 EmacPsDeviceId)
 {
 	LONG Status;
 	XEmacPs_Config *Config;
 	XEmacPs_Bd BdTemplate;
-	u16 EmacPsIntrId;
 
 	/*************************************/
 	/* Setup device for first-time usage */
@@ -395,28 +372,6 @@ LONG EmacPsDmaIntrExample(INTC * IntcInstancePtr,
 		return XST_FAILURE;
 	}
 
-#if defined(XPAR_INTC_0_DEVICE_ID)
-	EmacPsIntrId = XPAR_AXI_INTC_0_PROCESSING_SYSTEM7_0_IRQ_P2F_ENET0_INTR;
-#else
-	if ((EmacPsInstancePtr->Config.BaseAddress == ZYNQ_EMACPS_0_BASEADDR) ||
-		(EmacPsInstancePtr->Config.BaseAddress == ZYNQMP_EMACPS_0_BASEADDR) ||
-		(EmacPsInstancePtr->Config.BaseAddress == VERSAL_EMACPS_0_BASEADDR)) {
-		EmacPsIntrId = XPS_GEM0_INT_ID;
-	} else if ((EmacPsInstancePtr->Config.BaseAddress == ZYNQ_EMACPS_1_BASEADDR) ||
-			(EmacPsInstancePtr->Config.BaseAddress == ZYNQMP_EMACPS_1_BASEADDR) ||
-			(EmacPsInstancePtr->Config.BaseAddress == VERSAL_EMACPS_1_BASEADDR)) {
-		EmacPsIntrId = XPS_GEM1_INT_ID;
-	} else if (EmacPsInstancePtr->Config.BaseAddress == ZYNQMP_EMACPS_2_BASEADDR) {
-#ifdef XPS_GEM2_INT_ID
-		EmacPsIntrId = XPS_GEM2_INT_ID;
-#endif
-	} else if (EmacPsInstancePtr->Config.BaseAddress == ZYNQMP_EMACPS_3_BASEADDR) {
-#ifdef XPS_GEM3_INT_ID
-		EmacPsIntrId = XPS_GEM3_INT_ID;
-#endif
-	}
-#endif
-
 	GemVersion = ((Xil_In32(Config->BaseAddress + 0xFC)) >> 16) & 0xFFF;
 
 	if (GemVersion == GEMVERSION_VERSAL) {
@@ -429,7 +384,7 @@ LONG EmacPsDmaIntrExample(INTC * IntcInstancePtr,
 		XEmacPs_SetOptions(EmacPsInstancePtr, XEMACPS_JUMBO_ENABLE_OPTION);
 	}
 
-	XEmacPsClkSetup(EmacPsInstancePtr, EmacPsIntrId);
+	XEmacPsClkSetup(EmacPsInstancePtr);
 
 	/*
 	 * Set the MAC address
@@ -619,8 +574,10 @@ LONG EmacPsDmaIntrExample(INTC * IntcInstancePtr,
 	/*
 	 * Setup the interrupt controller and enable interrupts
 	 */
-	Status = EmacPsSetupIntrSystem(IntcInstancePtr,
-					EmacPsInstancePtr, EmacPsIntrId);
+	Status = XSetupInterruptSystem(EmacPsInstancePtr, &XEmacPs_IntrHandler,
+				       EmacPsInstancePtr->Config.IntrId,
+				       EmacPsInstancePtr->Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 
 	/*
 	 * Run the EmacPs DMA Single Frame Interrupt example
@@ -633,7 +590,8 @@ LONG EmacPsDmaIntrExample(INTC * IntcInstancePtr,
 	/*
 	 * Disable the interrupts for the EmacPs device
 	 */
-	EmacPsDisableIntrSystem(IntcInstancePtr, EmacPsIntrId);
+	XDisconnectInterruptCntrl(EmacPsInstancePtr->Config.IntrId,
+				  EmacPsInstancePtr->Config.IntrParent);
 
 	/*
 	 * Stop the device
@@ -1045,172 +1003,6 @@ static LONG EmacPsResetDevice(XEmacPs * EmacPsInstancePtr)
 	return XST_SUCCESS;
 }
 
-
-/****************************************************************************/
-/**
-*
-* This function setups the interrupt system so interrupts can occur for the
-* EMACPS.
-* @param	IntcInstancePtr is a pointer to the instance of the Intc driver.
-* @param	EmacPsInstancePtr is a pointer to the instance of the EmacPs
-*		driver.
-* @param	EmacPsIntrId is the Interrupt ID and is typically
-*		XPAR_<EMACPS_instance>_INTR value from xparameters.h.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-*****************************************************************************/
-static LONG EmacPsSetupIntrSystem(INTC *IntcInstancePtr,
-				  XEmacPs *EmacPsInstancePtr,
-				  u16 EmacPsIntrId)
-{
-	LONG Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-
-	#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the interrupt controller driver so that it's ready to
-	 * use.
-	 */
-	Status = XIntc_Initialize(IntcInstancePtr, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-	#endif
-
-	/*
-	 * Connect the handler that will be called when an interrupt
-	 * for the device occurs, the handler defined above performs the
-	 * specific interrupt processing for the device.
-	 */
-	Status = XIntc_Connect(IntcInstancePtr, EmacPsIntrId,
-		(XInterruptHandler) XEmacPs_IntrHandler, EmacPsInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	#ifndef TESTAPP_GEN
-/*
- * Start the interrupt controller such that interrupts are enabled for
- * all devices that cause interrupts.
- */
-
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-	#endif
-
-	/*
-	 * Enable the interrupt from the hardware
-	 */
-	XIntc_Enable(IntcInstancePtr, EmacPsIntrId);
-
-	#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the exception table.
-	 */
-	Xil_ExceptionInit();
-
-	/*
-	 * Register the interrupt controller handler with the exception table.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler) XIntc_InterruptHandler,
-					IntcInstancePtr);
-	#endif
-
-#else
-#ifndef TESTAPP_GEN
-	XScuGic_Config *GicConfig;
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	GicConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == GicConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, GicConfig,
-		    GicConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-			(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-			IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect a device driver handler that will be called when an
-	 * interrupt for the device occurs, the device driver handler performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, EmacPsIntrId,
-			(Xil_InterruptHandler) XEmacPs_IntrHandler,
-			(void *) EmacPsInstancePtr);
-	if (Status != XST_SUCCESS) {
-		EmacPsUtilErrorTrap
-			("Unable to connect ISR to interrupt controller");
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Enable interrupts from the hardware
-	 */
-	XScuGic_Enable(IntcInstancePtr, EmacPsIntrId);
-#endif
-#ifndef TESTAPP_GEN
-	/*
-	 * Enable interrupts in the processor
-	 */
-	Xil_ExceptionEnable();
-#endif
-	return XST_SUCCESS;
-}
-
-
-/****************************************************************************/
-/**
-*
-* This function disables the interrupts that occur for EmacPs.
-*
-* @param	IntcInstancePtr is the pointer to the instance of the ScuGic
-*		driver.
-* @param	EmacPsIntrId is interrupt ID and is typically
-*		XPAR_<EMACPS_instance>_INTR value from xparameters.h.
-*
-* @return	None.
-*
-* @note		None.
-*
-*****************************************************************************/
-static void EmacPsDisableIntrSystem(INTC * IntcInstancePtr,
-				     u16 EmacPsIntrId)
-{
-	/*
-	 * Disconnect and disable the interrupt for the EmacPs device
-	 */
-#ifdef XPAR_INTC_0_DEVICE_ID
-	XIntc_Disconnect(IntcInstancePtr, EmacPsIntrId);
-#else
-	XScuGic_Disconnect(IntcInstancePtr, EmacPsIntrId);
-#endif
-
-}
-
 /****************************************************************************/
 /**
 *
@@ -1366,7 +1158,7 @@ static void XEmacPsErrorHandler(void *Callback, u8 Direction, u32 ErrorWord)
 * @note		None.
 *
 *****************************************************************************/
-void XEmacPsClkSetup(XEmacPs *EmacPsInstancePtr, u16 EmacPsIntrId)
+void XEmacPsClkSetup(XEmacPs *EmacPsInstancePtr)
 {
 	u32 ClkCntrl;
 	u32 BaseAddress = EmacPsInstancePtr->Config.BaseAddress;
