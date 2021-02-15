@@ -132,7 +132,9 @@
 #define XPS_SYS_CTRL_BASEADDR	XPAR_PS7_SLCR_0_S_AXI_BASEADDR
 #endif
 
+#ifndef SDT
 #define EMACPS_DEVICE_ID	XPAR_XEMACPS_0_DEVICE_ID
+#endif
 
 #define ZYNQ_EMACPS_0_BASEADDR 0xE000B000
 #define ZYNQ_EMACPS_1_BASEADDR 0xE000C000
@@ -264,8 +266,13 @@ u32 GemVersion;
 /*
  * Example
  */
+#ifndef SDT
 LONG EmacPsDmaIntrExample(XEmacPs *EmacPsInstancePtr,
 			  u16 EmacPsDeviceId);
+#else
+LONG EmacPsDmaIntrExample(XEmacPs *EmacPsInstancePtr,
+			  UINTPTR BaseAddress);
+#endif
 
 LONG EmacPsDmaSingleFrameIntrExample(XEmacPs * EmacPsInstancePtr);
 
@@ -304,8 +311,13 @@ int main(void)
 	 * Call the EmacPs DMA interrupt example , specify the parameters
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = EmacPsDmaIntrExample(&EmacPsInstance,
 				       EMACPS_DEVICE_ID);
+#else
+	Status = EmacPsDmaIntrExample(&EmacPsInstance,
+				      XPAR_XEMACPS_0_BASEADDR);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		EmacPsUtilErrorTrap("Emacps intr dma Example Failed\r\n");
@@ -335,8 +347,13 @@ int main(void)
 * @note		None.
 *
 *****************************************************************************/
+#ifndef SDT
 LONG EmacPsDmaIntrExample(XEmacPs * EmacPsInstancePtr,
 			  u16 EmacPsDeviceId)
+#else
+LONG EmacPsDmaIntrExample(XEmacPs * EmacPsInstancePtr,
+			  UINTPTR BaseAddress)
+#endif
 {
 	LONG Status;
 	XEmacPs_Config *Config;
@@ -352,7 +369,11 @@ LONG EmacPsDmaIntrExample(XEmacPs * EmacPsInstancePtr,
 	 *  retiring _Initialize. So in _CfgInitialize we use
 	 *  XPAR_(IP)_BASEADDRESS to make sure it is not virtual address.
 	 */
+#ifndef SDT
 	Config = XEmacPs_LookupConfig(EmacPsDeviceId);
+#else
+	Config = XEmacPs_LookupConfig(BaseAddress);
+#endif
 
 #if EL1_NONSECURE
 	/* Request device to indicate it is in use by this application */
