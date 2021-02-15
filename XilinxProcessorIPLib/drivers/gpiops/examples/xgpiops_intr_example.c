@@ -63,6 +63,7 @@
 #include "xscugic.h"
 #include "xil_exception.h"
 #include "xplatform_info.h"
+#include "xinterrupt_wrap.h"
 #include <xil_printf.h>
 
 /************************** Constant Definitions *****************************/
@@ -73,12 +74,6 @@
  * the user can easily change all the needed device IDs in one place.
  */
 #define GPIO_DEVICE_ID		XPAR_XGPIOPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#ifdef versal
-#define GPIO_INTERRUPT_ID	XPMC_GPIO_INT_ID
-#else
-#define GPIO_INTERRUPT_ID	XPAR_XGPIOPS_0_INTR
-#endif
 
 /* The following constants define the GPIO banks that are used. */
 #ifdef versal
@@ -93,10 +88,8 @@
 
 /************************** Function Prototypes ******************************/
 
-static int GpioIntrExample(XScuGic *Intc, XGpioPs *Gpio, u16 DeviceId,
-			   u16 GpioIntrId);
+static int GpioIntrExample(XGpioPs *Gpio, u16 DeviceId);
 static void IntrHandler(void *CallBackRef, u32 Bank, u32 Status);
-static int SetupInterruptSystem(XScuGic *Intc, XGpioPs *Gpio, u16 GpioIntrId);
 
 /************************** Variable Definitions *****************************/
 
@@ -105,8 +98,6 @@ static int SetupInterruptSystem(XScuGic *Intc, XGpioPs *Gpio, u16 GpioIntrId);
  * easily accessible from a debugger.
  */
 static XGpioPs Gpio; /* The Instance of the GPIO Driver */
-
-static XScuGic Intc; /* The Instance of the Interrupt Controller Driver */
 
 static u32 AllButtonsPressed; /* Intr status of the bank */
 static u32 Input_Bank_Pin; /* Pin Number within Bank */
@@ -136,8 +127,7 @@ int main(void)
 	 * Run the GPIO interrupt example, specify the parameters that
 	 * are generated in xparameters.h.
 	 */
-	Status = GpioIntrExample(&Intc, &Gpio, GPIO_DEVICE_ID,
-				 GPIO_INTERRUPT_ID);
+	Status = GpioIntrExample(&Gpio, GPIO_DEVICE_ID);
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("GPIO Interrupt Example Test Failed\r\n");
@@ -168,7 +158,7 @@ int main(void)
 * @note		None
 *
 *****************************************************************************/
-int GpioIntrExample(XScuGic *Intc, XGpioPs *Gpio, u16 DeviceId, u16 GpioIntrId)
+int GpioIntrExample(XGpioPs *Gpio, u16 DeviceId)
 {
 	XGpioPs_Config *ConfigPtr;
 	int Status;
@@ -222,7 +212,10 @@ int GpioIntrExample(XScuGic *Intc, XGpioPs *Gpio, u16 DeviceId, u16 GpioIntrId)
 	 * Setup the interrupts such that interrupt processing can occur. If
 	 * an error occurs then exit.
 	 */
-	Status = SetupInterruptSystem(Intc, Gpio, GPIO_INTERRUPT_ID);
+	Status = XSetupInterruptSystem(Gpio,&XGpioPs_IntrHandler,
+				       ConfigPtr->IntrId,
+				       ConfigPtr->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -266,90 +259,4 @@ static void IntrHandler(void *CallBackRef, u32 Bank, u32 Status)
 		XGpioPs_WritePin(Gpio, Output_Pin, DataRead);
 		AllButtonsPressed = TRUE;
 	}
-}
-
-
-/*****************************************************************************/
-/**
-*
-* This function sets up the interrupt system for the example. It enables falling
-* edge interrupts for all the pins of bank 0 in the GPIO device.
-*
-* @param	GicInstancePtr is a pointer to the XScuGic driver Instance.
-* @param	GpioInstancePtr contains a pointer to the instance of the GPIO
-*		component which is going to be connected to the interrupt
-*		controller.
-* @param	GpioIntrId is the interrupt Id and is typically
-*		XPAR_<GICPS>_<GPIOPS_instance>_VEC_ID value from
-*		xparameters.h.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-****************************************************************************/
-static int SetupInterruptSystem(XScuGic *GicInstancePtr, XGpioPs *Gpio,
-				u16 GpioIntrId)
-{
-	int Status;
-
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(GicInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				GicInstancePtr);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(GicInstancePtr, GpioIntrId,
-				(Xil_ExceptionHandler)XGpioPs_IntrHandler,
-				(void *)Gpio);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/* Enable falling edge interrupts for all the pins in GPIO bank. */
-	XGpioPs_SetIntrType(Gpio, GPIO_BANK, 0x00, 0xFFFFFFFF, 0x00);
-
-	/* Set the handler for gpio interrupts. */
-	XGpioPs_SetCallbackHandler(Gpio, (void *)Gpio, IntrHandler);
-
-
-	/* Enable the GPIO interrupts of GPIO Bank. */
-	XGpioPs_IntrEnable(Gpio, GPIO_BANK, (1 << Input_Bank_Pin));
-
-
-	/* Enable the interrupt for the GPIO device. */
-	XScuGic_Enable(GicInstancePtr, GpioIntrId);
-
-
-	/* Enable interrupts in the Processor. */
-	Xil_ExceptionEnableMask(XIL_EXCEPTION_IRQ);
-
-	return XST_SUCCESS;
 }
