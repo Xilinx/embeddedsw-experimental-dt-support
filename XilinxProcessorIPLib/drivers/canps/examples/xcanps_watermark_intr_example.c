@@ -49,7 +49,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define CAN_DEVICE_ID		XPAR_XCANPS_0_DEVICE_ID
+#endif
 
 /*
  * Maximum CAN frame length in words.
@@ -99,8 +101,13 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
 			      u16 CanDeviceId);
+#else
+int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
+			      UINTPTR BaseAddress);
+#endif
 
 static void Config(XCanPs *InstancePtr);
 static void SendFrame(XCanPs *InstancePtr);
@@ -156,8 +163,13 @@ int main(void)
 	/*
 	 * Run the Can Rx Watermark interrupt example.
 	 */
+#ifndef SDT
 	Status = CanPsWatermarkIntrExample(&CanInstance,
 					    CAN_DEVICE_ID);
+#else
+	Status = CanPsWatermarkIntrExample(&CanInstance,
+					   XPAR_XCANPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CAN Watermark Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -189,8 +201,13 @@ int main(void)
 *		an infinite loop and will never return to the caller.
 *
 ******************************************************************************/
+#ifndef SDT
 int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
 			      u16 CanDeviceId)
+#else
+int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
+			      UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XCanPs_Config *ConfigPtr;
@@ -199,7 +216,11 @@ int CanPsWatermarkIntrExample(XCanPs *CanInstPtr,
 	/*
 	 * Initialize the Can device.
 	 */
+#ifndef SDT
 	ConfigPtr = XCanPs_LookupConfig(CanDeviceId);
+#else
+	ConfigPtr = XCanPs_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}

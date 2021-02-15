@@ -46,7 +46,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define CAN_DEVICE_ID          XPAR_XCANPS_0_DEVICE_ID
+#endif
 
 /* Maximum CAN frame length in word */
 #define XCANPS_MAX_FRAME_SIZE_IN_WORDS (XCANPS_MAX_FRAME_SIZE / sizeof(u32))
@@ -90,8 +92,13 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int CanPsIntrExample(XCanPs *CanInstPtr,
 		     u16 CanDeviceId);
+#else
+int CanPsIntrExample(XCanPs *CanInstPtr,
+		     UINTPTR BaseAddress);
+#endif
 static void Config(XCanPs *InstancePtr);
 static void SendFrame(XCanPs *InstancePtr);
 
@@ -144,8 +151,13 @@ int main(void)
 	/*
 	 * Run the Can interrupt example.
 	 */
+#ifndef SDT
 	Status = CanPsIntrExample(&CanInstance,
 				   CAN_DEVICE_ID);
+#else
+	Status = CanPsIntrExample(&CanInstance,
+				  XPAR_XCANPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CAN Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -177,7 +189,11 @@ int main(void)
 *		an infinite loop and will never return to the caller.
 *
 ******************************************************************************/
+#ifndef SDT
 int CanPsIntrExample(XCanPs *CanInstPtr, u16 CanDeviceId)
+#else
+int CanPsIntrExample(XCanPs *CanInstPtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XCanPs_Config *ConfigPtr;
@@ -185,7 +201,11 @@ int CanPsIntrExample(XCanPs *CanInstPtr, u16 CanDeviceId)
 	/*
 	 * Initialize the Can device.
 	 */
+#ifndef SDT
 	ConfigPtr = XCanPs_LookupConfig(CanDeviceId);
+#else
+	ConfigPtr = XCanPs_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
