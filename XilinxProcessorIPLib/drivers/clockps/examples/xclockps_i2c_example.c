@@ -28,8 +28,16 @@
 #include "xstatus.h"
 #include "xil_printf.h"
 
+#ifdef SDT
+#include "xresetps.h"
+#endif
+
 /************************** Constant Definitions *****************************/
+#ifndef SDT
 #define CLOCK_DEVICE_ID              (XPAR_XCLOCKPS_DEVICE_ID)
+#else
+#define CLOCK_DEVICE_ID              (0)
+#endif
 #define XCLOCK_I2C0_REF_RATE1        (1428428)
 #define XCLOCK_I2C0_REF_RATE2        (33330000)
 
@@ -38,11 +46,19 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 static XStatus ClockPsExample(XClock *ClockInstancePtr, u16 ClockDevId);
+#else
+static XStatus ClockPsExample(XClock *ClockInstancePtr, u32 BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 XClock ClockInstance;		/* Instance of clock Controller */
+#ifndef SDT
 XClockPs_Config *ConfigPtr;
+#else
+XResetPs_Config *ConfigPtr;
+#endif
 
 /*****************************************************************************/
 /**
@@ -87,16 +103,28 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 static XStatus ClockPsExample(XClock *ClockInstancePtr, u16 ClockDeviceId)
+#else
+static XStatus ClockPsExample(XClock *ClockInstancePtr, u32 BaseAddress)
+#endif
 {
 	XStatus    Status;
 	XClockRate Rate;
 
 	/* Lookup clock configurations */
+#ifndef SDT
 	ConfigPtr = XClock_LookupConfig(ClockDeviceId);
+#else
+	ConfigPtr = XResetPs_LookupConfig(BaseAddress);
+#endif
 
 	/* Initialize the Clock controller driver */
+#ifndef SDT
 	Status = XClock_CfgInitialize(ClockInstancePtr, ConfigPtr);
+#else
+	Status = XClock_CfgInitialize(ClockInstancePtr, BaseAddress);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Failed: Fetching clock configuration\r\n");
 		return Status;
