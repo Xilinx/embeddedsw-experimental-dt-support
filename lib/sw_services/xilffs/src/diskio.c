@@ -70,7 +70,11 @@
 #include "diskio.h"
 #include "ff.h"
 #include "xil_types.h"
+#include "xstatus.h"
+
+#ifdef SDT
 #include "xilffs_config.h"
+#endif
 
 #ifdef FILE_SYSTEM_INTERFACE_SD
 #include "xsdps.h"		/* SD device driver */
