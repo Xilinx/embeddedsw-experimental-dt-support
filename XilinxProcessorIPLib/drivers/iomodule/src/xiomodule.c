@@ -121,7 +121,11 @@ s32 XIOModule_Initialize(XIOModule * InstancePtr, u32 BaseAddress)
 	 * Lookup the device configuration in the CROM table. Use this
 	 * configuration info down below when initializing this component.
 	 */
+#ifndef SDT
+	CfgPtr = XIOModule_LookupConfig(DeviceId);
+#else
 	CfgPtr = XIOModule_LookupConfig(BaseAddress);
+#endif
 	if (CfgPtr == NULL) {
 		return XST_DEVICE_NOT_FOUND;
 	}
@@ -862,7 +866,11 @@ s32 XIOModule_Timer_Initialize(XIOModule * InstancePtr, u32 BaseAddress)
 	 * Lookup the device configuration in the temporary CROM table. Use this
 	 * configuration info down below when initializing this component.
 	 */
+#ifndef SDT
+	IOModuleConfigPtr = XIOModule_LookupConfig(DeviceId);
+#else
 	IOModuleConfigPtr = XIOModule_LookupConfig(BaseAddress);
+#endif
 
 	if (IOModuleConfigPtr == (XIOModule_Config *) NULL) {
 		return XST_DEVICE_NOT_FOUND;
