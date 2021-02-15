@@ -35,14 +35,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define IIC_DEVICE_ID		XPAR_XIICPS_0_DEVICE_ID
+#endif
 
 
 /**************************** Type Definitions ********************************/
 
 /************************** Function Prototypes *******************************/
 
+#ifndef SDT
 int IicPsSelfTestExample(u16 DeviceId);
+#else
+int IicPsSelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions ******************************/
 
@@ -70,7 +76,11 @@ int main(void)
 	 * Run the Iic Self Test example, specify the Device ID that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = IicPsSelfTestExample(IIC_DEVICE_ID);
+#else
+	Status = IicPsSelfTestExample(XPAR_XIICPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("IIC Self Test Failed\r\n");
 		return XST_FAILURE;
@@ -98,7 +108,11 @@ int main(void)
 *
 *
 *******************************************************************************/
+#ifndef SDT
 int IicPsSelfTestExample(u16 DeviceId)
+#else
+int IicPsSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XIicPs_Config *Config;
@@ -107,7 +121,11 @@ int IicPsSelfTestExample(u16 DeviceId)
 	 * Initialize the IIC driver so that it's ready to use
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XIicPs_LookupConfig(DeviceId);
+#else
+	Config = XIicPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}

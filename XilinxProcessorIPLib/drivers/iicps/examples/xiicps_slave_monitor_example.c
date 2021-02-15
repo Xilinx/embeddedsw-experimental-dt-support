@@ -45,8 +45,13 @@
 int IicPsSlaveMonitorExample();
 
 static void Handler(void *CallBackRef, u32 Event);
+#ifndef SDT
 static int IicPsSlaveMonitor(u16 Address, u16 DeviceId);
 static int IicPsConfig(u16 DeviceId);
+#else
+static int IicPsSlaveMonitor(u16 Address, UINTPTR BaseAddress);
+static int IicPsConfig(UINTPTR BaseAddress);
+#endif
 static int IicPsFindDevice(u16 Addr);
 
 /************************** Variable Definitions ******************************/
@@ -108,7 +113,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 static int IicPsConfig(u16 DeviceId)
+#else
+static int IicPsConfig(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XIicPs_Config *ConfigPtr;	/* Pointer to configuration data */
@@ -116,7 +125,11 @@ static int IicPsConfig(u16 DeviceId)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
+#ifndef SDT
 	ConfigPtr = XIicPs_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XIicPs_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -190,7 +203,11 @@ int IicPsSlaveMonitorExample(void)
 * @note 	None.
 *
 *******************************************************************************/
+#ifndef SDT
 static int IicPsSlaveMonitor(u16 Address, u16 DeviceId)
+#else
+static int IicPsSlaveMonitor(u16 Address, UINTPTR BaseAddress)
+#endif
 {
 	u32 Index;
 	int Status;
@@ -199,7 +216,11 @@ static int IicPsSlaveMonitor(u16 Address, u16 DeviceId)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
+#ifndef SDT
 	Status = IicPsConfig(DeviceId);
+#else
+	Status = IicPsConfig(BaseAddress);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}

@@ -44,7 +44,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define IIC_DEVICE_ID		XPAR_XIICPS_0_DEVICE_ID
+#endif
 
 /*
  * The slave address to send to and receive from.
@@ -63,8 +65,11 @@
 /**************************** Type Definitions ********************************/
 
 /************************** Function Prototypes *******************************/
-
+#ifndef SDT
 s32 IicPsMultiMasterIntrExample(u16 DeviceId);
+#else
+s32 IicPsMultiMasterIntrExample(UINTPTR BaseAddress);
+#endif
 
 void Handler(void *CallBackRef, u32 Event);
 
@@ -109,7 +114,11 @@ s32 main(void)
 	 * Run the Iic Master Interrupt example , specify the Device ID that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = IicPsMultiMasterIntrExample(IIC_DEVICE_ID);
+#else
+	Status = IicPsMultiMasterIntrExample(XPAR_XIICPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("IIC MultiMaster Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -146,7 +155,11 @@ s32 main(void)
 * working it may never return.
 *
 *******************************************************************************/
+#ifndef SDT
 s32 IicPsMultiMasterIntrExample(u16 DeviceId)
+#else
+s32 IicPsMultiMasterIntrExample(UINTPTR BaseAddress)
+#endif
 {
 	s32 Status;
 	XIicPs_Config *Config;
@@ -159,7 +172,11 @@ s32 IicPsMultiMasterIntrExample(u16 DeviceId)
 	 * Initialize the IIC driver so that it's ready to use
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XIicPs_LookupConfig(DeviceId);
+#else
+	Config = XIicPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
