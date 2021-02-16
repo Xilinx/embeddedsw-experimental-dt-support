@@ -66,8 +66,8 @@
 /***************************** Include Files *********************************/
 
 #include "xqspipsu_flash_config.h"
-#include "xscugic.h"		/* Interrupt controller device driver */
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -86,8 +86,6 @@
  * change all the needed parameters in one place.
  */
 #define QSPIPSU_DEVICE_ID	XPAR_XQSPIPSU_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define QSPIPSU_INTR_ID		XPAR_XQSPIPS_0_INTR
 
 /*
  * Number of flash pages to be written.
@@ -121,8 +119,8 @@ u8 FSRFlag;
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-int QspiPsuInterruptFlashExample(XScuGic *IntcInstancePtr, XQspiPsu *QspiPsuInstancePtr,
-				u16 QspiPsuDeviceId, u16 QspiPsuIntrId);
+int QspiPsuInterruptFlashExample(XQspiPsu *QspiPsuInstancePtr,
+				 u16 QspiPsuDeviceId);
 int FlashReadID(XQspiPsu *QspiPsuPtr);
 int FlashErase(XQspiPsu *QspiPsuPtr, u32 Address, u32 ByteCount, u8 *WriteBfrPtr);
 int FlashWrite(XQspiPsu *QspiPsuPtr, u32 Address, u32 ByteCount, u8 Command,
@@ -132,9 +130,6 @@ int FlashRead(XQspiPsu *QspiPsuPtr, u32 Address, u32 ByteCount, u8 Command,
 u32 GetRealAddr(XQspiPsu *QspiPsuPtr, u32 Address);
 int BulkErase(XQspiPsu *QspiPsuPtr, u8 *WriteBfrPtr);
 int DieErase(XQspiPsu *QspiPsuPtr, u8 *WriteBfrPtr);
-static int QspiPsuSetupIntrSystem(XScuGic *IntcInstancePtr,
-			       XQspiPsu *QspiPsuInstancePtr, u16 QspiPsuIntrId);
-static void QspiPsuDisableIntrSystem(XScuGic *IntcInstancePtr, u16 QspiPsuIntrId);
 void QspiPsuHandler(void *CallBackRef, u32 StatusEvent, unsigned int ByteCount);
 void QspiPsuConfigurePoll(XQspiPsu *QspiPsuPtr);
 int FlashEnterExit4BAddMode(XQspiPsu *QspiPsuPtr,unsigned int Enable);
@@ -157,7 +152,6 @@ u32 ExtendedID;
  * are initialized to zero each time the program runs. They could be local
  * but should at least be static so they are zeroed.
  */
-static XScuGic IntcInstance;
 static XQspiPsu QspiPsuInstance;
 
 static XQspiPsu_Msg FlashMsg[5];
@@ -226,8 +220,8 @@ int main(void)
 	/*
 	 * Run the QspiPsu Interrupt example.
 	 */
-	Status = QspiPsuInterruptFlashExample(&IntcInstance, &QspiPsuInstance,
-					QSPIPSU_DEVICE_ID, QSPIPSU_INTR_ID);
+	Status = QspiPsuInterruptFlashExample(&QspiPsuInstance,
+					QSPIPSU_DEVICE_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("QSPIPSU Flash PollData and PollTimeout "
 				"Example Failed\r\n");
@@ -256,9 +250,8 @@ int main(void)
  * @note	None.
  *
  *****************************************************************************/
-int QspiPsuInterruptFlashExample(XScuGic *IntcInstancePtr,
-		XQspiPsu *QspiPsuInstancePtr,
-		u16 QspiPsuDeviceId, u16 QspiPsuIntrId)
+int QspiPsuInterruptFlashExample(XQspiPsu *QspiPsuInstancePtr,
+		u16 QspiPsuDeviceId)
 {
 	int Status;
 	u8 UniqueValue;
@@ -295,8 +288,10 @@ int QspiPsuInterruptFlashExample(XScuGic *IntcInstancePtr,
 	 * Connect the QspiPsu device to the interrupt subsystem such that
 	 * interrupts can occur. This function is application specific
 	 */
-	Status = QspiPsuSetupIntrSystem(IntcInstancePtr, QspiPsuInstancePtr,
-				     QspiPsuIntrId);
+	Status = XSetupInterruptSystem(QspiPsuInstancePtr,&XQspiPsu_InterruptHandler,
+				       QspiPsuConfig->IntrId,
+				       QspiPsuConfig->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -447,7 +442,7 @@ int QspiPsuInterruptFlashExample(XScuGic *IntcInstancePtr,
 		}
 	}
 
-	QspiPsuDisableIntrSystem(IntcInstancePtr, QspiPsuIntrId);
+	XDisconnectInterruptCntrl(QspiPsuConfig->IntrId, QspiPsuConfig->IntrParent);
 
 	return XST_SUCCESS;
 }
@@ -1380,107 +1375,6 @@ u32 GetRealAddr(XQspiPsu *QspiPsuPtr, u32 Address)
 	}
 
 	return(RealAddr);
-}
-
-/*****************************************************************************/
-/**
- *
- * This function setups the interrupt system for a QspiPsu device.
- *
- * @param	IntcInstancePtr is a pointer to the instance of the Intc device.
- * @param	QspiPsuInstancePtr is a pointer to the instance of the QspiPsu
- *		device.
- * @param	QspiPsuIntrId is the interrupt Id for an QSPIPSU device.
- *
- * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
- *
- * @note	None.
- *
- ******************************************************************************/
-static int QspiPsuSetupIntrSystem(XScuGic *IntcInstancePtr,
-			       XQspiPsu *QspiPsuInstancePtr, u16 QspiPsuIntrId)
-{
-	int Status;
-
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (IntcConfig == NULL) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				IntcInstancePtr);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, QspiPsuIntrId,
-				(Xil_ExceptionHandler)XQspiPsu_InterruptHandler,
-				(void *)QspiPsuInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the QspiPsu device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, QspiPsuIntrId);
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
- *
- * This function disables the interrupts that occur for the QspiPsu device.
- *
- * @param	IntcInstancePtr is a pointer to the instance of the Intc device.
- * @param	QspiPsuInstancePtr is a pointer to the instance of the QspiPsu
- *		device.
- * @param	QspiPsuIntrId is the interrupt Id for an QSPIPSU device.
- *
- * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
- *
- * @note	None.
- *
- ******************************************************************************/
-static void QspiPsuDisableIntrSystem(XScuGic *IntcInstancePtr,
-		u16 QspiPsuIntrId)
-{
-	/*
-	 * Disable the interrupt for the QSPIPSU device.
-	 */
-	XScuGic_Disable(IntcInstancePtr, QspiPsuIntrId);
-
-	/*
-	 * Disconnect and disable the interrupt for the QspiPsu device.
-	 */
-	XScuGic_Disconnect(IntcInstancePtr, QspiPsuIntrId);
 }
 
 /*****************************************************************************/
