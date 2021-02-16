@@ -65,7 +65,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define QSPIPSU_DEVICE_ID	XPAR_XQSPIPSU_0_DEVICE_ID
+#endif
 
 /*
  * Number of flash pages to be written.
@@ -106,8 +108,13 @@ u8 FSRFlag;
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 int QspiPsuWriteProtectFlashExample(XQspiPsu *QspiPsuInstancePtr,
 				    u16 QspiPsuDeviceId);
+#else
+int QspiPsuWriteProtectFlashExample(XQspiPsu *QspiPsuInstancePtr,
+				    UINTPTR BaseAddress);
+#endif
 int FlashReadID(XQspiPsu *QspiPsuPtr);
 int FlashErase(XQspiPsu *QspiPsuPtr, u32 Address, u32 ByteCount, u8 *WriteBfrPtr);
 int FlashWrite(XQspiPsu *QspiPsuPtr, u32 Address, u32 ByteCount, u8 Command,
@@ -198,8 +205,13 @@ int main(void)
 	/*
 	 * Run the QspiPsu Write Protect example.
 	 */
+#ifndef SDT
 	Status = QspiPsuWriteProtectFlashExample(&QspiPsuInstance,
 						 QSPIPSU_DEVICE_ID);
+#else
+	Status = QspiPsuWriteProtectFlashExample(&QspiPsuInstance,
+						 XPAR_XQSPIPSU_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("QSPIPSU Write Protect Example Failed\r\n");
 		return XST_FAILURE;
@@ -229,8 +241,13 @@ int main(void)
  * @note	None.
  *
  *****************************************************************************/
+#ifndef SDT
 int QspiPsuWriteProtectFlashExample(XQspiPsu *QspiPsuInstancePtr,
 				    u16 QspiPsuDeviceId)
+#else
+int QspiPsuWriteProtectFlashExample(XQspiPsu *QspiPsuInstancePtr,
+				    UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 UniqueValue;
@@ -246,7 +263,11 @@ int QspiPsuWriteProtectFlashExample(XQspiPsu *QspiPsuInstancePtr,
 	/*
 	 * Initialize the QSPIPSU driver so that it's ready to use
 	 */
+#ifndef SDT
 	QspiPsuConfig = XQspiPsu_LookupConfig(QspiPsuDeviceId);
+#else
+	QspiPsuConfig = XQspiPsu_LookupConfig(BaseAddress);
+#endif
 	if (QspiPsuConfig == NULL) {
 		return XST_FAILURE;
 	}
