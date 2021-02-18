@@ -51,7 +51,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int XZDma_WriteOnlyExample(u16 DeviceId);
+#else
+int XZDma_WriteOnlyExample(UINTPTR BaseAddress);
+#endif
 static void DoneHandler(void *CallBackRef);
 
 /************************** Constant Definitions ******************************/
@@ -61,7 +65,9 @@ static void DoneHandler(void *CallBackRef);
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define ZDMA_DEVICE_ID		XPAR_XZDMA_0_DEVICE_ID /* ZDMA device Id */
+#endif
 
 #define SIZE			1024 /* Size of the data to be written */
 
@@ -99,7 +105,11 @@ int main(void)
 	int Status;
 
 	/* Run the simple write only mode example */
+#ifndef SDT
 	Status = XZDma_WriteOnlyExample((u16)ZDMA_DEVICE_ID);
+#else
+	Status = XZDma_WriteOnlyExample(XPAR_XZDMA_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("ZDMA Example Failed\r\n");
 		return XST_FAILURE;
@@ -125,7 +135,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XZDma_WriteOnlyExample(u16 DeviceId)
+#else
+int XZDma_WriteOnlyExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XZDma_Config *Config;
@@ -140,7 +154,11 @@ int XZDma_WriteOnlyExample(u16 DeviceId)
 	 * Look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XZDma_LookupConfig(DeviceId);
+#else
+	Config = XZDma_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
