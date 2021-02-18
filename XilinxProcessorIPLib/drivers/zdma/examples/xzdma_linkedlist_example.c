@@ -37,7 +37,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int XZDma_LinkedListExample(u16 DeviceId);
+#else
+int XZDma_LinkedListExample(UINTPTR BaseAddress);
+#endif
 static void DoneHandler(void *CallBackRef);
 
 /************************** Constant Definitions ******************************/
@@ -47,7 +51,9 @@ static void DoneHandler(void *CallBackRef);
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define ZDMA_DEVICE_ID		XPAR_XZDMA_0_DEVICE_ID /* ZDMA device Id */
+#endif
 #define TESTDATA1		0xABCD1230 /**< Test data */
 #define TESTDATA2		0x00005000 /**< Test data */
 
@@ -103,7 +109,11 @@ int main(void)
 	int Status;
 
 	/* Run the Linked list example */
+#ifndef SDT
 	Status = XZDma_LinkedListExample((u16)ZDMA_DEVICE_ID);
+#else
+	Status = XZDma_LinkedListExample(XPAR_XZDMA_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("ZDMA Example Failed\r\n");
 		return XST_FAILURE;
@@ -129,7 +139,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XZDma_LinkedListExample(u16 DeviceId)
+#else
+int XZDma_LinkedListExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XZDma_Config *Config;
@@ -142,7 +156,11 @@ int XZDma_LinkedListExample(u16 DeviceId)
 	 * Look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XZDma_LookupConfig(DeviceId);
+#else
+	Config = XZDma_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
