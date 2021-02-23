@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for lwip udp perf client
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  reg:
+    description: Physical base address and size of the controller register map
+  interrupts:
+    description: Interrupt property of the controller
+
+depends:
+    - emaclite
+    - axiethernet
+    - emacps
+    - tmrctr
+    - ttcps
+
+required:
+    emaclite:
+        - reg
+        - interrupts
+    axiethernet:
+        - reg
+        - interrupts
+    emacps:
+        - reg
+        - interrupts
+    tmrctr:
+        - reg
+        - interrupts
+    ttcps:
+        - reg
+        - interrupts
+...
