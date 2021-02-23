@@ -39,6 +39,7 @@
 #include "lwip/sys.h"
 #endif
 
+#include "xinterrupt_wrap.h"
 #include "lwip/stats.h"
 #include "lwip/inet_chksum.h"
 
@@ -675,7 +676,11 @@ XStatus init_axi_dma(struct xemac_s *xemac)
 	}
 	/* initialize DMA */
 	baseaddr = xaxiemacif->axi_ethernet.Config.AxiDevBaseAddress;
+#ifndef SDT
 	dmaconfig = XAxiDma_LookupConfigBaseAddr(baseaddr);
+#else
+	dmaconfig = XAxiDma_LookupConfig(baseaddr);
+#endif
 	XAxiDma_CfgInitialize(&xaxiemacif->axidma, dmaconfig);
 
 	rxringptr = XAxiDma_GetRxRing(&xaxiemacif->axidma);
@@ -786,156 +791,20 @@ XStatus init_axi_dma(struct xemac_s *xemac)
 	XAxiDma_BdRingIntEnable(txringptr, XAXIDMA_IRQ_ALL_MASK);
 	XAxiDma_BdRingIntEnable(rxringptr, XAXIDMA_IRQ_ALL_MASK);
 
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(Xil_ExceptionHandler)xaxiemac_error_handler,
-			&xaxiemacif->axi_ethernet);
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-				xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr,
-				(Xil_ExceptionHandler)axidma_send_handler,
-				xemac);
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-				xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr,
-				(Xil_ExceptionHandler)axidma_recv_handler,
-				xemac);
+	status = XSetupInterruptSystem(&xaxiemacif->axi_ethernet, &xaxiemac_error_handler,
+				       xaxiemacif->axi_ethernet.Config.IntrId,
+				       xaxiemacif->axi_ethernet.Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			AXIETH_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr,
-			AXIDMA_TX_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
-        XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr,
-			AXIDMA_RX_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
+	status = XSetupInterruptSystem(xemac, &axidma_send_handler,
+				      dmaconfig->IntrId[0],
+				      dmaconfig->IntrParent,
+				      XINTERRUPT_DEFAULT_PRIORITY);
 
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-				xaxiemacif->axi_ethernet.Config.TemacIntr);
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-				xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr);
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-				xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr);
-#else
-#if NO_SYS
-#if XPAR_INTC_0_HAS_FAST == 1
+	status = XSetupInterruptSystem(xemac, &axidma_recv_handler,
+				      dmaconfig->IntrId[1],
+				      dmaconfig->IntrParent,
+				      XINTERRUPT_DEFAULT_PRIORITY);
 
-	/* Register axiethernet interrupt with interrupt controller as Fast
-							Interrupts */
-
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XFastInterruptHandler)xaxiemac_errorfast_handler);
-
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr,
-			(XFastInterruptHandler)axidma_sendfast_handler);
-
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr,
-			(XFastInterruptHandler)axidma_recvfast_handler);
-#else
-	/* Register axiethernet interrupt with interrupt controller */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XInterruptHandler)xaxiemac_error_handler,
-			&xaxiemacif->axi_ethernet);
-	/* connect & enable DMA interrupts */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr,
-			(XInterruptHandler)axidma_send_handler,
-				xemac);
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr,
-			(XInterruptHandler)axidma_recv_handler,
-				xemac);
-#endif
-	/* Enable EMAC interrupts in the interrupt controller */
-	do {
-		/* read current interrupt enable mask */
-		unsigned int cur_mask = XIntc_In32(xtopologyp->intc_baseaddr +
-							XIN_IER_OFFSET);
-
-		/* form new mask enabling AXIDMA & axiethernet interrupts */
-		cur_mask = cur_mask
-			| (1 << xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr)
-			| (1 << xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr)
-			| (1 << xaxiemacif->axi_ethernet.Config.TemacIntr);
-
-		/* set new mask */
-		XIntc_EnableIntr(xtopologyp->intc_baseaddr, cur_mask);
-	} while (0);
-#else
-#if XPAR_INTC_0_HAS_FAST == 1
-
-	/* Register axiethernet interrupt with interrupt controller as Fast
-							Interrupts */
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XFastInterruptHandler)xaxiemac_errorfast_handler);
-
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr,
-			(XFastInterruptHandler)axidma_sendfast_handler);
-
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr,
-			(XFastInterruptHandler)axidma_recvfast_handler);
-#else
-	/* Register axiethernet interrupt with interrupt controller */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XInterruptHandler)xaxiemac_error_handler,
-			&xaxiemacif->axi_ethernet);
-	/* connect & enable DMA interrupts */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr,
-			(XInterruptHandler)axidma_send_handler,
-				xemac);
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr,
-			(XInterruptHandler)axidma_recv_handler,
-				xemac);
-#endif
-	/* Enable EMAC interrupts in the interrupt controller */
-	do {
-		/* read current interrupt enable mask */
-		unsigned int cur_mask = XIntc_In32(xtopologyp->intc_baseaddr +
-							XIN_IER_OFFSET);
-
-		/* form new mask enabling AXIDMA & axiethernet interrupts */
-		cur_mask = cur_mask
-			| (1 << xaxiemacif->axi_ethernet.Config.AxiDmaTxIntr)
-			| (1 << xaxiemacif->axi_ethernet.Config.AxiDmaRxIntr)
-			| (1 << xaxiemacif->axi_ethernet.Config.TemacIntr);
-
-		/* set new mask */
-		XIntc_EnableIntr(xtopologyp->intc_baseaddr, cur_mask);
-	} while (0);
-#endif
-#endif
 	return 0;
 }
-
-#if XPAR_INTC_0_HAS_FAST == 1
-/****************************** Fast receive Handler *************************/
-static void axidma_recvfast_handler(void)
-{
-	axidma_recv_handler((void *)xemac_fast);
-}
-
-/****************************** Fast Send Handler ****************************/
-static void axidma_sendfast_handler(void)
-{
-	axidma_send_handler((void *)xemac_fast);
-}
-
-/****************************** Fast Error Handler ***************************/
-static void xaxiemac_errorfast_handler(void)
-{
-	xaxiemac_error_handler(&xaxiemacif_fast->axi_ethernet);
-}
-#endif

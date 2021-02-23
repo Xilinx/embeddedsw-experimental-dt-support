@@ -37,15 +37,12 @@
 #include "lwip/sys.h"
 #endif
 
+#include "xinterrupt_wrap.h"
 #include "lwip/stats.h"
 #include "lwip/inet_chksum.h"
 
 #include "netif/xadapter.h"
 #include "netif/xaxiemacif.h"
-
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-#include "xscugic.h"
-#endif
 
 #include "xstatus.h"
 
@@ -615,51 +612,24 @@ void axi_mcdma_register_handlers(struct xemac_s *xemac, u8 ChanId)
 {
 	xaxiemacif_s *xaxiemacif = (xaxiemacif_s *)(xemac->state);
 	XMcdma *McDmaInstPtr = &xaxiemacif->aximcdma;
+	int num_channels = McDmaInstPtr->Config.RxNumChannels;
 
 	struct xtopology_t *xtopologyp = &xtopology[xemac->topology_index];
 
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
+	XSetupInterruptSystem(&xaxiemacif->axi_ethernet, &xaxiemac_error_handler,
+			      xaxiemacif->axi_ethernet.Config.IntrId,
+			      xaxiemacif->axi_ethernet.Config.IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(Xil_InterruptHandler)xaxiemac_error_handler,
-			&xaxiemacif->axi_ethernet);
+	XSetupInterruptSystem(McDmaInstPtr, &XMcdma_IntrHandler,
+			      McDmaInstPtr->Config.IntrId[num_channels + (ChanId - 1)],
+			      xaxiemacif->aximcdma.Config.IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiMcDmaRxIntr[ChanId - 1],
-			(Xil_InterruptHandler)XMcdma_IntrHandler,
-			McDmaInstPtr);
-
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiMcDmaTxIntr[ChanId - 1],
-			(Xil_InterruptHandler)XMcdma_TxIntrHandler,
-			McDmaInstPtr);
-
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			AXIETH_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
-
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiMcDmaTxIntr[ChanId - 1],
-			AXIDMA_TX_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
-
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiMcDmaRxIntr[ChanId - 1],
-			AXIDMA_RX_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
-
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.TemacIntr);
-
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiMcDmaTxIntr[ChanId - 1]);
-
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiMcDmaRxIntr[ChanId - 1]);
-
-#endif /* XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ */
+	XSetupInterruptSystem(McDmaInstPtr, &XMcdma_TxIntrHandler,
+			      xaxiemacif->aximcdma.Config.IntrId[ChanId - 1],
+			      xaxiemacif->aximcdma.Config.IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 }
 
 XStatus axi_mcdma_setup_rx_chan(struct xemac_s *xemac, u32_t ChanId)

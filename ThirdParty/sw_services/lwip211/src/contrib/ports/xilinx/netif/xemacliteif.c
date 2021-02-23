@@ -58,13 +58,8 @@
 #include "netif/xpqueue.h"
 
 #include "xlwipconfig.h"
+#include "xinterrupt_wrap.h"
 #include "xparameters.h"
-#if XLWIP_CONFIG_INCLUDE_EMACLITE_ON_ZYNQ == 1
-#include "xscugic.h"
-#define INTC_DIST_BASE_ADDR	XPAR_SCUGIC_DIST_BASEADDR
-#else
-#include "xintc.h"
-#endif
 
 /* Define those to better describe your network interface. */
 #define IFNAME0 'x'
@@ -540,50 +535,10 @@ static err_t low_level_init(struct netif *netif)
 	XEmacLite_Initialize(xemaclitep, config->DeviceId);
 	xemaclitep->NextRxBufferToUse = 0;
 
-#if XLWIP_CONFIG_INCLUDE_EMACLITE_ON_ZYNQ == 1
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-				xtopologyp->intc_emac_intr,
-				(Xil_ExceptionHandler)XEmacLite_InterruptHandler,
-				xemaclitep);
-
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-				xtopologyp->intc_emac_intr,
-				EMACLITE_INTR_PRIORITY_SET_IN_GIC,
-				TRIG_TYPE_RISING_EDGE_SENSITIVE);
-
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-					xtopologyp->intc_emac_intr);
-#else
-#if NO_SYS
-#if XPAR_INTC_0_HAS_FAST == 1
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-		xtopologyp->intc_emac_intr,
-		(XFastInterruptHandler)XEmacLite_FastInterruptHandler);
-#else
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-				xtopologyp->intc_emac_intr,
-				(XInterruptHandler)XEmacLite_InterruptHandler,
-				xemaclitep);
-#endif
-#else
-#if XPAR_INTC_0_HAS_FAST == 1
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xtopologyp->intc_emac_intr,
-			(XFastInterruptHandler)XEmacLite_FastInterruptHandler);
-
-	XIntc_EnableIntr(xtopologyp->intc_baseaddr, XIntc_In32(xtopologyp->intc_baseaddr +
-			XIN_IER_OFFSET) | (1 << xtopologyp->intc_emac_intr));
-#else
-
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-					xtopologyp->intc_emac_intr,
-					(XInterruptHandler)XEmacLite_InterruptHandler,
-					xemaclitep);
-	XIntc_EnableIntr(xtopologyp->intc_baseaddr, XIntc_In32(xtopologyp->intc_baseaddr +
-				XIN_IER_OFFSET) | (1 << xtopologyp->intc_emac_intr));
-#endif
-#endif
-#endif
+	XSetupInterruptSystem(xemaclitep, &XEmacLite_InterruptHandler,
+			      config->IntrId,
+			      config->IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 
 	/* set mac address */
 	XEmacLite_SetMacAddress(xemaclitep, (unsigned char*)(netif->hwaddr));

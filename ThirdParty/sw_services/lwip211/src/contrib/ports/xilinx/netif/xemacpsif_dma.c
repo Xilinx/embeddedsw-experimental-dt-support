@@ -37,6 +37,7 @@
 #include "netif/xemacpsif.h"
 #include "xstatus.h"
 
+#include "xinterrupt_wrap.h"
 #include "xlwipconfig.h"
 #include "xparameters.h"
 #include "xparameters_ps.h"
@@ -54,9 +55,6 @@
 #include "timers.h"
 #endif
 
-
-#define INTC_BASE_ADDR		XPAR_SCUGIC_0_CPU_BASEADDR
-#define INTC_DIST_BASE_ADDR	XPAR_SCUGIC_0_DIST_BASEADDR
 
 /* Byte alignment of BDs */
 #define BD_ALIGNMENT (XEMACPS_DMABD_MINIMUM_ALIGNMENT*2)
@@ -752,19 +750,9 @@ XStatus init_dma(struct xemac_s *xemac)
 	}
 
 
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	XScuGic_RegisterHandler(INTC_BASE_ADDR, xtopologyp->scugic_emac_intr,
-				(Xil_ExceptionHandler)XEmacPs_IntrHandler,
-						(void *)&xemacpsif->emacps);
-	/*
-	 * Enable the interrupt for emacps.
-	 */
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR, (u32) xtopologyp->scugic_emac_intr);
-	emac_intr_num = (u32) xtopologyp->scugic_emac_intr;
+	XSetupInterruptSystem(&xemacpsif->emacps, &XEmacPs_IntrHandler,
+			      xemacpsif->emacps.Config.IntrId,  xemacpsif->emacps.Config.IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 	return 0;
 }
 
@@ -866,14 +854,4 @@ void reset_dma(struct xemac_s *xemac)
 
 	XEmacPs_SetQueuePtr(&(xemacpsif->emacps), xemacpsif->emacps.RxBdRing.BaseBdAddr, 0, XEMACPS_RECV);
 	XEmacPs_SetQueuePtr(&(xemacpsif->emacps), xemacpsif->emacps.TxBdRing.BaseBdAddr, txqueuenum, XEMACPS_SEND);
-}
-
-void emac_disable_intr(void)
-{
-	XScuGic_DisableIntr(INTC_DIST_BASE_ADDR, emac_intr_num);
-}
-
-void emac_enable_intr(void)
-{
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR, emac_intr_num);
 }

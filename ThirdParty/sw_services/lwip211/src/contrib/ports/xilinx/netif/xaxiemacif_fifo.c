@@ -39,22 +39,10 @@
 #include "lwip/sys.h"
 #endif
 
+#include "xinterrupt_wrap.h"
 #include "lwip/stats.h"
 #include "netif/xadapter.h"
 #include "netif/xaxiemacif.h"
-
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-#include "xscugic.h"
-#else
-#include "xintc_l.h"
-#endif
-
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-#define AXIFIFO_INTR_PRIORITY_SET_IN_GIC	0xA0
-#define AXIETH_INTR_PRIORITY_SET_IN_GIC		0xA0
-#define TRIG_TYPE_RISING_EDGE_SENSITIVE		0x3
-#define INTC_DIST_BASE_ADDR	XPAR_SCUGIC_DIST_BASEADDR
-#endif
 
 #include "xstatus.h"
 
@@ -234,107 +222,15 @@ XStatus init_axi_fifo(struct xemac_s *xemac)
 	/* enable fifo interrupts */
 	XLlFifo_IntEnable(&xaxiemacif->axififo, XLLF_INT_ALL_MASK);
 
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-				xaxiemacif->axi_ethernet.Config.TemacIntr,
-				(XInterruptHandler)xaxiemac_error_handler,
-				&xaxiemacif->axi_ethernet);
-	XScuGic_RegisterHandler(xtopologyp->scugic_baseaddr,
-				xaxiemacif->axi_ethernet.Config.AxiFifoIntr,
-				(XInterruptHandler)xllfifo_intr_handler,
-				xemac);
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			AXIETH_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
-	XScuGic_SetPriTrigTypeByDistAddr(INTC_DIST_BASE_ADDR,
-			xaxiemacif->axi_ethernet.Config.AxiFifoIntr,
-			AXIFIFO_INTR_PRIORITY_SET_IN_GIC,
-			TRIG_TYPE_RISING_EDGE_SENSITIVE);
+	XSetupInterruptSystem(&xaxiemacif->axi_ethernet, &xaxiemac_error_handler,
+			      xaxiemacif->axi_ethernet.Config.IntrId,
+			      xaxiemacif->axi_ethernet.Config.IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-				xaxiemacif->axi_ethernet.Config.TemacIntr);
-	XScuGic_EnableIntr(INTC_DIST_BASE_ADDR,
-				xaxiemacif->axi_ethernet.Config.AxiFifoIntr);
-#else
-#if NO_SYS
-#if XPAR_INTC_0_HAS_FAST == 1
-	/* Register temac interrupt with interrupt controller */
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XFastInterruptHandler)xaxiemac_fasterror_handler);
-
-	/* connect & enable FIFO interrupt */
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiFifoIntr,
-			(XFastInterruptHandler)xllfifo_fastintr_handler);
-#else
-	/* Register temac interrupt with interrupt controller */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XInterruptHandler)xaxiemac_error_handler,
-			&xaxiemacif->axi_ethernet);
-
-	/* connect & enable FIFO interrupt */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiFifoIntr,
-			(XInterruptHandler)xllfifo_intr_handler,
-			xemac);
-
-#endif
-	/* Enable EMAC interrupts in the interrupt controller */
-	do {
-		/* read current interrupt enable mask */
-		unsigned int cur_mask = XIntc_In32(xtopologyp->intc_baseaddr + XIN_IER_OFFSET);
-
-		/* form new mask enabling SDMA & ll_temac interrupts */
-		cur_mask = cur_mask
-				| (1 << xaxiemacif->axi_ethernet.Config.AxiFifoIntr)
-				| (1 << xaxiemacif->axi_ethernet.Config.TemacIntr);
-
-		/* set new mask */
-		XIntc_EnableIntr(xtopologyp->intc_baseaddr, cur_mask);
-	} while (0);
-#else
-#if XPAR_INTC_0_HAS_FAST == 1
-	/* Register temac interrupt with interrupt controller */
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XFastInterruptHandler)xaxiemac_fasterror_handler);
-
-	/* connect & enable FIFO interrupt */
-	XIntc_RegisterFastHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiFifoIntr,
-			(XFastInterruptHandler)xllfifo_fastintr_handler);
-#else
-	/* Register temac interrupt with interrupt controller */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.TemacIntr,
-			(XInterruptHandler)xaxiemac_error_handler,
-			&xaxiemacif->axi_ethernet);
-
-	/* connect & enable FIFO interrupt */
-	XIntc_RegisterHandler(xtopologyp->intc_baseaddr,
-			xaxiemacif->axi_ethernet.Config.AxiFifoIntr,
-			(XInterruptHandler)xllfifo_intr_handler,
-			xemac);
-
-#endif
-	/* Enable EMAC interrupts in the interrupt controller */
-	do {
-		/* read current interrupt enable mask */
-		unsigned int cur_mask = XIntc_In32(xtopologyp->intc_baseaddr + XIN_IER_OFFSET);
-
-		/* form new mask enabling SDMA & ll_temac interrupts */
-		cur_mask = cur_mask
-				| (1 << xaxiemacif->axi_ethernet.Config.AxiFifoIntr)
-				| (1 << xaxiemacif->axi_ethernet.Config.TemacIntr);
-
-		/* set new mask */
-		XIntc_EnableIntr(xtopologyp->intc_baseaddr, cur_mask);
-	} while (0);
-#endif
-#endif
+	XSetupInterruptSystem(xemac, &xllfifo_intr_handler,
+			      fifoconfig->IntrId,
+			      fifoconfig->IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
 
 	return 0;
 }

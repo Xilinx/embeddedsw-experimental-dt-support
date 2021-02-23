@@ -94,7 +94,7 @@ find_mac_type(unsigned base)
 {
 	int i;
 
-	for (i = 0; i < xtopology_n_emacs; i++) {
+	for (i = 0; xtopology[i].emac_baseaddr != NULL; i++) {
 		if (xtopology[i].emac_baseaddr == base)
 			return xtopology[i].emac_type;
 	}
@@ -107,7 +107,7 @@ xtopology_find_index(unsigned base)
 {
 	int i;
 
-	for (i = 0; i < xtopology_n_emacs; i++) {
+	for (i = 0; xtopology[i].emac_baseaddr != NULL; i++) {
 		if (xtopology[i].emac_baseaddr == base)
 			return i;
 	}
