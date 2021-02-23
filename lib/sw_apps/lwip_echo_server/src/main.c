@@ -37,6 +37,7 @@
 #if defined (__arm__) || defined(__aarch64__)
 #include "xil_printf.h"
 #endif
+#include "xiltimer.h"
 
 #include "lwip/tcp.h"
 #include "xil_cache.h"
@@ -113,7 +114,7 @@ int ProgramSfpPhy(void);
 #endif
 
 #ifdef XPS_BOARD_ZCU102
-#ifdef XPAR_XIICPS_0_DEVICE_ID
+#ifdef XPAR_XIICPS_0_BASEADDR
 int IicPhyReset(void);
 #endif
 #endif
@@ -186,9 +187,7 @@ int main()
 
 #endif
 	netif_set_default(echo_netif);
-
-	/* now enable interrupts */
-	platform_enable_interrupts();
+	init_timer();
 
 	/* specify that the network if is up */
 	netif_set_up(echo_netif);
