@@ -31,9 +31,7 @@
 
 #include "lwip/err.h"
 #include "lwip/tcp.h"
-#if defined (__arm__) || defined (__aarch64__)
 #include "xil_printf.h"
-#endif
 
 int transfer_data() {
 	return 0;
