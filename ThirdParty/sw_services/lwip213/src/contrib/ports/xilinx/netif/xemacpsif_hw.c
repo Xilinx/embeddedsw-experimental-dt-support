@@ -32,13 +32,11 @@
 #include "netif/xemacpsif.h"
 #include "lwipopts.h"
 
-
 u32_t link_speed = 100;
 extern XEmacPs_Config XEmacPs_ConfigTable[];
-extern u32_t phymapemac0[32];
-extern u32_t phymapemac1[32];
 extern u32_t phyaddrforemac;
 
+u32_t phymapemac[32];
 #if !NO_SYS
 extern long xInsideISR;
 #endif
@@ -63,8 +61,7 @@ void init_emacps(xemacpsif_s *xemacps, struct netif *netif)
 	XEmacPs *xemacpsp;
 	s32_t status = XST_SUCCESS;
 	u32_t i;
-	u32_t phyfoundforemac0 = FALSE;
-	u32_t phyfoundforemac1 = FALSE;
+	u32_t phyfoundforemac = FALSE;
 
 	xemacpsp = &xemacps->emacps;
 
@@ -104,27 +101,16 @@ void init_emacps(xemacpsif_s *xemacps, struct netif *netif)
 #ifndef SGMII_FIXED_LINK
 	detect_phy(xemacpsp);
 	for (i = 31; i > 0; i--) {
-		if (xemacpsp->Config.BaseAddress == XPAR_XEMACPS_0_BASEADDR) {
-			if (phymapemac0[i] == TRUE) {
-				link_speed = phy_setup_emacps(xemacpsp, i);
-				phyfoundforemac0 = TRUE;
-				phyaddrforemac = i;
-			}
-		} else {
-			if (phymapemac1[i] == TRUE) {
-				link_speed = phy_setup_emacps(xemacpsp, i);
-				phyfoundforemac1 = TRUE;
-				phyaddrforemac = i;
-			}
+		if (phymapemac[i] == TRUE) {
+			link_speed = phy_setup_emacps(xemacpsp, i);
+			phyaddrforemac = i;
+			phyfoundforemac = TRUE;
 		}
 	}
-	/* If no PHY was detected, use broadcast PHY address of 0 */
-	if (xemacpsp->Config.BaseAddress == XPAR_XEMACPS_0_BASEADDR) {
-		if (phyfoundforemac0 == FALSE)
-			link_speed = phy_setup_emacps(xemacpsp, 0);
-	} else {
-		if (phyfoundforemac1 == FALSE)
-			link_speed = phy_setup_emacps(xemacpsp, 0);
+
+	if (phyfoundforemac == FALSE) {
+		/* Try default */
+		link_speed = phy_setup_emacps(xemacpsp, 0);
 	}
 #else
 	link_speed = pcs_setup_emacps(xemacpsp);
