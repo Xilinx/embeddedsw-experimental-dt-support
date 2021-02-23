@@ -51,7 +51,6 @@ extern volatile int TcpSlowTmrFlag;
 #define DEFAULT_IP_MASK		"255.255.255.0"
 #define DEFAULT_GW_ADDRESS	"192.168.1.1"
 
-void platform_enable_interrupts(void);
 void start_application(void);
 void print_app_header(void);
 
@@ -64,7 +63,7 @@ int ProgramSfpPhy(void);
 #endif
 
 #ifdef XPS_BOARD_ZCU102
-#ifdef XPAR_XIICPS_0_DEVICE_ID
+#ifdef XPAR_XIICPS_0_BASEADDR
 int IicPhyReset(void);
 #endif
 #endif
@@ -144,8 +143,7 @@ int main(void)
 	}
 	netif_set_default(netif);
 
-	/* now enable interrupts */
-	platform_enable_interrupts();
+	init_timer();
 
 	/* specify that the network if is up */
 	netif_set_up(netif);
