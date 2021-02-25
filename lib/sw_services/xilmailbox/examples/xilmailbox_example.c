@@ -39,11 +39,19 @@
 #include "xscugic.h"
 #include "xilmailbox.h"
 #include "xdebug.h"
+#ifdef SDT
+#include "xilmailbox_hwconfig.h"
+#endif
 
 /************************* Test Configuration ********************************/
 /* IPI device ID to use for this test */
+#ifdef SDT
+#define TEST_CHANNEL_ID		XMAILBOX_IPI_BASEADDRESS
+#define REMOTE_CHANNEL_ID	XMAILBOX_IPI_CHANNEL_ID
+#else
 #define TEST_CHANNEL_ID	XPAR_XIPIPSU_0_DEVICE_ID
 #define REMOTE_CHANNEL_ID	XPAR_XIPIPSU_0_BIT_MASK
+#endif
 
 /* Test message length in words. Max is 8 words (32 bytes) */
 #define TEST_MSG_LEN	8
