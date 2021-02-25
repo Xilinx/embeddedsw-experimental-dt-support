@@ -34,7 +34,7 @@
 #endif
 
 #ifdef XPS_BOARD_ZCU102
-#ifdef XPAR_XIICPS_0_DEVICE_ID
+#ifdef XPAR_XIICPS_0_BASEADDR
 #include "xiicps.h"
 
 #define BUF_LEN		10U
@@ -60,7 +60,7 @@ int IicPhyReset(void)
 	int Status = XST_SUCCESS;
 
 	/* Initialize the IIC0 driver so that it is ready to use */
-	I2c0CfgPtr = XIicPs_LookupConfig(XPAR_XIICPS_0_DEVICE_ID);
+	I2c0CfgPtr = XIicPs_LookupConfig(0);
 	if (I2c0CfgPtr == NULL) {
 		Status = XST_FAILURE;
 		return Status;
