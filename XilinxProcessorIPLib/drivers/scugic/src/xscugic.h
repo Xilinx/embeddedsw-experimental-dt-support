@@ -223,8 +223,8 @@ typedef struct
 #else
 	char *Name;		/**< Compatible string */
 #endif
-	u32 CpuBaseAddress;	/**< CPU Interface Register base address */
 	u32 DistBaseAddress;	/**< Distributor Register base address */
+	u32 CpuBaseAddress;	/**< CPU Interface Register base address */
 	XScuGic_VectorTableEntry HandlerTable[XSCUGIC_MAX_NUM_INTR_INPUTS];/**<
 				 Vector table of interrupt handlers */
 } XScuGic_Config;
