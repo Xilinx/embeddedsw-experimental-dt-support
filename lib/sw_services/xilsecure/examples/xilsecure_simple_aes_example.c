@@ -49,7 +49,11 @@
 #define XSECURE_IV_SIZE		(12)
 #define XSECURE_KEY_SIZE	(32)
 
+#ifndef SDT
 #define XSECURE_CSUDMA_DEVICEID	XPAR_XCSUDMA_0_DEVICE_ID
+#else
+#define XSECURE_CSUDMA_DEVICEID	XPAR_XCSUDMA_0_BASEADDR
+#endif
 
 /**************************** Type Definitions *******************************/
 
