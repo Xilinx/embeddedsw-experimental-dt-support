@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for freertos bsp
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  reg:
+    description: Physical base address and size of the controller register map
+
+depends:
+  - tmrctr
+  - ttcps
+  - scugic
+
+required:
+    tmrctr:
+        - reg
+        - interrupts
+    ttcps:
+        - reg
+    scugic:
+        - reg
+...

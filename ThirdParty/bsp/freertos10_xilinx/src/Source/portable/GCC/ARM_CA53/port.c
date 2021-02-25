@@ -36,6 +36,8 @@
 
 /* Xilinx includes. */
 #include "xscugic.h"
+#include "bspconfig.h"
+#include "xinterrupt_wrap.h"
 
 
 #ifndef configINTERRUPT_CONTROLLER_BASE_ADDRESS
@@ -179,7 +181,7 @@ volatile uint64_t ullCriticalNesting = 9999ULL;
  * The instance of the interrupt controller used by this port.  This is required
  * by the Xilinx library API functions.
  */
-extern XScuGic xInterruptController;
+uintptr_t IntrControllerAddr = configINTERRUPT_CONTROLLER_BASE_ADDRESS;
 
 /* Saved as part of the task context.  If ullPortTaskHasFPUContext is non-zero
 then floating point context must be saved and restored for the task. */
@@ -340,7 +342,7 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 }
 /*-----------------------------------------------------------*/
 
-BaseType_t xPortInstallInterruptHandler( uint8_t ucInterruptID, XInterruptHandler pxHandler, void *pvCallBackRef )
+BaseType_t xPortInstallInterruptHandler( uint16_t ucInterruptID, XInterruptHandler pxHandler, void *pvCallBackRef )
 {
 int32_t lReturn;
 
@@ -348,7 +350,7 @@ int32_t lReturn;
 	lReturn = prvEnsureInterruptControllerIsInitialised();
 	if( lReturn == pdPASS )
 	{
-		lReturn = XScuGic_Connect( &xInterruptController, ucInterruptID, pxHandler, pvCallBackRef );
+		lReturn = XConnectToInterruptCntrl(ucInterruptID, pxHandler, pvCallBackRef, IntrControllerAddr);
 	}
 	if( lReturn == XST_SUCCESS )
 	{
@@ -362,6 +364,7 @@ int32_t lReturn;
 
 static int32_t prvEnsureInterruptControllerIsInitialised( void )
 {
+static int32_t lInterruptControllerInitialised = pdFALSE;
 int32_t lReturn;
 
 	/* Ensure the interrupt controller instance variable is initialised before
@@ -386,23 +389,15 @@ int32_t lReturn;
 
 static int32_t prvInitialiseInterruptController( void )
 {
-BaseType_t xStatus;
-XScuGic_Config *pxGICConfig;
-
-	/* Initialize the interrupt controller driver. */
-	pxGICConfig = XScuGic_LookupConfig( configINTERRUPT_CONTROLLER_DEVICE_ID );
-	xStatus = XScuGic_CfgInitialize( &xInterruptController, pxGICConfig, pxGICConfig->CpuBaseAddress );
-	/* Connect the interrupt controller interrupt handler to the hardware
-	interrupt handling logic in the ARM processor. */
-	Xil_ExceptionRegisterHandler( XIL_EXCEPTION_ID_IRQ_INT,
-								( Xil_ExceptionHandler ) XScuGic_InterruptHandler,
-								&xInterruptController);
-	/* Enable interrupts in the ARM. */
-	Xil_ExceptionEnable();
+int xStatus;
+	xStatus = XConfigInterruptCntrl(IntrControllerAddr);
 
 	if( xStatus == XST_SUCCESS )
 	{
 		xStatus = pdPASS;
+		XRegisterInterruptHandler(NULL, IntrControllerAddr);
+		Xil_ExceptionInit();
+		Xil_ExceptionEnable();
 	}
 	else
 	{
@@ -414,7 +409,7 @@ XScuGic_Config *pxGICConfig;
 }
 /*-----------------------------------------------------------*/
 
-void vPortEnableInterrupt( uint8_t ucInterruptID )
+void vPortEnableInterrupt( uint16_t ucInterruptID )
 {
 int32_t lReturn;
 
@@ -423,13 +418,13 @@ int32_t lReturn;
 	lReturn = prvEnsureInterruptControllerIsInitialised();
 	if( lReturn == pdPASS )
 	{
-		XScuGic_Enable( &xInterruptController, ucInterruptID );
+		XEnableIntrId(ucInterruptID, IntrControllerAddr);
 	}
 	configASSERT( lReturn );
 }
 /*-----------------------------------------------------------*/
 
-void vPortDisableInterrupt( uint8_t ucInterruptID )
+void vPortDisableInterrupt( uint16_t ucInterruptID )
 {
 int32_t lReturn;
 
@@ -438,7 +433,7 @@ int32_t lReturn;
 	lReturn = prvEnsureInterruptControllerIsInitialised();
 	if( lReturn == pdPASS )
 	{
-		XScuGic_Disable( &xInterruptController, ucInterruptID );
+		XDisableIntrId(ucInterruptID, IntrControllerAddr);
 	}
 	configASSERT( lReturn );
 }
