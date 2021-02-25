@@ -38,7 +38,7 @@
 
 /* Xilinx includes. */
 #include "xscugic.h"
-#ifdef XPAR_XILTIMER_ENABLED
+#if defined(XPAR_XILTIMER_ENABLED) || defined(SDT)
 #include "bspconfig.h"
 #include "xinterrupt_wrap.h"
 #endif
@@ -184,7 +184,7 @@ volatile uint64_t ullCriticalNesting = 9999ULL;
  * The instance of the interrupt controller used by this port.  This is required
  * by the Xilinx library API functions.
  */
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 extern XScuGic xInterruptController;
 #else
 uintptr_t IntrControllerAddr = configINTERRUPT_CONTROLLER_BASE_ADDRESS;
@@ -349,7 +349,7 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 }
 /*-----------------------------------------------------------*/
 
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 BaseType_t xPortInstallInterruptHandler( uint8_t ucInterruptID, XInterruptHandler pxHandler, void *pvCallBackRef )
 #else
 BaseType_t xPortInstallInterruptHandler( uint16_t ucInterruptID, XInterruptHandler pxHandler, void *pvCallBackRef )
@@ -361,7 +361,7 @@ int32_t lReturn;
 	lReturn = prvEnsureInterruptControllerIsInitialised();
 	if( lReturn == pdPASS )
 	{
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 		lReturn = XScuGic_Connect( &xInterruptController, ucInterruptID, pxHandler, pvCallBackRef );
 #else
 		lReturn = XConnectToInterruptCntrl(ucInterruptID, pxHandler, pvCallBackRef, IntrControllerAddr);
@@ -379,6 +379,7 @@ int32_t lReturn;
 
 static int32_t prvEnsureInterruptControllerIsInitialised( void )
 {
+static int32_t lInterruptControllerInitialised = pdFALSE;
 int32_t lReturn;
 
 	/* Ensure the interrupt controller instance variable is initialised before
@@ -403,7 +404,7 @@ int32_t lReturn;
 
 static int32_t prvInitialiseInterruptController( void )
 {
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 BaseType_t xStatus;
 XScuGic_Config *pxGICConfig;
 
@@ -424,7 +425,7 @@ xStatus = XConfigInterruptCntrl(IntrControllerAddr);
 	if( xStatus == XST_SUCCESS )
 	{
 		xStatus = pdPASS;
-#ifdef XPAR_XILTIMER_ENABLED
+#if defined(XPAR_XILTIMER_ENABLED) || defined(SDT)
 		XRegisterInterruptHandler(NULL, IntrControllerAddr);
 		Xil_ExceptionInit();
 		Xil_ExceptionEnable();
@@ -434,7 +435,7 @@ xStatus = XConfigInterruptCntrl(IntrControllerAddr);
 	{
 		xStatus = pdFAIL;
 	}
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 	configASSERT( xStatus == pdPASS );
 #endif
 
@@ -442,7 +443,7 @@ xStatus = XConfigInterruptCntrl(IntrControllerAddr);
 }
 /*-----------------------------------------------------------*/
 
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 void vPortEnableInterrupt( uint8_t ucInterruptID )
 #else
 void vPortEnableInterrupt( uint16_t ucInterruptID )
@@ -455,7 +456,7 @@ int32_t lReturn;
 	lReturn = prvEnsureInterruptControllerIsInitialised();
 	if( lReturn == pdPASS )
 	{
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 		XScuGic_Enable( &xInterruptController, ucInterruptID );
 #else
 		XEnableIntrId(ucInterruptID, IntrControllerAddr);
@@ -465,7 +466,7 @@ int32_t lReturn;
 }
 /*-----------------------------------------------------------*/
 
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 void vPortDisableInterrupt( uint8_t ucInterruptID )
 #else
 void vPortDisableInterrupt( uint16_t ucInterruptID )
@@ -478,7 +479,7 @@ int32_t lReturn;
 	lReturn = prvEnsureInterruptControllerIsInitialised();
 	if( lReturn == pdPASS )
 	{
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 		XScuGic_Disable( &xInterruptController, ucInterruptID );
 #else
 		XDisableIntrId(ucInterruptID, IntrControllerAddr);
