@@ -49,7 +49,7 @@ err_t dhcp_start(struct netif *netif);
 #endif /* LWIP_IPV6 */
 
 #ifdef XPS_BOARD_ZCU102
-#ifdef XPAR_XIICPS_0_DEVICE_ID
+#ifdef XPAR_XIICPS_0_BASEADDR
 int IicPhyReset(void);
 #endif
 #endif
