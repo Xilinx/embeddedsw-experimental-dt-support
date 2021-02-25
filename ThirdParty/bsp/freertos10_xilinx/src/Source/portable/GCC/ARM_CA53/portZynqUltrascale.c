@@ -31,7 +31,7 @@
 
 /* Xilinx includes. */
 #include "xscugic.h"
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 #include "xttcps.h"
 #else
 #include "xiltimer.h"
@@ -57,7 +57,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
 								__attribute__((weak));
 #endif
 
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 /* Timer used to generate the tick interrupt. */
 XTtcPs xTimerInstance;
 XScuGic xInterruptController;
@@ -66,40 +66,24 @@ extern uintptr_t IntrControllerAddr;
 #endif
 /*-----------------------------------------------------------*/
 
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 void FreeRTOS_SetupTickInterrupt( void )
 {
-BaseType_t xStatus;
-XTtcPs_Config *pxTimerConfiguration;
-XInterval usInterval;
-uint8_t ucPrescale;
-const uint8_t ucLevelSensitive = 1;
-
-	pxTimerConfiguration = XTtcPs_LookupConfig( configTIMER_ID );
-
-	/* Initialise the device. */
-	xStatus = XTtcPs_CfgInitialize( &xTimerInstance, pxTimerConfiguration, pxTimerConfiguration->BaseAddress );
-
-	if( xStatus != XST_SUCCESS )
-	{
-		/* Not sure how to do this before XTtcPs_CfgInitialize is called as
-		*xRTOSTickTimerInstance is set within XTtcPs_CfgInitialize(). */
-		XTtcPs_Stop( &xTimerInstance );
-		xStatus = XTtcPs_CfgInitialize( &xTimerInstance, pxTimerConfiguration, pxTimerConfiguration->BaseAddress );
-		configASSERT( xStatus == XST_SUCCESS );
-	}
-
-	/* Set the options. */
-	XTtcPs_SetOptions( &xTimerInstance, ( XTTCPS_OPTION_INTERVAL_MODE | XTTCPS_OPTION_WAVE_DISABLE ) );
 	/*
 	 * The Xilinx implementation of generating run time task stats uses the same timer used for generating
 	 * FreeRTOS ticks. In case user decides to generate run time stats the timer time out interval is changed
 	 * as "configured tick rate * 10". The multiplying factor of 10 is hard coded for Xilinx FreeRTOS ports.
 	 */
 #if (configGENERATE_RUN_TIME_STATS == 1)
-	XTtcPs_CalcIntervalFromFreq( &xTimerInstance, configTICK_RATE_HZ*10, &usInterval, &ucPrescale );
+	/* XTimer_SetInterval() API expects delay in milli seconds
+         * Convert the user provided tick rate to milli seconds.
+         */
+	XTimer_SetInterval((configTICK_RATE_HZ * 10)/10);
 #else
-	XTtcPs_CalcIntervalFromFreq( &xTimerInstance, configTICK_RATE_HZ, &( usInterval ), &( ucPrescale ) );
+	/* XTimer_SetInterval() API expects delay in milli seconds
+         * Convert the user provided tick rate to milli seconds.
+         */
+	XTimer_SetInterval(configTICK_RATE_HZ/10);
 #endif
 
 	/* Set the interval and prescale. */
