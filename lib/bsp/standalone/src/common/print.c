@@ -24,7 +24,7 @@ void print(const char8 *ptr)
 #if HYP_GUEST && EL1_NONSECURE && XEN_USE_PV_CONSOLE
 	XPVXenConsole_Write(ptr);
 #else
-#ifdef STDOUT_BASEADDRESS || defined(SDT)
+#if defined(STDOUT_BASEADDRESS) || defined(SDT)
   while (*ptr != (char8)0) {
     outbyte (*ptr);
 	ptr++;
