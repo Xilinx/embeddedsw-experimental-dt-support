@@ -46,7 +46,6 @@
 #include "xstatus.h"
 #include "xplmi_hw.h"
 #include "xplmi_status.h"
-#include "xparameters.h"
 #include <stdarg.h>
 
 /* PLM specific outbyte function */
