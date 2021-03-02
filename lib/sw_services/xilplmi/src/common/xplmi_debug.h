@@ -51,6 +51,7 @@ extern "C" {
 #include "xplmi_config.h"
 #include "xplmi_event_logging.h"
 #include "xplmi_proc.h"
+#include "xparameters.h"
 
 /**@cond xplmi_internal
  * @{
