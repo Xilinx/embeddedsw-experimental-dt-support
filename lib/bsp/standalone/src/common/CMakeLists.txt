@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 collect (PROJECT_LIB_SOURCES print.c)
 #collect (PROJECT_LIB_HEADERS sleep.h)
 collect (PROJECT_LIB_HEADERS xbasic_types.h)

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 collect (PROJECT_LIB_SOURCES errno.c)
 #collect (PROJECT_LIB_SOURCES microblaze_sleep.c)
 collect (PROJECT_LIB_SOURCES _exit.c)

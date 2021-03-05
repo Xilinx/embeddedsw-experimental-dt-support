@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 #STRING(FIND ${CROSS_PREFIX} "aarch64-none-elf-" POSITION1) 
 #STRING(FIND ${CROSS_PREFIX} "arm-none-eabi" POSITION2)
 #STRING(FIND ${CROSS_PREFIX} "armr5-none-eabi-" POSITION3)

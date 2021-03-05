@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53-32")
 add_subdirectory(32bit)
 else()
