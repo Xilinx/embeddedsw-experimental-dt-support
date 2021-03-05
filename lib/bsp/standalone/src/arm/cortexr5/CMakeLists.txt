@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 add_subdirectory(gcc)
 add_subdirectory(platform)
 #collect (PROJECT_LIB_SOURCES xtime_l.c)

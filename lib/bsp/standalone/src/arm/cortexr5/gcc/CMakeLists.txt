@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "FreeRTOS")
 collect (PROJECT_LIB_SOURCES  asm_vectors.S)
 endif()
