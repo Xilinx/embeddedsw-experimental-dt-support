@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 collect (PROJECT_LIB_HEADERS xddr_xmpu4_cfg.h)
 collect (PROJECT_LIB_HEADERS xiou_secure_slcr.h)
 collect (PROJECT_LIB_HEADERS xddr_xmpu1_cfg.h)
