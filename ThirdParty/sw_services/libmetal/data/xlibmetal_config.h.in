@@ -1,0 +1,7 @@
+#ifndef _XLIBMETAL_CONFIG_H
+#define _XLIBMETAL_CONFIG_H
+
+#include "xparameters_ps.h"
+
+#cmakedefine XPAR_SCUGIC_0_DIST_BASEADDR @XPAR_SCUGIC_0_DIST_BASEADDR@
+#endif /* _XLIBMETAL_CONFIG_H */

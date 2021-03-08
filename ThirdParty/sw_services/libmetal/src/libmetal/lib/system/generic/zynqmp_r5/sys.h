@@ -15,6 +15,9 @@
 
 #include <metal/system/@PROJECT_SYSTEM@/xlnx_common/sys.h>
 #include "xscugic.h"
+#ifdef SDT
+#include "xlibmetal_config.h"
+#endif
 
 #ifndef __METAL_GENERIC_ZYNQMP_R5_SYS__H__
 #define __METAL_GENERIC_ZYNQMP_R5_SYS__H__

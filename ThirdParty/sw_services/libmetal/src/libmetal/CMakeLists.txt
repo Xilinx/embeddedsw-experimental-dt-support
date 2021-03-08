@@ -1,11 +1,19 @@
 cmake_minimum_required (VERSION 2.6)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../../cmake/common.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../data/libmetal.cmake NO_POLICY_SCOPE)
+
 list (APPEND CMAKE_MODULE_PATH
       "${CMAKE_SOURCE_DIR}/cmake"
       "${CMAKE_SOURCE_DIR}/cmake/modules"
       "${CMAKE_SOURCE_DIR}/cmake/platforms")
 
+set(METAL_INCLUDE_DIRS
+    "${CMAKE_BINARY_DIR}/include"
+	"${CMAKE_BINARY_DIR}/lib/include"
+)
 include (syscheck)
+
 project (metal C)
 
 include (CheckIncludeFiles)
