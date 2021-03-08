@@ -3,6 +3,19 @@ if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../../cmake/common.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../data/openamp.cmake NO_POLICY_SCOPE)
+
+list (APPEND CMAKE_MODULE_PATH
+      "${CMAKE_SOURCE_DIR}/cmake"
+      "${CMAKE_SOURCE_DIR}/cmake/modules"
+      "${CMAKE_SOURCE_DIR}/cmake/platforms")
+
+set(OPENAMP_INCLUDE_DIRS
+    "${CMAKE_BINARY_DIR}/include"
+    "${CMAKE_BINARY_DIR}/lib/include"
+)
+
 # The version number
 set (OPENAMP_VERSION_MAJOR 1)
 set (OPENAMP_VERSION_MINOR 0)
