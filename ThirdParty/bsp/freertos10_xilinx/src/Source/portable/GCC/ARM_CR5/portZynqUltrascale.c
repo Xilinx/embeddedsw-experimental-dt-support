@@ -33,14 +33,16 @@
 #include "task.h"
 
 /* Xilinx includes. */
+#include "xiltimer.h"
 #include "xil_printf.h"
 #include "xparameters.h"
 #include "xscugic.h"
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 #include "xttcps.h"
 #else
 #include "xiltimer.h"
 #endif
+#include "FreeRTOSConfig.h"
 
 /*
  * Some FreeRTOSConfig.h settings require the application writer to provide the
@@ -70,7 +72,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
 								__attribute__((weak));
 #endif
 
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 /* Timer used to generate the tick interrupt. */
 static XTtcPs xTimerInstance;
 XScuGic xInterruptController;
@@ -79,68 +81,27 @@ extern uintptr_t IntrControllerAddr;
 #endif
 /*-----------------------------------------------------------*/
 
-#ifndef XPAR_XILTIMER_ENABLED
 void FreeRTOS_SetupTickInterrupt( void )
 {
-XInterval usInterval;
-uint8_t ucPrescaler;
-int iStatus;
-XTtcPs_Config *pxTimerConfig;
-XScuGic_Config *pxInterruptControllerConfig;
-
-	/* Initialize the interrupt controller driver. */
-	pxInterruptControllerConfig = XScuGic_LookupConfig( configINTERRUPT_CONTROLLER_DEVICE_ID );
-	XScuGic_CfgInitialize( &xInterruptController,
-						   pxInterruptControllerConfig,
-						   pxInterruptControllerConfig->CpuBaseAddress );
-
-	/* Connect the interrupt controller interrupt handler to the hardware
-	interrupt handling logic in the ARM processor. */
-	Xil_ExceptionRegisterHandler( XIL_EXCEPTION_ID_IRQ_INT,
-								( Xil_ExceptionHandler ) XScuGic_InterruptHandler,
-								&xInterruptController);
-
-	/* Enable interrupts in the ARM. */
-	Xil_ExceptionEnable();
-
-	/* Connect to the interrupt controller. */
-	XScuGic_Connect( &xInterruptController,
-					 configTIMER_INTERRUPT_ID,
-					( Xil_InterruptHandler ) FreeRTOS_Tick_Handler,
-					( void * ) &xTimerInstance );
-
-	pxTimerConfig = XTtcPs_LookupConfig( configTIMER_ID );
-
-	iStatus = XTtcPs_CfgInitialize( &xTimerInstance, pxTimerConfig, pxTimerConfig->BaseAddress );
-
-	if( iStatus != XST_SUCCESS )
-	{
-		XTtcPs_Stop(&xTimerInstance);
-		iStatus = XTtcPs_CfgInitialize( &xTimerInstance, pxTimerConfig, pxTimerConfig->BaseAddress );
-		if( iStatus != XST_SUCCESS )
-		{
-			xil_printf( "In %s: Timer Cfg initialization failed...\r\n", __func__ );
-			return;
-		}
-	}
-	XTtcPs_SetOptions( &xTimerInstance, XTTCPS_OPTION_INTERVAL_MODE | XTTCPS_OPTION_WAVE_DISABLE );
 	/*
 	 * The Xilinx implementation of generating run time task stats uses the same timer used for generating
 	 * FreeRTOS ticks. In case user decides to generate run time stats the timer time out interval is changed
 	 * as "configured tick rate * 10". The multiplying factor of 10 is hard coded for Xilinx FreeRTOS ports.
 	 */
 #if (configGENERATE_RUN_TIME_STATS == 1)
-	XTtcPs_CalcIntervalFromFreq( &xTimerInstance, configTICK_RATE_HZ*10, &usInterval, &ucPrescaler );
+	/* XTimer_SetInterval() API expects delay in milli seconds
+         * Convert the user provided tick rate to milli seconds.
+         */
+	XTimer_SetInterval((configTICK_RATE_HZ * 10)/10);
 #else
-	XTtcPs_CalcIntervalFromFreq( &xTimerInstance, configTICK_RATE_HZ, &usInterval, &ucPrescaler );
+	/* XTimer_SetInterval() API expects delay in milli seconds
+         * Convert the user provided tick rate to milli seconds.
+         */
+	XTimer_SetInterval(configTICK_RATE_HZ/10);
 #endif
-	XTtcPs_SetInterval( &xTimerInstance, usInterval );
-	XTtcPs_SetPrescaler( &xTimerInstance, ucPrescaler );
-	/* Enable the interrupt for timer. */
-	XScuGic_EnableIntr( configINTERRUPT_CONTROLLER_BASE_ADDRESS, configTIMER_INTERRUPT_ID );
-	XTtcPs_EnableInterrupts( &xTimerInstance, XTTCPS_IXR_INTERVAL_MASK );
-	XTtcPs_Start( &xTimerInstance );
-
+	XTimer_SetHandler(TimerCounterHandler, 0);
+	XTimer_SetTickPriority(portLOWEST_USABLE_INTERRUPT_PRIORITY << portPRIORITY_SHIFT);
+	
 }
 #else
 void TimerCounterHandler(void *CallBackRef, u32 TmrCtrNumber)
@@ -180,7 +141,7 @@ void FreeRTOS_SetupTickInterrupt( void )
 
 void FreeRTOS_ClearTickInterrupt( void )
 {
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
 	XTtcPs_ClearInterruptStatus( &xTimerInstance, XTtcPs_GetInterruptStatus( &xTimerInstance ) );
 #else
 	XTimer_ClearTickInterrupt();
@@ -195,14 +156,16 @@ static const XScuGic_VectorTableEntry *pxVectorTable = XScuGic_ConfigTable[ XPAR
 uint32_t ulInterruptID;
 const XScuGic_VectorTableEntry *pxVectorEntry;
 
-	/* The ID of the interrupt is obtained by bitwise ANDing the ICCIAR value
-	with 0x3FF. */
+	/* Interrupts cannot be re-enabled until the source of the interrupt is
+	cleared. The ID of the interrupt is obtained by bitwise ANDing the ICCIAR
+	value with 0x3FF. */
 	ulInterruptID = ulICCIAR & 0x3FFUL;
 	if( ulInterruptID < XSCUGIC_MAX_NUM_INTR_INPUTS )
 	{
 		/* Call the function installed in the array of installed handler
 		functions. */
 		pxVectorEntry = &( pxVectorTable[ ulInterruptID ] );
+		configASSERT( pxVectorEntry );
 		pxVectorEntry->Handler( pxVectorEntry->CallBackRef );
 	}
 }
