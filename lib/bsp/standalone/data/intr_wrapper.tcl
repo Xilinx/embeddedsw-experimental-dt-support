@@ -68,7 +68,7 @@ proc gen_intr {drv_handle file_name args} {
 		        	puts $file_handle "\#define [::hsi::utils::get_driver_param_name $ip $intr_prop] (XPAR_FABRIC_${ip_name}_${intr_pin_name}_INTR + $sensitivity)"
 			}
 		} else {
-		        puts $file_handle "\#define [::hsi::utils::get_driver_param_name $ip $intr_prop] XPAR_${ip_name}_INTR"
+		        puts $file_handle "\#define [::hsi::utils::get_driver_param_name $ip $intr_prop] XPAR_${ip_name}_INTERRUPT_ID"
 		}
 	   }
 	} else {
