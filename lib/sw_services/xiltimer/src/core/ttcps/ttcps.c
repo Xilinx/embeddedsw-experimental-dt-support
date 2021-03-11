@@ -223,6 +223,29 @@ static void XTickTimer_TtcStop(XTimer *InstancePtr)
 
 /*****************************************************************************/
 /**
+ * This function implements the tick interrupt handler
+ *
+ * @param  InstancePtr is Pointer to the XTimer instance
+ * @param  Priority is priority to set for interrupt trigger
+ *
+ * @return	None
+ *
+ ****************************************************************************/
+static void XTickTimer_SetTtcIntrPriority(XTimer *InstancePtr, u8 Priority)
+{
+	XTtcPs *TtcPsInstPtr = &InstancePtr->TtcPs_TickInst;
+
+#ifndef SDT
+	XSetPriorityTriggerType(TtcPsInstPtr->Config.IntrId, Priority,
+				TtcPsInstPtr->Config.IntrParent);
+#else
+	XSetPriorityTriggerType(TtcPsInstPtr->Config.IntrId[0], Priority,
+				TtcPsInstPtr->Config.IntrParent);
+#endif
+}
+
+/*****************************************************************************/
+/**
  * This function clears the tick interrupt status
  *
  * @param  InstancePtr is Pointer to the XTimer instance
