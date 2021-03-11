@@ -29,7 +29,6 @@ proc generate {drv_handle} {
     } else {
         xdefine_config_file $drv_handle "xttcps_g.c" "XTtcPs"  "DEVICE_ID" "C_S_AXI_BASEADDR" "C_TTC_CLK_FREQ_HZ"
     }
-    xdefine_canonical_xpars $drv_handle "xparameters.h" "XTtcPs" "DEVICE_ID" "C_S_AXI_BASEADDR" "C_TTC_CLK_FREQ_HZ" "C_TTC_CLK_CLKSRC"
 }
 
 
