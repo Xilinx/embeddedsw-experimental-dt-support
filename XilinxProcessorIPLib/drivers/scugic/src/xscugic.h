@@ -574,6 +574,7 @@ u32 XScuGic_GetCpuID(void);
  */
 #ifndef SDT
 XScuGic_Config *XScuGic_LookupConfig(u16 DeviceId);
+XScuGic_Config *XScuGic_LookupConfigBaseAddr(UINTPTR BaseAddress);
 #else
 XScuGic_Config *XScuGic_LookupConfig(UINTPTR BaseAddr);
 #endif
