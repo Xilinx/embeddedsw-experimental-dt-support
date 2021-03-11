@@ -121,9 +121,8 @@ proc gen_testfunc_call {swproj mhsinst} {
       append testfunc_call "
    {
       int Status;
-      Status = XZDma_SimpleExample(&${intcvar}, &${ipname}, \\
-                                 ${deviceid}, \\
-                                 ${intr_id});
+      Status = XZDma_SimpleExample(&${ipname}, \\
+                                 ${deviceid});
    }"
 
    }
@@ -162,9 +161,8 @@ proc gen_testfunc_call {swproj mhsinst} {
 
       print(\"\\r\\n Running Interrupt Test  for ${ipname}...\\r\\n\");
 
-      Status = XZDma_SimpleExample(&${intcvar}, &${ipname}, \\
-                                 ${deviceid}, \\
-                                 ${intr_id});
+      Status = XZDma_SimpleExample(&${ipname}, \\
+                                 ${deviceid});
 
       if (Status == 0) {
          print(\"ZDMA Simple Example PASSED\\r\\n\");
