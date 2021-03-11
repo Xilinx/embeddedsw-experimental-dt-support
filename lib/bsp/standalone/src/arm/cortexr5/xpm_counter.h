@@ -46,6 +46,7 @@
 #include <stdint.h>
 #include "xpseudo_asm.h"
 #include "xil_types.h"
+#include "xstatus.h"
 
 #ifdef __cplusplus
 extern "C" {
