@@ -208,7 +208,11 @@ typedef struct {
 #endif
 	u32 BaseAddress;  /**< Base address for device */
 	u32 InputClockHz; /**< Input clock frequency */
+#ifdef SDT
 	u16 IntrId[XTTCPS_NUM_COUNTERS];		/** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+#else
+	u16 IntrId;
+#endif
 	UINTPTR IntrParent;		/** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XTtcPs_Config;
 

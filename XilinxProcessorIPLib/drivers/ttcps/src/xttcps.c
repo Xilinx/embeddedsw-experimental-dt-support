@@ -117,9 +117,13 @@ s32 XTtcPs_CfgInitialize(XTtcPs *InstancePtr, XTtcPs_Config *ConfigPtr,
 	InstancePtr->Config.InputClockHz = ConfigPtr->InputClockHz;
 	InstancePtr->StatusHandler = StubStatusHandler;
 
+#ifdef SDT
 	for (Count=0; Count<XTTCPS_NUM_COUNTERS; Count++) {
 		InstancePtr->Config.IntrId[Count] = ConfigPtr->IntrId[Count];
 	}
+#else
+	InstancePtr->Config.IntrId = ConfigPtr->IntrId;
+#endif
 	InstancePtr->Config.IntrParent = ConfigPtr->IntrParent;
 
 	IsStartResult = XTtcPs_IsStarted(InstancePtr);
