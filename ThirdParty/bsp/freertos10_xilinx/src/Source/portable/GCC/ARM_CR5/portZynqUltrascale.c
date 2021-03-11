@@ -85,6 +85,11 @@ void FreeRTOS_SetupTickInterrupt( void )
 }
 /*-----------------------------------------------------------*/
 
+void FreeRTOS_ClearTickInterrupt( void )
+{
+	return;
+}
+
 /*-----------------------------------------------------------*/
 
 void vApplicationIRQHandler( uint32_t ulICCIAR )

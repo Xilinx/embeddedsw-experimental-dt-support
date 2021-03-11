@@ -69,6 +69,12 @@ void FreeRTOS_SetupTickInterrupt( void )
 	XTimer_SetHandler(TimerCounterHandler, 0);
 	XTimer_SetTickPriority(portLOWEST_USABLE_INTERRUPT_PRIORITY << portPRIORITY_SHIFT);
 }
+
+void FreeRTOS_ClearTickInterrupt( void )
+{
+	return;
+}
+
 /*-----------------------------------------------------------*/
 
 void vApplicationIRQHandler( uint32_t ulICCIAR )

@@ -165,12 +165,17 @@ proc generate {os_handle} {
 	set armcommonsrcdir "../${standalone_version}/src/arm/common"
 	set armsrcdir "../${standalone_version}/src/arm"
 	set clksrcdir "../${standalone_version}/src/common/clocking"
+        set intrsrcdir "../${standalone_version}/src/common/intr"
 
 	foreach entry [glob -nocomplain [file join $commonsrcdir *]] {
 		file copy -force $entry [file join ".." "${standalone_version}" "src"]
 	}
 
 	foreach entry [glob -nocomplain [file join $clksrcdir *]] {
+		file copy -force $entry [file join ".." "${standalone_version}" "src"]
+	}
+
+	foreach entry [glob -nocomplain [file join $intrsrcdir *]] {
 		file copy -force $entry [file join ".." "${standalone_version}" "src"]
 	}
 
