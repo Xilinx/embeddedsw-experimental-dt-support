@@ -171,10 +171,17 @@ static void XTimer_TtcIntrHandler(XTimer *InstancePtr)
 
 	XTtcPs_SetStatusHandler(TtcPsInstPtr, InstancePtr,
 		              (XTtcPs_StatusHandler)XTtc_CallbackHandler);
+#ifndef SDT
+	XSetupInterruptSystem(TtcPsInstPtr, XTtcPs_InterruptHandler,
+			      TtcPsInstPtr->Config.IntrId,
+			      TtcPsInstPtr->Config.IntrParent,
+			      XINTERRUPT_DEFAULT_PRIORITY);
+#else
 	XSetupInterruptSystem(TtcPsInstPtr, XTtcPs_InterruptHandler,
 			      TtcPsInstPtr->Config.IntrId[0],
 			      TtcPsInstPtr->Config.IntrParent,
 			      XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 }
 
 static void XTickTimer_TtcStop(XTimer *InstancePtr)
@@ -188,8 +195,13 @@ static void XTickTimer_SetTtcIntrPriority(XTimer *InstancePtr, u8 Priority)
 {
 	XTtcPs *TtcPsInstPtr = &InstancePtr->TtcPs_TickInst;
 
+#ifndef SDT
+	XSetPriorityTriggerType(TtcPsInstPtr->Config.IntrId, Priority,
+				TtcPsInstPtr->Config.IntrParent);
+#else
 	XSetPriorityTriggerType(TtcPsInstPtr->Config.IntrId[0], Priority,
 				TtcPsInstPtr->Config.IntrParent);
+#endif
 }
 #endif
 

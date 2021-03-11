@@ -40,5 +40,6 @@ BEGIN LIBRARY xiltimer
   OPTION NAME = xiltimer;
   PARAM name = sleep_timer, type = peripheral_instance, range = (psv_ttc, psu_ttc, ps7_ttc, axi_timer), default=none, desc = "This parameter is used to select specific timer for sleep functionality", permit = user;
   PARAM name = tick_timer, type = peripheral_instance, range = (psv_ttc, psu_ttc, ps7_ttc, axi_timer), default=none, desc = "This parameter is used to select specific timer for tick functionality", permit = user;
+  PARAM name = en_tick_timer, desc = "Enable Tick Timer", type = bool, default = false;
   PARAM name = ttc_select_cntr, type = enum, default = 2, values = ("0" = 0, "1" = 1, "2" = 2), desc = "Selects the counter to be used in the respective module. Allowed range is 0-2", permit = user;
 END LIBRARY

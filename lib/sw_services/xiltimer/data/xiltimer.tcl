@@ -117,11 +117,29 @@ proc generate {lib_handle} {
         puts "timer_ips $timer_ips"
         set timer_len [llength $timer_ips]
         puts "timer_len $timer_len"
-	if { [expr [llength $timer_ips] >= 2] } {
+	# check processor type
+	set proc_instance [hsi::get_sw_processor];
+	set hw_processor [common::get_property HW_INSTANCE $proc_instance]
+	set is_zynqmp_fsbl_bsp [common::get_property CONFIG.ZYNQMP_FSBL_BSP [hsi::get_os]]
+	set cortexa53proc [hsi::get_cells -hier -filter {IP_NAME=="psu_cortexa53_0"}]
+	set is_ticktimer_en [common::get_property CONFIG.en_tick_timer $lib_handle]
+
+	if {$proc_instance == "psv_pmc_0" || $proc_instance == "psu_pmu_0"} {
+		incr sleep_timer_is_default
+		incr tick_timer_is_default
+	} elseif {$proc_instance == "psu_cortexa53_0" && $is_zynqmp_fsbl_bsp == true} {
+		incr sleep_timer_is_default
+		incr tick_timer_is_default
+	} elseif { [expr [llength $timer_ips] >= 2] } {
 		if { $sleep_timer == "none"} {
 			set sleep_timer [lindex $timer_ips 0]
 		}
-		if { $tick_timer == "none"} {
+		puts "is_ticktimer_en $is_ticktimer_en"
+		if { $is_ticktimer_en} {
+			if { $tick_timer == "none"} {
+				set tick_timer [lindex $timer_ips 1]
+			}
+		} elseif { $tick_timer == "none"} {
 			incr tick_timer_is_default
 		}
 	} elseif {[expr [llength $timer_ips] != 0]} {
