@@ -56,7 +56,7 @@
 /***************************** Include Files *********************************/
 
 #include "xpm_counter.h"
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 #include "xil_sleeptimer.h"
 #include "xtime_l.h"
 #endif
@@ -281,6 +281,7 @@ u32 Xpm_GetEventCounter(u32 EventCntrId, u32 *CntVal)
     }
 }
 
+#if 0
 /****************************************************************************/
 /**
 *
