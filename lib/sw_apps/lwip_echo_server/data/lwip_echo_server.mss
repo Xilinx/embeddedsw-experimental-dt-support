@@ -17,3 +17,7 @@ BEGIN LIBRARY
  PARAMETER pbuf_pool_size = 2048
 END
 
+BEGIN LIBRARY
+ PARAMETER LIBRARY_NAME = xiltimer
+ PARAMETER en_tick_timer = true 
+END
