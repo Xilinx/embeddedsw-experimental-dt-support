@@ -29,7 +29,9 @@
 
 #include "xospipsv.h"
 #include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -55,6 +57,7 @@
 * 		was not found. See XOspiPsv.h for the definition of XOspiPsv_Config.
 *
 ******************************************************************************/
+#ifndef SDT
 XOspiPsv_Config *XOspiPsv_LookupConfig(u16 DeviceId)
 {
 	XOspiPsv_Config *CfgPtr = NULL;
@@ -68,4 +71,19 @@ XOspiPsv_Config *XOspiPsv_LookupConfig(u16 DeviceId)
 	}
 	return (XOspiPsv_Config *)CfgPtr;
 }
+#else
+XOspiPsv_Config *XOspiPsv_LookupConfig(UINTPTR BaseAddress)
+{
+	XOspiPsv_Config *CfgPtr = NULL;
+	s32 Index;
+
+	for (Index = 0; XOspiPsv_ConfigTable[Index].Name != NULL; Index++) {
+		if (XOspiPsv_ConfigTable[Index].BaseAddress == BaseAddress) {
+			CfgPtr = &XOspiPsv_ConfigTable[Index];
+			break;
+		}
+	}
+	return (XOspiPsv_Config *)CfgPtr;
+}
+#endif
 /** @} */
