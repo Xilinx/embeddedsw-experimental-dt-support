@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for OSPIPSV controller
+
+maintainers:
+  - Sai Krishna Potthuri <lakshmi.sai.krishna.potthuri@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,versal-ospi-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,clock-freq:
+    description: Input clock frequency
+  dma-coherent:
+    description: Present if dma operations are coherent
+    type: boolean
+
+config:
+    - XOspiPsv_Config
+
+required:
+    - compatible
+    - reg: 1
+    - xlnx,clock-freq
+    - dma-coherent
+    - xlnx,ospi-mode
+...
