@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for video deinterlacer controller
+
+maintainers:
+  - Vishal Sagar <vsagar@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,v-deinterlacer
+  reg:
+    description: Physical base addreiss and size of the controller register map
+  xlnx,num-video-components:  
+    description: Number of Video Components
+  xlnx,max-data-width:  
+    description: Maximum Data width of each channel
+
+required:
+    - compatible
+    - reg
+    - xlnx,num-video-components
+    - xlnx,max-data-width
+
+depends:
+    - video_common
+
+...

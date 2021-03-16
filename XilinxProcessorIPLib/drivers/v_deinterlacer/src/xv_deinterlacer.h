@@ -42,7 +42,11 @@ typedef uint32_t u32;
 * associated.
 */
 typedef struct {
+#ifndef SDT
     u16 DeviceId;              /**< Unique ID  of device */
+#else
+    char *Name;
+#endif
     UINTPTR BaseAddress;       /**< The base address of the core instance. */
     u16 NumVidComponents;      /**< Number of Video Components */
     u16 MaxDataWidth;          /**< Maximum Data width of each channel */
@@ -80,8 +84,13 @@ typedef struct {
 
 /************************** Function Prototypes *****************************/
 #ifndef __linux__
+#ifndef SDT
 int XV_deinterlacer_Initialize(XV_deinterlacer *InstancePtr, u16 DeviceId);
 XV_deinterlacer_Config* XV_deinterlacer_LookupConfig(u16 DeviceId);
+#else
+int XV_deinterlacer_Initialize(XV_deinterlacer *InstancePtr, UINTPTR BaseAddress);
+XV_deinterlacer_Config* XV_deinterlacer_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XV_deinterlacer_CfgInitialize(XV_deinterlacer *InstancePtr,
                                   XV_deinterlacer_Config *ConfigPtr,
 								  UINTPTR EffectiveAddr);
