@@ -42,7 +42,11 @@ typedef uint32_t u32;
 * structure associated.
 */
 typedef struct {
+#ifndef SDT
     u16 DeviceId;          /**< Unique ID  of device */
+#else
+    char *Name;
+#endif
     UINTPTR BaseAddress;   /**< The base address of the core instance. */
     u16 PixPerClk;         /**< Samples Per Clock supported by core instance */
     u16 NumVidComponents;  /**< Number of Video Components */
@@ -85,8 +89,13 @@ typedef struct {
 
 /************************** Function Prototypes *****************************/
 #ifndef __linux__
+#ifndef SDT
 int XV_vcresampler_Initialize(XV_vcresampler *InstancePtr, u16 DeviceId);
 XV_vcresampler_Config* XV_vcresampler_LookupConfig(u16 DeviceId);
+#else
+int XV_vcresampler_Initialize(XV_vcresampler *InstancePtr, UINTPTR BaseAddress);
+XV_vcresampler_Config* XV_vcresampler_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XV_vcresampler_CfgInitialize(XV_vcresampler *InstancePtr,
                                  XV_vcresampler_Config *ConfigPtr,
 								 UINTPTR EffectiveAddr);
