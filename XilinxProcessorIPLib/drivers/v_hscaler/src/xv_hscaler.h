@@ -42,7 +42,11 @@ typedef uint32_t u32;
 * associated.
 */
 typedef struct {
+#ifndef SDT
     u16 DeviceId;         /**< Unique ID  of device */
+#else
+    char *Name;
+#endif
     UINTPTR BaseAddress;  /**< The base address of the core instance. */
     u16 PixPerClk;        /**< Samples Per Clock supported by core instance */
     u16 NumVidComponents; /**< Number of Video Components */
@@ -89,8 +93,13 @@ typedef struct {
 
 /************************** Function Prototypes *****************************/
 #ifndef __linux__
+#ifndef SDT
 int XV_hscaler_Initialize(XV_hscaler *InstancePtr, u16 DeviceId);
 XV_hscaler_Config* XV_hscaler_LookupConfig(u16 DeviceId);
+#else
+int XV_hscaler_Initialize(XV_hscaler *InstancePtr, UINTPTR BaseAddress);
+XV_hscaler_Config* XV_hscaler_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XV_hscaler_CfgInitialize(XV_hscaler *InstancePtr,
                              XV_hscaler_Config *ConfigPtr,
 							 UINTPTR EffectiveAddr);
