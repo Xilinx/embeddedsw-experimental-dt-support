@@ -53,7 +53,11 @@ typedef uint16_t u16;
 typedef uint32_t u32;
 #else
 typedef struct {
+#ifndef SDT
     u16 DeviceId;
+#else
+    char *Name;
+#endif
     UINTPTR Ctrl_BaseAddress;
     u8	MemoryBased;
     u8	NumStreams;
@@ -125,8 +129,13 @@ typedef struct {
 
 /************************** Function Prototypes *****************************/
 #ifndef __linux__
+#ifndef SDT
 int XV_scenechange_Initialize(XV_scenechange *InstancePtr, u16 DeviceId);
 XV_scenechange_Config* XV_scenechange_LookupConfig(u16 DeviceId);
+#else
+int XV_scenechange_Initialize(XV_scenechange *InstancePtr, UINTPTR BaseAddress);
+XV_scenechange_Config* XV_scenechange_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XV_scenechange_CfgInitialize(XV_scenechange *InstancePtr, XV_scenechange_Config *ConfigPtr);
 #else
 int XV_scenechange_Initialize(XV_scenechange *InstancePtr, const char* InstanceName);
