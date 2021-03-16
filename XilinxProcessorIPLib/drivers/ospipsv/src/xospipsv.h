@@ -106,7 +106,11 @@ typedef struct {
  * This typedef contains configuration information for the device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Base address of the device */
 	u32 InputClockHz;	/**< Input clock frequency */
 	u8 IsCacheCoherent;		/**< If OSPI is Cache Coherent or not */
@@ -362,7 +366,11 @@ extern XOspiPsv_Config XOspiPsv_ConfigTable[];
 #define XOSPIPSV_RXADDR_OVER_32BIT	0x100000000U
 
 /* Initialization and reset */
+#ifndef SDT
 XOspiPsv_Config *XOspiPsv_LookupConfig(u16 DeviceId);
+#else
+XOspiPsv_Config *XOspiPsv_LookupConfig(UINTPTR BaseAddress);
+#endif
 u32 XOspiPsv_CfgInitialize(XOspiPsv *InstancePtr, const XOspiPsv_Config *ConfigPtr);
 void XOspiPsv_Reset(XOspiPsv *InstancePtr);
 /* Configuration functions */
