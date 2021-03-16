@@ -65,7 +65,11 @@ extern "C" {
 /****************************** Type Definitions ******************************/
 
 typedef struct {
+#ifndef SDT
 	u16 DeviceId; /**< Unique ID of PCIe IP */
+#else
+	char *Name;		/* Compatible string */
+#endif
 #if defined(__aarch64__) || defined(__arch64__)
 	u64 BrigReg;  /**< Bridge Register base address */
 	u64 PciReg;		/**< pcie Register base address */
@@ -99,7 +103,11 @@ extern size_t XPciePsu_ConfigTableSize;
 
 /***************************** Function Prototypes ****************************/
 
+#ifndef SDT
 XPciePsu_Config *XPciePsu_LookupConfig(u16 DeviceId);
+#else
+XPciePsu_Config *XPciePsu_LookupConfig(UINTPTR BrigReg);
+#endif
 
 u32 XPciePsu_CfgInitialize(XPciePsu *InstancePtr, const XPciePsu_Config *CfgPtr,
 			   UINTPTR EffectiveBrgAddress);
