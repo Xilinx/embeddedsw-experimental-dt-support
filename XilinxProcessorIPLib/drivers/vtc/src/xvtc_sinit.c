@@ -36,7 +36,9 @@
 /***************************** Include Files *********************************/
 
 #include "xvtc.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -75,6 +77,7 @@
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 XVtc_Config *XVtc_LookupConfig(u16 DeviceId)
 {
 	extern XVtc_Config XVtc_ConfigTable[];
@@ -94,4 +97,23 @@ XVtc_Config *XVtc_LookupConfig(u16 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XVtc_Config *XVtc_LookupConfig(UINTPTR BaseAddress)
+{
+	extern XVtc_Config XVtc_ConfigTable[];
+	XVtc_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0U; XVtc_ConfigTable[Index].Name != NULL; Index++) {
+            if ((XVtc_ConfigTable[Index].BaseAddress == BaseAddress) ||
+                             !BaseAddress) {
+
+                      CfgPtr = &XVtc_ConfigTable[Index];
+                break;
+           }
+        }
+
+	return CfgPtr;
+}
+#endif
 /** @} */
