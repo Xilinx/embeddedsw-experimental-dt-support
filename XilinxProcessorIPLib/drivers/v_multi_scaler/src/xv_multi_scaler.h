@@ -76,7 +76,11 @@ typedef uint32_t u32;
 #define XV_MULTI_SCALER_DST_IMG_BUF_1(x) \
 				XV_multi_scaler_Set_HwReg_dstImgBuf1_##x##_V
 typedef struct {
+#ifndef SDT
     u16 DeviceId;
+#else
+    char *Name;
+#endif
     u32 Ctrl_BaseAddress;
     u32 SamplesPerClock;
     u32 MaxDataWidth;
@@ -130,8 +134,13 @@ typedef struct {
 
 /************************** Function Prototypes *****************************/
 #ifndef __linux__
+#ifndef SDT
 int XV_multi_scaler_Initialize(XV_multi_scaler *InstancePtr, u16 DeviceId);
 XV_multi_scaler_Config* XV_multi_scaler_LookupConfig(u16 DeviceId);
+#else
+int XV_multi_scaler_Initialize(XV_multi_scaler *InstancePtr, UINTPTR BaseAddress);
+XV_multi_scaler_Config* XV_multi_scaler_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XV_multi_scaler_CfgInitialize(XV_multi_scaler *InstancePtr,
 	XV_multi_scaler_Config *ConfigPtr);
 #else
