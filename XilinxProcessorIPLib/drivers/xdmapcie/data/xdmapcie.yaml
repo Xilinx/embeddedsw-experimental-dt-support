@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for XDMAPCIE controller
+
+maintainers:
+  - Arjun V <arjunv@xilinx.com>
+  - Bharat Kumar Gogada <bharatku@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - xlnx,psv-pciea-attrib
+          - xlnx,pcie-dma-versal-2.0
+          - xlnx,xdma-host-3.00
+
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XDmaPcie_Config
+
+required:
+    - compatible
+    - reg
+    - xlnx,axibar-num
+    - xlnx,include-baroffset-reg
+    - xlnx,device_port_type
+    - reg
+    - xlnx,axibar-0
+    - xlnx,axibar-1
+    - xlnx,axibar-highaddr-0
+    - xlnx,axibar-highaddr-1
+...

@@ -97,7 +97,11 @@ extern "C" {
  */
 
 typedef  struct {
+#ifndef SDT
 	u16 DeviceId;			/**< Unique ID of PCIe IP */
+#else
+	char *Name;			/* Compatible string */
+#endif
 	UINTPTR BaseAddress;		/**< Register base address */
 	u8  LocalBarsNum;		/* The number of local bus (AXI) BARs
 					 * in hardware
@@ -208,7 +212,11 @@ typedef struct {
  * This API is implemented in xdmapcie_sinit.c
  */
 
+#ifndef SDT
 XDmaPcie_Config * XDmaPcie_LookupConfig(u16 DeviceId);
+#else
+XDmaPcie_Config * XDmaPcie_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /*
  * PCIe Setup and Configuration Functions.
