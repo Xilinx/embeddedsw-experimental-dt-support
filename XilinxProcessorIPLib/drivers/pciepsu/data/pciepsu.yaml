@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for PCIEPSU controller
+
+maintainers:
+  - Arjun V <arjunv@xilinx.com>
+  - Bharat Kumar Gogada <bharatku@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,nwl-pcie-2.11
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XPciePsu_Config
+
+required:
+    - compatible
+    - reg: 3
+    - ranges: 2
+...
