@@ -129,7 +129,11 @@ const u16 XVprocSs_PixelHStep[3][4] =
 
 /************************** Function Prototypes ******************************/
 static void SetPowerOnDefaultState(XVprocSs *XVprocSsPtr);
+#ifndef SDT
 static void GetIncludedSubcores(XVprocSs *XVprocSsPtr);
+#else
+static void GetIncludedSubcores(XVprocSs *XVprocSsPtr, UINTPTR BaseAddress);
+#endif
 static int ValidateSubsystemConfig(XVprocSs *InstancePtr);
 static int ValidateScalerOnlyConfig(XVprocSs *XVprocSsPtr);
 static int ValidateCscOnlyConfig(XVprocSs *XVprocSsPtr,
@@ -281,6 +285,7 @@ void XVprocSs_SetUserTimerHandler(XVprocSs *InstancePtr,
 * @return None
 *
 ******************************************************************************/
+#ifndef SDT
 static void GetIncludedSubcores(XVprocSs *XVprocSsPtr)
 {
   XVprocSsPtr->HcrsmplrPtr    = ((XVprocSsPtr->Config.HCrsmplr.IsPresent)   \
@@ -308,7 +313,26 @@ static void GetIncludedSubcores(XVprocSs *XVprocSsPtr)
   XVprocSsPtr->RstAximmPtr    = ((XVprocSsPtr->Config.RstAximm.IsPresent)    \
                               ? (&subcoreRepo[XVprocSsPtr->Config.DeviceId].RstAximm)    : NULL);
 }
+#else
+static void GetIncludedSubcores(XVprocSs *XVprocSsPtr, UINTPTR BaseAddress)
+{
+  u32 Index = 0;
 
+  Index = XVprocSs_GetDrvIndex(XVprocSsPtr, BaseAddress);
+  XVprocSsPtr->HcrsmplrPtr    = &subcoreRepo[Index].Hcrsmplr;
+  XVprocSsPtr->VcrsmplrInPtr  = &subcoreRepo[Index].VcrsmplrIn;
+  XVprocSsPtr->VcrsmplrOutPtr = &subcoreRepo[Index].VcrsmplrOut;
+  XVprocSsPtr->VscalerPtr     = &subcoreRepo[Index].Vscaler;
+  XVprocSsPtr->HscalerPtr     = &subcoreRepo[Index].Hscaler;
+  XVprocSsPtr->VdmaPtr        = &subcoreRepo[Index].Vdma;
+  XVprocSsPtr->LboxPtr        = &subcoreRepo[Index].Lbox;
+  XVprocSsPtr->CscPtr         = &subcoreRepo[Index].Csc;
+  XVprocSsPtr->DeintPtr       = &subcoreRepo[Index].Deint;
+  XVprocSsPtr->RouterPtr      = &subcoreRepo[Index].Router;
+  XVprocSsPtr->RstAxisPtr     = &subcoreRepo[Index].RstAxis;
+  XVprocSsPtr->RstAximmPtr    = &subcoreRepo[Index].RstAximm;
+}
+#endif
 /*****************************************************************************/
 /**
 * This function sets the base address of the video frame buffers used by the
@@ -370,7 +394,11 @@ int XVprocSs_CfgInitialize(XVprocSs *InstancePtr, XVprocSs_Config *CfgPtr,
   XVprocSs_LogWrite(InstancePtr, XVPROCSS_EVT_CHK_TOPO, XVprocSs_GetSubsystemTopology(InstancePtr));
 
   /* Determine sub-cores included in the provided instance of subsystem */
+#ifndef SDT
   GetIncludedSubcores(InstancePtr);
+#else
+  GetIncludedSubcores(InstancePtr, InstancePtr->Config.BaseAddress);
+#endif
 
   /* Initialize all included sub_cores */
   if(InstancePtr->RstAxisPtr) {

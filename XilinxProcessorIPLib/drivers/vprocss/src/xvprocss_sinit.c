@@ -26,8 +26,10 @@
 ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xparameters.h"
 #include "xvprocss.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -55,6 +57,7 @@ extern XVprocSs_Config XVprocSs_ConfigTable[];
 *         given device ID, or NULL if no match is found
 *
 *******************************************************************************/
+#ifndef SDT
 XVprocSs_Config* XVprocSs_LookupConfig(u32 DeviceId)
 {
   XVprocSs_Config *CfgPtr = NULL;
@@ -70,4 +73,46 @@ XVprocSs_Config* XVprocSs_LookupConfig(u32 DeviceId)
   }
   return (CfgPtr);
 }
+#else
+XVprocSs_Config* XVprocSs_LookupConfig(UINTPTR BaseAddress)
+{
+  XVprocSs_Config *CfgPtr = NULL;
+  u32 Index;
+
+  for (Index = 0U; XVprocSs_ConfigTable[Index].Name != NULL; Index++) {
+    if ((XVprocSs_ConfigTable[Index].BaseAddress == BaseAddress) ||
+		     !BaseAddress) { 
+      CfgPtr = &XVprocSs_ConfigTable[Index];
+      break;
+    }
+  }
+  return (CfgPtr);
+}
+
+/*****************************************************************************/
+/**
+* This function returns the Index number of config table using BaseAddress.
+*
+* @param  A pointer to the instance structure
+*
+* @param  Base address of the instance
+*
+* @return Index number of the config table
+*
+*
+*******************************************************************************/
+
+u32 XVprocSs_GetDrvIndex(XVprocSs *InstancePtr, UINTPTR BaseAddress)
+{
+ u32 Index = 0;
+
+ for (Index = 0U; XVprocSs_ConfigTable[Index].Name != NULL; Index++) {
+   if ((XVprocSs_ConfigTable[Index].BaseAddress == BaseAddress)) {
+	break;
+   }
+ }
+ return Index;
+}
+
+#endif
 /** @} */
