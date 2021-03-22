@@ -49,10 +49,6 @@
 
 
 /************************** Constant Definitions *****************************/
-#ifdef SDT
-#define XPAR_RAM_INSTR_CNTLR_0_S_AXI_BASEADDR XPAR_PSV_PMC_RAM_INSTR_CNTLR_BASEADDR
-#define XPAR_RAM_DATA_CNTLR_0_S_AXI_HIGHADDR XPAR_PSV_PMC_RAM_DATA_CNTLR_HIGHADDR
-#endif
 
 /**************************** Type Definitions *******************************/
 
