@@ -29,6 +29,7 @@
 
 #include "xil_cache.h"
 #include "mb_interface.h"
+#include "bspconfig.h"
 
 #define XIL_MICROBLAZE_EXT_CACHE_LINE_LEN	16
 
@@ -65,6 +66,7 @@ void Xil_ICacheDisable(void)
 	Xil_L1ICacheDisable();
 }
 void microblaze_flush_dcache(void) {
+#ifndef VERSAL_PLM
 	UINTPTR startadr=0, endadr=0;
 
 	if (CfgPtr->UseDcache && CfgPtr->AllowDcaheWr) {
@@ -80,10 +82,11 @@ void microblaze_flush_dcache(void) {
 			startadr += (CfgPtr->DcacheLineLen * 4);
 		}
 	}
-
+#endif
 }
 
 void microblaze_flush_dcache_range(UINTPTR cacheaddr, u32 len) {
+#ifndef VERSAL_PLM
 	 UINTPTR startadr=0, endadr=0, temp=0;
 
 	 if (CfgPtr->UseDcache && CfgPtr->AllowDcaheWr) {
@@ -112,10 +115,11 @@ void microblaze_flush_dcache_range(UINTPTR cacheaddr, u32 len) {
 			mtmsr(temp);
 		}
 	}
-
+#endif
 }
 
 void microblaze_invalidate_dcache(void) {
+#ifndef VERSAL_PLM
 	 UINTPTR startadr=0, endadr=0, temp=0;
 
 	 if (CfgPtr->UseDcache && CfgPtr->AllowDcaheWr) {
@@ -140,10 +144,11 @@ void microblaze_invalidate_dcache(void) {
 			mtmsr(temp);
 		}
 	}
-
+#endif
 }
 
 void microblaze_invalidate_dcache_range(UINTPTR cacheaddr, u32 len) {
+#ifndef VERSAL_PLM
 	 UINTPTR startadr=0, endadr=0, temp=0;
 	 INTPTR count=0;
 
@@ -176,10 +181,11 @@ void microblaze_invalidate_dcache_range(UINTPTR cacheaddr, u32 len) {
 			mtmsr(temp);
 		}
 	}
-
+#endif
 }
 
 void microblaze_flush_cache_ext(void) {
+#ifndef VERSAL_PLM
 	UINTPTR startadr=0, endadr=0;
 
 	if ((CfgPtr->Interconnect > 3) && CfgPtr->AllowDcaheWr) {
@@ -196,9 +202,11 @@ void microblaze_flush_cache_ext(void) {
 			startadr += (CfgPtr->DcacheLineLen * 4);
 		}
 	}
+#endif
 }
 
 void microblaze_flush_cache_ext_range(UINTPTR cacheaddr, u32 len) {
+#ifndef VERSAL_PLM
 	UINTPTR startadr=0, endadr=0;
 
 	if ((CfgPtr->Interconnect > 3) && CfgPtr->AllowDcaheWr) {
@@ -215,9 +223,11 @@ void microblaze_flush_cache_ext_range(UINTPTR cacheaddr, u32 len) {
 			startadr += (CfgPtr->DcacheLineLen * 4);
 		}
 	}
+#endif
 }
 
 void microblaze_invalidate_cache_ext(void) {
+#ifndef VERSAL_PLM
 	UINTPTR startadr=0, endadr=0;
 
 	if ((CfgPtr->Interconnect > 3) && CfgPtr->AllowDcaheWr) {
@@ -234,9 +244,11 @@ void microblaze_invalidate_cache_ext(void) {
 			startadr += (CfgPtr->DcacheLineLen * 4);
 		}
 	}
+#endif
 }
 
 void microblaze_invalidate_cache_ext_range(UINTPTR cacheaddr, u32 len) {
+#ifndef VERSAL_PLM
 	UINTPTR startadr=0, endadr=0;
 
 	if ((CfgPtr->Interconnect > 3) && CfgPtr->AllowDcaheWr) {
@@ -253,9 +265,11 @@ void microblaze_invalidate_cache_ext_range(UINTPTR cacheaddr, u32 len) {
 			startadr += (CfgPtr->DcacheLineLen * 4);
 		}
 	}
+#endif
 }
 
 void microblaze_invalidate_icache(void) {
+#ifndef VERSAL_PLM
 	 UINTPTR startadr=0, endadr=0, temp=0;
 
 	 if (CfgPtr->UseIcache && CfgPtr->AllowIcacheWr) {
@@ -278,10 +292,11 @@ void microblaze_invalidate_icache(void) {
 			mtmsr(temp);
 		}
 	}
-
+#endif
 }
 
 void microblaze_invalidate_icache_range(UINTPTR cacheaddr, u32 len) {
+#ifndef VERSAL_PLM
 	 UINTPTR startadr=0, endadr=0, temp=0;
 
 	 if (CfgPtr->UseIcache && CfgPtr->AllowIcacheWr) {
@@ -305,10 +320,11 @@ void microblaze_invalidate_icache_range(UINTPTR cacheaddr, u32 len) {
 			mtmsr(temp);
 		}
 	}
-
+#endif
 }
 
 void microblaze_disable_dcache(void) {
+#ifndef VERSAL_PLM
  	UINTPTR val=0;
 
 	if (CfgPtr->AllowDcaheWr) {
@@ -321,9 +337,11 @@ void microblaze_disable_dcache(void) {
 		val = mfmsr();
 		mtmsr(val & (~XMICROBLAZE_DCACHE_MASK));
 	}
+#endif
 }
 
 void microblaze_enable_dcache(void) {
+#ifndef VERSAL_PLM
 	UINTPTR val=0;
 
 	if (CfgPtr->UseMsrInstr) {
@@ -332,8 +350,10 @@ void microblaze_enable_dcache(void) {
 		val = mfmsr();
 		mtmsr(val | (XMICROBLAZE_DCACHE_MASK));
 	}
+#endif
 }
 void microblaze_disable_icache(void) {
+#ifndef VERSAL_PLM
 	UINTPTR val=0;
 
 	if (CfgPtr->UseMsrInstr) {
@@ -342,9 +362,11 @@ void microblaze_disable_icache(void) {
 		val = mfmsr();
 		mtmsr(val & (~XMICROBLAZE_ICACHE_MASK));
 	}
+#endif
 }
 
 void microblaze_enable_icache(void) {
+#ifndef VERSAL_PLM
 	UINTPTR val=0;
 
 	if (CfgPtr->UseMsrInstr) {
@@ -353,23 +375,27 @@ void microblaze_enable_icache(void) {
 		val = mfmsr();
 		mtmsr(val | (XMICROBLAZE_ICACHE_MASK));
 	}
+#endif
 }
 
- void Xil_L1DCacheFlushRange(Addr, Len) {
+void Xil_L1DCacheFlushRange(Addr, Len) {
+#ifndef VERSAL_PLM
 	XMicroblaze_Config *CfgPtr = XGet_CpuCfgPtr();
 	if (CfgPtr->DcacheUseWriteback) {
 		microblaze_flush_dcache_range((Addr), (Len));
 	} else {
 		microblaze_invalidate_dcache_range((Addr), (Len));
 	}
+#endif
 }
 
 void Xil_L1DCacheFlush() {
+#ifndef VERSAL_PLM
 	XMicroblaze_Config *CfgPtr = XGet_CpuCfgPtr();
 	if (CfgPtr->DcacheUseWriteback) {
 		microblaze_flush_dcache();
 	} else {
 		microblaze_invalidate_dcache();
 	}
+#endif
 }
-
