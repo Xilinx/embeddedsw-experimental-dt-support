@@ -106,9 +106,11 @@ void XUartPsv_ResetHw(UINTPTR BaseAddress)
 
 #ifdef SDT
 #ifdef XPAR_STDIN_IS_UARTPSV
+#if !defined(VERSAL_PLM)
 void outbyte(char c) {
          XUartPsv_SendByte(STDOUT_BASEADDRESS, c);
 }
+#endif
 
 char inbyte(void) {
          return XUartPsv_RecvByte(STDIN_BASEADDRESS);
