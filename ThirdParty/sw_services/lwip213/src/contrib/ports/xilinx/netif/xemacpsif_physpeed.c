@@ -164,7 +164,7 @@ extern u32_t phymapemac[32];
 
 #if defined (CONFIG_LINKSPEED_AUTODETECT)
 static u32_t get_IEEE_phy_speed(XEmacPs *xemacpsp, u32_t phy_addr);
-static void SetUpSLCRDivisors(u32_t mac_baseaddr, s32_t speed);
+static void SetUpSLCRDivisors(UINTPTR mac_baseaddr, s32_t speed);
 static u32_t get_Xilinx_phy_speed(XEmacPs *xemacpsp, u32_t phy_addr);
 static int isgemphy_pcspma(XEmacPs *xemacpsp, u32 phy_addr);
 #if defined (CONFIG_LINKSPEED1000) || defined (CONFIG_LINKSPEED100) \
