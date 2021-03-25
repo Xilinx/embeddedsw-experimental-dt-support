@@ -324,7 +324,8 @@ proc gen_intr {drv_handle file_name} {
                    puts $file_handle "\#define XPAR_${ip_name}_${val}_INTERRUPT XPAR_${ip_name}_${val}_INTERRUPT_ID"
               }
            } else {
-               puts $file_handle "\#define [::hsi::utils::get_driver_param_name $ip "C_INTERRUPT"] $intr"
+               set ip_name [string toupper $ip_name]
+               puts $file_handle "\#define XPAR_${ip_name}_${val}_INTERRUPT $intr"
            }
 
             set ip_name [string toupper $ip_name]
