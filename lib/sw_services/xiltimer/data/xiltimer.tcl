@@ -124,7 +124,7 @@ proc generate {lib_handle} {
 	set cortexa53proc [hsi::get_cells -hier -filter {IP_NAME=="psu_cortexa53_0"}]
 	set is_ticktimer_en [common::get_property CONFIG.en_tick_timer $lib_handle]
 
-	if {$proc_instance == "psv_pmc_0" || $proc_instance == "psu_pmu_0"} {
+	if {$proc_instance == "psv_pmc_0" || $proc_instance == "psu_pmu_0" || $proc_instance == "psv_psm_0"} {
 		incr sleep_timer_is_default
 		incr tick_timer_is_default
 	} elseif {$proc_instance == "psu_cortexa53_0" && $is_zynqmp_fsbl_bsp == true} {
