@@ -279,7 +279,11 @@ typedef struct {
  * The IPIPSU configuration table, sized by the number of instances
  * defined in xparameters.h.
  */
+#ifndef SDT
 extern XIpiPsu_Config XIpiPsu_ConfigTable[XPAR_XIPIPSU_NUM_INSTANCES];
+#else
+extern XIpiPsu_Config XIpiPsu_ConfigTable[];
+#endif
 
 /************************** Function Prototypes *****************************/
 
