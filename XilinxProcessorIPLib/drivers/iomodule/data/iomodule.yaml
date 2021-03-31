@@ -37,6 +37,5 @@ required:
     - xlnx,pit-prescaler
     - xlnx,pit-readable
     - xlnx,gpo-init
-    - xlnx,max-intr-size
     - Handler-table
 ...
