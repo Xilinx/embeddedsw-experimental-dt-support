@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+#include "xparameters.h"
+
 /*Check if UART is present in design */
 #if defined (STDOUT_BASEADDRESS)
 /*Check if MDM uart or PS Uart */
