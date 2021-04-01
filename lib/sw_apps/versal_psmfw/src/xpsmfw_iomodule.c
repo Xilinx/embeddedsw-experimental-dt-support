@@ -48,7 +48,7 @@ static void XPsmFw_InterruptIpiHandler(void)
 		goto done;
 	}
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#ifdef XPAR_XIPIPSU_0_BASEADDR
 	Status = XPsmFw_DispatchIpiHandler(IPI_PSM_ISR_PMC_MASK);
 #else
 	XPsmFw_Printf(DEBUG_ERROR, "PSM IPI channel is not enabled\r\n");

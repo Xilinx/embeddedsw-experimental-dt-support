@@ -51,6 +51,10 @@ extern "C" {
 #define IPI_PSM_IER_PMC_MASK 0U
 #endif
 
+#ifdef SDT
+#define IPI_PSM_IER_PMC_MASK	0x00000002U
+#endif
+
 /**
  * Initialize the IPI driver instance
  * This should be called in the core init
