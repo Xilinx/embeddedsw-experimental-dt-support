@@ -47,12 +47,10 @@ extern "C" {
 
 #ifdef XPAR_XIPIPS_TARGET_PSV_PMC_0_CH0_MASK
 #define IPI_PSM_IER_PMC_MASK	  XPAR_XIPIPS_TARGET_PSV_PMC_0_CH0_MASK
+#elif defined(SDT)
+#define IPI_PSM_IER_PMC_MASK	0x00000002U
 #else
 #define IPI_PSM_IER_PMC_MASK 0U
-#endif
-
-#ifdef SDT
-#define IPI_PSM_IER_PMC_MASK	0x00000002U
 #endif
 
 /**
