@@ -34,7 +34,7 @@ required:
     - reg
     - xlnx,ipi-bitmask
     - xlnx,ipi-id
-    - interrupts
+    - xlnx,int-id
     - xlnx,ipi-target-count
     - child,required:
         - xlnx,ipi-bitmask
