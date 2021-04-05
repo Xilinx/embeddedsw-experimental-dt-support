@@ -20,7 +20,7 @@ properties:
           - arasan,sdhci-8.9a
   reg:
     description: Physical base address and size of the controller register map
-  xlnx,clock-freq:
+  clock-frequency:
     description: Input clock frequency
   xlnx,mio_bank: The value will be 0/1/2 depending on MIO bank selection
 
@@ -30,7 +30,7 @@ config:
 required:
     - compatible
     - reg
-    - xlnx,clock-freq
+    - clock-frequency
     - xlnx,card-detect
     - xlnx,write-protect
     - xlnx,bus-width
