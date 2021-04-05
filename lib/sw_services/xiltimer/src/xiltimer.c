@@ -116,7 +116,6 @@ void XilTimer_Sleep(unsigned long delay, XTimer_DelayType DelayType) {
 *****************************************************************************/
 void __attribute__ ((constructor)) xtimerinit()
 {
-
     XilSleepTimer_Init(&TimerInst);
     XilTickTimer_Init(&TimerInst);
 }
