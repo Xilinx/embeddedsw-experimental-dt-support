@@ -514,14 +514,14 @@ static inline void XPlmi_OutByte64(u64 Addr, u8 Data)
 /*
  * Definition for QSPI to be included
  */
-#if (!defined(PLM_QSPI_EXCLUDE) && defined(XPAR_XQSPIPSU_0_DEVICE_ID))
+#if (!defined(PLM_QSPI_EXCLUDE) && defined(XPAR_XQSPIPSU_0_BASEADDR))
 #define XLOADER_QSPI
 #endif
 
 /*
  * Definition for OSPI to be included
  */
-#if (!defined(PLM_OSPI_EXCLUDE) && defined(XPAR_XOSPIPSV_0_DEVICE_ID))
+#if (!defined(PLM_OSPI_EXCLUDE) && defined(XPAR_XOSPIPSV_0_BASEADDR))
 #define XLOADER_OSPI
 #define XLOADER_OSPI_DEVICE_ID		XPAR_XOSPIPSV_0_DEVICE_ID
 #define XLOADER_OSPI_BASEADDR		XPAR_XOSPIPSV_0_BASEADDR
