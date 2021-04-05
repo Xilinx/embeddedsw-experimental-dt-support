@@ -271,7 +271,11 @@ int XLoader_QspiInit(u32 DeviceFlags)
 	XQspiPsu_SelectFlash(&QspiPsuInstance,
 		XQSPIPSU_SELECT_FLASH_CS_LOWER, XQSPIPSU_SELECT_FLASH_BUS_LOWER);
 
+#ifndef SDT
 	QspiMode = (u8)XPAR_XQSPIPSU_0_QSPI_MODE;
+#else
+	QspiMode = (u8)XPAR_XQSPIPSU_0_CONNECTION_MODE;
+#endif
 	switch (QspiMode) {
 		case XQSPIPSU_CONNECTION_MODE_SINGLE:
 			XLoader_Printf(DEBUG_INFO,
@@ -293,7 +297,12 @@ int XLoader_QspiInit(u32 DeviceFlags)
 	if (Status != XST_SUCCESS) {
 		goto END;
 	}
+
+#ifndef SDT
 	QspiBusWidth = (u8)XPAR_XQSPIPSU_0_QSPI_BUS_WIDTH;
+#else
+	QspiBusWidth = (u8)XPAR_XQSPIPSU_0_BUS_WIDTH;
+#endif
 	switch (QspiBusWidth) {
 		case XLOADER_QSPI_BUSWIDTH_ONE:
 			if (QspiBootMode == XLOADER_PDI_SRC_QSPI24) {
