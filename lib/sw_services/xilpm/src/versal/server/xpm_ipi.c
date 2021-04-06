@@ -7,7 +7,7 @@
 #include "xplmi_ipi.h"
 #include "xpm_ipi.h"
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_BASEADDR) || defined(XPAR_XIPIPSU_0_DEVICE_ID)
 /****************************************************************************/
 /**
  * @brief	Sends IPI request to the target module
