@@ -20,6 +20,8 @@ extern "C" {
 
 #ifdef XPAR_XIPIPSU_0_DEVICE_ID
 #define PSM_IPI_INT_MASK		XPAR_XIPIPS_TARGET_PSV_PSM_0_CH0_MASK
+#elif defined(SDT)
+#define PSM_IPI_INT_MASK		0x00000001U
 #else
 #define PSM_IPI_INT_MASK		(0U)
 #endif /* XPAR_XIPIPSU_0_DEVICE_ID */
