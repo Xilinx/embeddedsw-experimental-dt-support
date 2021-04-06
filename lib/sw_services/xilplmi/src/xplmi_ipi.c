@@ -56,7 +56,7 @@
 #include "xplmi_generic.h"
 #include "xplmi_hw.h"
 
-#ifdef XPAR_XIPIPSU_0_BASEADDR
+#if defined(XPAR_XIPIPSU_0_BASEADDR) || defined(XPAR_XIPIPSU_0_DEVICE_ID)
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
