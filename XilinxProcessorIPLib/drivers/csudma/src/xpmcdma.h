@@ -323,10 +323,17 @@ static INLINE u32 XPmcDma_IsBusy(XPmcDma *InstancePtr, XPmcDma_Channel Channel)
 *		NULL if no match is found.
 *
 ******************************************************************************/
+#ifndef SDT
 static INLINE XPmcDma_Config * XPmcDma_LookupConfig(u16 DeviceId)
 {
 	return XCsuDma_LookupConfig(DeviceId);
 }
+#else
+static INLINE XPmcDma_Config * XPmcDma_LookupConfig(UINTPTR BaseAddress)
+{
+	return XCsuDma_LookupConfig(BaseAddress);
+}
+#endif
 
 /*****************************************************************************/
 /**
