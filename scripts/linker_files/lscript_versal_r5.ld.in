@@ -20,7 +20,7 @@ _FIQ_STACK_SIZE = DEFINED(_FIQ_STACK_SIZE) ? _FIQ_STACK_SIZE : 1024;
 _UNDEF_STACK_SIZE = DEFINED(_UNDEF_STACK_SIZE) ? _UNDEF_STACK_SIZE : 1024;
 
 INCLUDE memory.ld
-INCLUDE cortexr5.ld
+INCLUDE cortexr5_versal.ld
 
 /* Specify the default entry point to the program */
 
@@ -33,7 +33,7 @@ SECTIONS
 .vectors : {
    KEEP (*(.vectors))
    *(.boot)
-} > psu_r5_0_atcm_MEM_0
+} > psv_r5_0_atcm_MEM_0
 
 .text : {
    *(.text)
