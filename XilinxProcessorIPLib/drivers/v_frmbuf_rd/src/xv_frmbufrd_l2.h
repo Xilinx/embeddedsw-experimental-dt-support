@@ -622,7 +622,11 @@ typedef struct {
                                      ((InstancePtr)->FrmbufRd.Config.Interlaced)
 
 /**************************** Function Prototypes *****************************/
+#ifndef SDT
 int XVFrmbufRd_Initialize(XV_FrmbufRd_l2 *InstancePtr, u16 DeviceId);
+#else
+int XVFrmbufRd_Initialize(XV_FrmbufRd_l2 *InstancePtr, UINTPTR BaseAddress);
+#endif
 void XVFrmbufRd_Start(XV_FrmbufRd_l2 *InstancePtr);
 int XVFrmbufRd_Stop(XV_FrmbufRd_l2 *InstancePtr);
 int XVFrmbufRd_WaitForIdle(XV_FrmbufRd_l2 *InstancePtr);
