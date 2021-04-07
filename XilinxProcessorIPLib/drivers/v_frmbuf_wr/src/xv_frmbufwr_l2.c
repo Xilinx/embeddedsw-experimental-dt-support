@@ -161,14 +161,22 @@ XVidC_ColorFormat WrMemory2Live(XVidC_ColorFormat MemFmt)
 *         XST_DEVICE_NOT_FOUND if device is not found
 *
 ******************************************************************************/
+#ifndef SDT
 int XVFrmbufWr_Initialize(XV_FrmbufWr_l2 *InstancePtr, u16 DeviceId)
+#else
+int XVFrmbufWr_Initialize(XV_FrmbufWr_l2 *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
   int Status;
   Xil_AssertNonvoid(InstancePtr != NULL);
 
   /* Setup the instance */
   memset(InstancePtr, 0, sizeof(XV_FrmbufWr_l2));
+#ifndef SDT
   Status = XV_frmbufwr_Initialize(&InstancePtr->FrmbufWr, DeviceId);
+#else
+  Status = XV_frmbufwr_Initialize(&InstancePtr->FrmbufWr, BaseAddress);
+#endif
 
   if(Status == XST_SUCCESS) {
     SetPowerOnDefaultState(InstancePtr);

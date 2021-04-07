@@ -42,7 +42,11 @@ typedef uint32_t u32;
 * Each core instance should have a configuration structure associated.
 */
 typedef struct {
+#ifndef SDT
   u16 DeviceId;             /**< Unique ID of device */
+#else
+  char *Name;		    /**< Unique Name of device */
+#endif
   UINTPTR BaseAddress;      /**< The base address of the core instance. */
   u16 PixPerClk;            /**< Samples Per Clock */
   u16 MaxWidth;             /**< Maximum columns supported by core instance */
@@ -111,8 +115,13 @@ typedef struct {
 
 /************************** Function Prototypes *****************************/
 #ifndef __linux__
+#ifndef SDT
 int XV_frmbufwr_Initialize(XV_frmbufwr *InstancePtr, u16 DeviceId);
 XV_frmbufwr_Config* XV_frmbufwr_LookupConfig(u16 DeviceId);
+#else
+int XV_frmbufwr_Initialize(XV_frmbufwr *InstancePtr, UINTPTR BaseAddress);
+XV_frmbufwr_Config* XV_frmbufwr_LookupConfig(UINTPTR BaseAddress);
+#endif
 int XV_frmbufwr_CfgInitialize(XV_frmbufwr *InstancePtr,
                                XV_frmbufwr_Config *ConfigPtr,
                                UINTPTR EffectiveAddr);
