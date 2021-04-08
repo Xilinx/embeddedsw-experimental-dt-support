@@ -83,6 +83,10 @@ typedef struct {
   u16 Y_U_V8En;             /**< Y_U_V8   support */
   u16 Y_U_V10En;            /**< Y_U_V10   support */
   u16 Interlaced;           /**< Interlaced support */
+#ifdef SDT
+  u16 IntrId; 		    /**< Interrupt ID */
+  UINTPTR IntrParent; 	    /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+#endif
 } XV_frmbufwr_Config;
 #endif
 

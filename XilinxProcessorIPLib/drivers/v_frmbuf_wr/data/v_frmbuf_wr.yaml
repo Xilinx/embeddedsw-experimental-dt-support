@@ -86,6 +86,10 @@ properties:
     description: y16 support
   xlnx,has-interlaced:
     description: Interlaced support
+  interrupts:
+    description: Interrupt number
+  interrupt-parent:
+    description: Parent interrupt
 
 required:
     - compatible
@@ -126,6 +130,8 @@ required:
     - xlnx,has-y-uv16-420
     - xlnx,has-y16
     - xlnx,has-interlaced
+    - interrupts
+    - interrupt-parent
 
 config:
     - XV_frmbufwr_Config
