@@ -103,8 +103,6 @@ required:
     - xlnx,has-rgbx8
     - xlnx,has-yuvx8
     - xlnx,has-yuyv8
-    - xlnx,has-rgba8
-    - xlnx,has-yuva8
     - xlnx,has-rgbx10
     - xlnx,has-yuvx10
     - xlnx,has-y-uv8
@@ -115,7 +113,6 @@ required:
     - xlnx,has-y-uv10-420
     - xlnx,has-y8
     - xlnx,has-y10
-    - xlnx,has-bgra8
     - xlnx,has-bgrx8
     - xlnx,has-uyvy8
     - xlnx,has-bgr8
