@@ -84,6 +84,10 @@ typedef struct {
   u16 Y_UV16_420En;         /**< Y_UV16_420 support */
   u16 Y16En;                /**< Y16      support */
   u16 Interlaced;           /**< Interlaced support */
+#ifdef SDT
+  u16 IntrId; 		    /**< Interrupt ID */
+  UINTPTR IntrParent; 	    /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+#endif
 } XV_frmbufrd_Config;
 #endif
 

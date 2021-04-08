@@ -130,6 +130,8 @@ required:
     - xlnx,has-y-uv16-420
     - xlnx,has-y16
     - xlnx,has-interlaced
+    - interrupts
+    - interrupt-parent
 
 config:
     - XV_frmbufrd_Config
