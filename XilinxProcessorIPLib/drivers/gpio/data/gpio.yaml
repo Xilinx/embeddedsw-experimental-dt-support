@@ -26,9 +26,8 @@ config:
 required:
     - compatible
     - reg
+    - xlnx,interrupt-present
     - xlnx,is-dual
-    - interrupts
-    - interrupt-parent
 
 examples:
   xgpio_intr_tapp_example.c:
