@@ -156,7 +156,7 @@ typedef struct {
 int XGpio_Initialize(XGpio *InstancePtr, u16 DeviceId);
 XGpio_Config *XGpio_LookupConfig(u16 DeviceId);
 #else
-int XGpio_Initialize(XGpio *InstancePtr, UINTPTR BaseAddress;
+int XGpio_Initialize(XGpio *InstancePtr, UINTPTR BaseAddress);
 XGpio_Config *XGpio_LookupConfig(UINTPTR BaseAddress);
 #endif
 
