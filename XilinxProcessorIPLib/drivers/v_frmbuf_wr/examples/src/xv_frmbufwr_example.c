@@ -47,6 +47,9 @@
 #include "xvidc.h"
 #include "xvtc.h"
 #include "xgpio.h"
+#ifdef SDT
+#include "xinterrupt_wrap.h"
+#endif
 
 #if defined(__MICROBLAZE__)
 #define DDR_BASEADDR XPAR_MIG7SERIES_0_BASEADDR
@@ -166,6 +169,7 @@ static int CheckVidinOverflow(void);
  * @return XST_SUCCESS if init is OK else XST_FAILURE
  *
  *****************************************************************************/
+#ifndef SDT
 static int SetupInterrupts(void)
 {
 #if defined(__MICROBLAZE__)
@@ -268,6 +272,7 @@ static int SetupInterrupts(void)
 
   return(XST_SUCCESS);
 }
+#endif
 
 /*****************************************************************************/
 /**
@@ -282,7 +287,11 @@ static int DriverInit(void)
   XVtc_Config *vtc_Config;
   XGpio_Config *GpioCfgPtr;
 
+#ifndef SDT
   vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_DEVICE_ID);
+#else
+  vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_BASEADDR);
+#endif
   if (vtc_Config == NULL) {
     xil_printf("ERROR:: VTC device not found\r\n");
     return(XST_FAILURE);
@@ -294,21 +303,33 @@ static int DriverInit(void)
     return(XST_FAILURE);
   }
 
+#ifndef SDT
   Status = XVFrmbufRd_Initialize(&frmbufrd, XPAR_V_FRMBUF_RD_0_DEVICE_ID);
-  if (Status != XST_SUCCESS) {
+#else
+  Status = XVFrmbufRd_Initialize(&frmbufrd, XPAR_V_FRMBUF_RD_0_BASEADDR);
+#endif
+  if(Status != XST_SUCCESS) {
     xil_printf("ERROR:: Frame Buffer Read initialization failed\r\n");
     return(XST_FAILURE);
   }
 
+#ifndef SDT
   Status = XVFrmbufWr_Initialize(&frmbufwr, XPAR_V_FRMBUF_WR_0_DEVICE_ID);
-  if (Status != XST_SUCCESS) {
+#else
+  Status = XVFrmbufWr_Initialize(&frmbufwr, XPAR_V_FRMBUF_WR_0_BASEADDR);
+#endif
+  if(Status != XST_SUCCESS) {
     xil_printf("ERROR:: Frame Buffer Write initialization failed\r\n");
     return(XST_FAILURE);
   }
 
   //Video Lock Monitor
+#ifndef SDT
   GpioCfgPtr = XGpio_LookupConfig(XPAR_VIDEO_LOCK_MONITOR_DEVICE_ID);
-  if (GpioCfgPtr == NULL) {
+#else
+  GpioCfgPtr = XGpio_LookupConfig(XPAR_VIDEO_LOCK_MONITOR_BASEADDR);
+#endif
+  if(GpioCfgPtr == NULL) {
     xil_printf("ERROR:: Video Lock Monitor GPIO device not found\r\n");
     return(XST_FAILURE);
   }
@@ -322,6 +343,25 @@ static int DriverInit(void)
     return(XST_FAILURE);
   }
 
+#ifdef SDT
+  Status = XSetupInterruptSystem(&frmbufwr,&XVFrmbufWr_InterruptHandler,
+                                 frmbufwr.FrmbufWr.Config.IntrId,
+                                 frmbufwr.FrmbufWr.Config.IntrParent,
+                                 XINTERRUPT_DEFAULT_PRIORITY);
+  if (Status != XST_SUCCESS) {
+    xil_printf("Interrupt setup failed for write buf\n\r");
+    return XST_FAILURE;
+  }
+
+  Status = XSetupInterruptSystem(&frmbufrd,&XVFrmbufRd_InterruptHandler,
+                                 frmbufrd.FrmbufRd.Config.IntrId,
+                                 frmbufrd.FrmbufRd.Config.IntrParent,
+                                 XINTERRUPT_DEFAULT_PRIORITY);
+  if (Status != XST_SUCCESS) {
+    xil_printf("Interrupt setup failed for read buf\n\r");
+    return XST_FAILURE;
+  } 
+#endif
   return(XST_SUCCESS);
 }
 
@@ -690,7 +730,9 @@ int main(void)
   *gpio_hlsIpReset = 1;
 
   /* Initialize IRQ */
+#ifndef SDT
   Status = SetupInterrupts();
+#endif
   if (Status == XST_FAILURE) {
     xil_printf("ERROR:: Interrupt Setup Failed\r\n");
     xil_printf("ERROR:: Test could not be completed\r\n");

@@ -135,11 +135,4 @@ config:
 
 depends:
     - video_common
-
-examples:
-     xv_frmbufwr_example.c:
-     - v-frmbuf-rd-connected: phandle
-     - vtc-connected: phandle
-     - gpio-connected: phandle
-
 ...
