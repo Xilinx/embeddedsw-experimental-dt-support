@@ -54,6 +54,10 @@
 #endif
 #include "xgpio.h"
 
+#ifdef SDT
+#include "xinterrupt_wrap.h"
+#endif
+
 #if defined(__MICROBLAZE__)
 #define DDR_BASEADDR XPAR_MIG7SERIES_0_BASEADDR
 #else
@@ -66,6 +70,10 @@
 #define PS_ACPU_GIC_DEVICE_ID XPAR_SCUGIC_0_DEVICE_ID
 #else
 #warning No GIC Device ID found
+#endif
+
+#if defined(SDT) && defined(XPAR_XV_FRMBUF_RD_NUM_INSTANCES)
+#define XPAR_XV_FRMBUFRD_NUM_INSTANCES XPAR_XV_FRMBUF_RD_NUM_INSTANCES
 #endif
 
 #ifdef XPAR_XV_FRMBUFRD_NUM_INSTANCES
@@ -106,7 +114,7 @@ u8 colorDepth;
 
 u32 volatile *gpio_hlsIpReset;
 
-#ifdef XPAR_XV_FRMBUFRD_NUM_INSTANCES
+#if defined(XPAR_XV_FRMBUFRD_NUM_INSTANCES) || defined(XPAR_XV_FRMBUF_RD_NUM_INSTANCES)
 typedef struct {
   XV_FrmbufRd_l2 Inst;
   u32            DeviceId;
@@ -164,6 +172,7 @@ static int CheckVidoutLock(void);
  * @return XST_SUCCESS if init is OK else XST_FAILURE
  *
  *****************************************************************************/
+#ifndef SDT
 static int SetupInterrupts(void)
 {
 #if defined(__MICROBLAZE__)
@@ -242,6 +251,7 @@ static int SetupInterrupts(void)
 
   return(XST_SUCCESS);
 }
+#endif
 
 /*****************************************************************************/
 /**
@@ -256,7 +266,11 @@ static int DriverInit(void)
   XVtc_Config *vtc_Config;
   XGpio_Config *GpioCfgPtr;
 
+#ifndef SDT
   vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_DEVICE_ID);
+#else
+  vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_BASEADDR);
+#endif
   if(vtc_Config == NULL) {
     xil_printf("ERROR:: VTC device not found\r\n");
     return(XST_FAILURE);
@@ -268,7 +282,11 @@ static int DriverInit(void)
     return(XST_FAILURE);
   }
 
+#ifndef SDT
   Status = XV_tpg_Initialize(&tpg, XPAR_V_TPG_0_DEVICE_ID);
+#else
+  Status = XV_tpg_Initialize(&tpg, XPAR_V_TPG_0_BASEADDR);
+#endif
   if(Status != XST_SUCCESS) {
     xil_printf("ERROR:: TPG device not found\r\n");
     return(XST_FAILURE);
@@ -277,7 +295,11 @@ static int DriverInit(void)
 #ifdef XPAR_XV_FRMBUFRD_NUM_INSTANCES
   for(int count=0; count < XPAR_XV_FRMBUFRD_NUM_INSTANCES; ++count)
   {
+#ifndef SDT
     FBLayer[count].DeviceId = XV_frmbufrd_ConfigTable[count].DeviceId;
+#else
+    FBLayer[count].DeviceId = XV_frmbufrd_ConfigTable[count].BaseAddress;
+#endif
     Status = XVFrmbufRd_Initialize(&FBLayer[count].Inst, FBLayer[count].DeviceId);
     if(Status != XST_SUCCESS) {
         xil_printf("ERROR:: Frame Buffer Read initialization failed\r\n");
@@ -286,14 +308,29 @@ static int DriverInit(void)
   }
 #endif
 
+#ifndef SDT
   Status  = XVMix_Initialize(&mix, XPAR_V_MIX_0_DEVICE_ID);
+#else
+  Status  = XVMix_Initialize(&mix, XPAR_V_MIX_0_BASEADDR);
+#endif
   if(Status != XST_SUCCESS) {
     xil_printf("ERROR:: Mixer device not found\r\n");
     return(XST_FAILURE);
   }
 
+#ifdef SDT
+  Status = XSetupInterruptSystem(&mix, &XVMix_InterruptHandler,
+                                 mix.Mix.Config.IntrId,
+				 mix.Mix.Config.IntrParent,
+                                 XINTERRUPT_DEFAULT_PRIORITY);
+#endif
+
   //Video Lock Monitor
+#ifndef SDT
   GpioCfgPtr = XGpio_LookupConfig(XPAR_VIDEO_LOCK_MONITOR_DEVICE_ID);
+#else
+  GpioCfgPtr = XGpio_LookupConfig(XPAR_VIDEO_LOCK_MONITOR_BASEADDR);
+#endif
   if(GpioCfgPtr == NULL) {
     xil_printf("ERROR:: Video Lock Monitor GPIO device not found\r\n");
     return(XST_FAILURE);
@@ -890,12 +927,14 @@ int main(void)
   *gpio_hlsIpReset = 1;
 
   /* Initialize IRQ */
+#ifndef SDT
   Status = SetupInterrupts();
   if (Status == XST_FAILURE) {
     xil_printf("ERROR:: Interrupt Setup Failed\r\n");
     xil_printf("ERROR:: Test could not be completed\r\n");
     while(1);
   }
+#endif
 
   Status = DriverInit();
   if(Status != XST_SUCCESS) {
