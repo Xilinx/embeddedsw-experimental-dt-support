@@ -192,6 +192,10 @@ typedef struct {
 	  XVMix_LayerColorFormat LyrColorFmt;
 	  u8 LayerColorFmt[XV_MIX_MAX_MEMORY_LAYERS];
   };
+#ifdef SDT
+  u16 IntrId; 		    /**< Interrupt ID */
+  UINTPTR IntrParent; 	    /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+#endif
 } XV_mix_Config;
 #endif
 
