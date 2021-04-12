@@ -54,7 +54,11 @@ int driverInit()
 {
 	int status;
 
+#ifndef SDT
 	vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_DEVICE_ID);
+#else
+	vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_BASEADDR);
+#endif
 	if(vtc_Config == NULL)
 	{
 		xil_printf("ERR:: VTC device not found\r\n");
@@ -67,7 +71,11 @@ int driverInit()
 		return(XST_FAILURE);
 	}
 
+#ifndef SDT
 	tpg_Config = XV_tpg_LookupConfig(XPAR_V_TPG_0_DEVICE_ID);
+#else
+	tpg_Config = XV_tpg_LookupConfig(XPAR_V_TPG_0_BASEADDR);
+#endif
 	if(tpg_Config == NULL)
 	{
 		xil_printf("ERR:: TPG device not found\r\n");
@@ -80,7 +88,11 @@ int driverInit()
 		return(XST_FAILURE);
 	}
 
+#ifndef SDT
 	tpg1_Config = XV_tpg_LookupConfig(XPAR_V_TPG_1_DEVICE_ID);
+#else
+	tpg1_Config = XV_tpg_LookupConfig(XPAR_V_TPG_1_BASEADDR);
+#endif
 	if(tpg1_Config == NULL)
 	{
 		xil_printf("ERR:: TPG device not found\r\n");
