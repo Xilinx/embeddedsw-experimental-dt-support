@@ -27,7 +27,11 @@ int driverInit()
 {
 	int status;
 
+#ifndef SDT
 	vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_DEVICE_ID);
+#else
+	vtc_Config = XVtc_LookupConfig(XPAR_V_TC_0_BASEADDR);
+#endif
 	if(vtc_Config == NULL)
 	{
 		xil_printf("ERROR:: VTC device not found\r\n");
@@ -39,8 +43,11 @@ int driverInit()
 		xil_printf("ERROR:: VTC Initialization failed %d\r\n", status);
 		return(XST_FAILURE);
 	}
-
+#ifndef SDT
 	tpg_Config = XV_tpg_LookupConfig(XPAR_V_TPG_0_DEVICE_ID);
+#else
+	tpg_Config = XV_tpg_LookupConfig(XPAR_V_TPG_0_BASEADDR);
+#endif
 	if(tpg_Config == NULL)
 	{
 		xil_printf("ERROR:: TPG device not found\r\n");
@@ -53,7 +60,11 @@ int driverInit()
 		return(XST_FAILURE);
 	}
 
+#ifndef SDT
 	gamma_lut_Config = XV_gamma_lut_LookupConfig(XPAR_V_GAMMA_LUT_0_DEVICE_ID);
+#else
+	gamma_lut_Config = XV_gamma_lut_LookupConfig(XPAR_V_GAMMA_LUT_0_BASEADDR);
+#endif
 	if(gamma_lut_Config == NULL)
 	{
 		xil_printf("ERROR:: Gamma LUT device not found\r\n");
@@ -84,7 +95,11 @@ void videoIpConfig(XVidC_VideoMode videoMode)
 	XV_gamma_lut_Set_HwReg_width(&gamma_lut, timing->HActive);
 	XV_gamma_lut_Set_HwReg_height(&gamma_lut, timing->VActive);
 	XV_gamma_lut_Set_HwReg_video_format(&gamma_lut, 0);
+#ifndef SDT
 	XV_gamma_lut_WriteReg(XPAR_XV_GAMMA_LUT_0_S_AXI_CTRL_BASEADDR, XV_GAMMA_LUT_CTRL_ADDR_AP_CTRL, 0x81);
+#else
+	XV_gamma_lut_WriteReg(XPAR_XV_GAMMA_LUT_0_BASEADDR, XV_GAMMA_LUT_CTRL_ADDR_AP_CTRL, 0x81);
+#endif
 
 	PixelsPerClk = tpg.Config.PixPerClk;
 
