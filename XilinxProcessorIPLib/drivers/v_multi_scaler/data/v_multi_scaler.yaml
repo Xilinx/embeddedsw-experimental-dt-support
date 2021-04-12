@@ -42,13 +42,12 @@ required:
     - xlnx,scale-mode
     - xlnx,taps
     - xlnx,max-outs
+    - interrupts
+    - interrupt-parent
 
 config:
     - XV_multi_scaler_Config
 
 depends:
     - video_common
-
-examples:
-     xv_multi_scaler_example.c:
 ...
