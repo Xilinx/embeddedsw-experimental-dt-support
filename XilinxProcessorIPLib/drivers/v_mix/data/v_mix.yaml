@@ -144,6 +144,8 @@ required:
     - xlnx,layer14-video-format
     - xlnx,layer15-video-format
     - xlnx,layer16-video-format
+    - interrupts
+    - interrupt-parent
 
 config:
     - XV_mix_Config
