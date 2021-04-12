@@ -43,6 +43,8 @@ required:
     - xlnx,has-y10
     - xlnx,max-cols
     - xlnx,max-rows
+    - interrupts
+    - interrupt-parent
 
 config:
     - XV_scenechange_Config

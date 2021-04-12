@@ -66,6 +66,10 @@ typedef struct {
     u8  EnableY10;
     u32 Cols;
     u32	Rows;
+#ifdef SDT
+    u16 IntrId; 		    /**< Interrupt ID */
+    UINTPTR IntrParent; 	    /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+#endif
 } XV_scenechange_Config;
 #endif
 
