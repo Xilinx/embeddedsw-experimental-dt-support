@@ -90,6 +90,10 @@ typedef struct {
     u32 ScaleMode;
     u32 NumTaps;
     u32 MaxOuts;
+#ifdef SDT
+    u16 IntrId; 		    /**< Interrupt ID */
+    UINTPTR IntrParent; 	    /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+#endif
 } XV_multi_scaler_Config;
 extern XV_multi_scaler_Config XV_multi_scaler_ConfigTable[];
 #endif
