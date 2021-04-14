@@ -45,6 +45,7 @@
 #include "xil_util.h"
 #include "xsecure_init.h"
 #include "xsecure_error.h"
+#include "xparameters.h"
 
 /************************** Constant Definitions *****************************/
 #define XSECURE_AES_DEC_KEY_SRC_MASK	0x000000FFU
