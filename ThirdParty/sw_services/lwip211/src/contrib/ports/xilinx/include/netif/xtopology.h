@@ -36,16 +36,19 @@ extern "C" {
 #endif
 
 #include "xil_types.h"
+#include "bspconfig.h"
 
-enum xemac_types { xemac_type_unknown = -1, xemac_type_xps_emaclite, xemac_type_xps_ll_temac, xemac_type_axi_ethernet, xemac_type_emacps };
+enum xemac_types { xemac_type_unknown = -1, xemac_type_axi_ethernet, xemac_type_xps_emaclite, xemac_type_emacps };
 
 struct xtopology_t {
 	UINTPTR emac_baseaddr;
 	enum xemac_types emac_type;
+#ifndef SDT
 	UINTPTR intc_baseaddr;
 	unsigned intc_emac_intr;	/* valid only for xemac_type_xps_emaclite */
 	UINTPTR scugic_baseaddr; /* valid only for Zynq */
 	unsigned scugic_emac_intr; /* valid only for GEM */
+#endif
 };
 
 extern int xtopology_n_emacs;
