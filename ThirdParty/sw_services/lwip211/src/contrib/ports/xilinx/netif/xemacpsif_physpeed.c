@@ -765,6 +765,7 @@ static u32_t configure_IEEE_phy_speed(XEmacPs *xemacpsp, u32_t phy_addr, u32_t s
 
 static void SetUpSLCRDivisors(UINTPTR mac_baseaddr, s32_t speed)
 {
+#ifndef SDT
 	volatile UINTPTR slcrBaseAddress;
 	u32_t SlcrDiv0 = 0;
 	u32_t SlcrDiv1 = 0;
@@ -1008,6 +1009,7 @@ static void SetUpSLCRDivisors(UINTPTR mac_baseaddr, s32_t speed)
 			xil_printf("Clock Divisors incorrect - Please check\r\n");
 		}
 	}
+#endif
 
 	return;
 }
