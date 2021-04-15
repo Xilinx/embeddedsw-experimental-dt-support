@@ -102,6 +102,8 @@ LONG XEmacPs_CfgInitialize(XEmacPs *InstancePtr, XEmacPs_Config * CfgPtr,
 	InstancePtr->Config.S10MDiv0 = CfgPtr->S10MDiv0;
 	InstancePtr->Config.S10MDiv1 = CfgPtr->S10MDiv1;
 #endif
+	InstancePtr->Config.IntrId = CfgPtr->IntrId;
+	InstancePtr->Config.IntrParent = CfgPtr->IntrParent;
 
 	/* Set callbacks to an initial stub routine */
 	InstancePtr->SendHandler = ((XEmacPs_Handler)((void*)XEmacPs_StubHandler));
