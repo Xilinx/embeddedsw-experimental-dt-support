@@ -18,6 +18,7 @@ properties:
         - enum:
           - xlnx,psv-pmc-cfu-apb
           - xlnx,cfu-apb-1.0
+          - xlnx,psv-pmc-cfu-apb-1.0
   reg:
     description: Physical base address and size of the controller register map
 
