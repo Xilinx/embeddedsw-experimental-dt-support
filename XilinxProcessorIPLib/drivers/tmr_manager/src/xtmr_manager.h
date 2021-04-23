@@ -138,6 +138,9 @@ typedef struct {
  */
 typedef struct {
 	XTMR_Manager_Stats Stats;	/* Component Statistics */
+#ifdef SDT
+	XTMR_Manager_Config Config;    /* Config structure pointer */
+#endif
 	UINTPTR RegBaseAddress;		/* Base address of registers */
 	u32 IsReady;			/* Device is initialized and ready */
 
