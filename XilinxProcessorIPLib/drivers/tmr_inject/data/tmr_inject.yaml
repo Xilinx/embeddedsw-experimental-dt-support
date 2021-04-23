@@ -23,6 +23,6 @@ config:
 required:
     - compatible
     - reg
-    - interrupts
-    - interrupt-parent
+    - xlnx,cpu-id
+    - xlnx,lmb-awidth
 ...
