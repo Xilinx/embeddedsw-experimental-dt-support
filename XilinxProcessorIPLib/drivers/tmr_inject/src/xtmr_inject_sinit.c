@@ -80,8 +80,8 @@ XTMR_Inject_Config *XTMR_Inject_LookupConfig(UINTPTR BaseAddr)
 	XTMR_Inject_Config *CfgPtr = NULL;
 	u32 Index;
 
-	for (Index=0; XTMR_Inject_ConfigTable[Index].BaseAddr != NULL; Index++) {
-		if (XTMR_Inject_ConfigTable[Index].BaseAddr == BaseAddr) {
+	for (Index=0; XTMR_Inject_ConfigTable[Index].RegBaseAddr != NULL; Index++) {
+		if (XTMR_Inject_ConfigTable[Index].RegBaseAddr == BaseAddr) {
 			CfgPtr = &XTMR_Inject_ConfigTable[Index];
 			break;
 		}
