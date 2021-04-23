@@ -42,6 +42,7 @@ endfunction()
 function (linker_gen path)
 	SET(MEM_NODE_INSTANCES "${TOTAL_MEM_CONTROLLERS}" CACHE STRING "Memory Controller")
 	SET_PROPERTY(CACHE MEM_NODE_INSTANCES PROPERTY STRINGS "${TOTAL_MEM_CONTROLLERS}")
+	set(CUSTOM_LINKER_FILE "None" CACHE STRING "Custom Linker Script")
 	list(LENGTH MEM_NODE_INSTANCES _len)
 	if (${_len} EQUAL 1)
 	    set(DDR ${MEM_NODE_INSTANCES})
@@ -72,6 +73,10 @@ function (linker_gen path)
 
 	if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa9"))
 	configure_file(${path}/lscript_a9.ld.in ${CMAKE_SOURCE_DIR}/lscript.ld)
+	endif()
+
+	if (NOT "${CUSTOM_LINKER_FILE}" STREQUAL "None")
+	    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CUSTOM_LINKER_FILE} ${CMAKE_SOURCE_DIR}/)
 	endif()
 endfunction(linker_gen)
 
