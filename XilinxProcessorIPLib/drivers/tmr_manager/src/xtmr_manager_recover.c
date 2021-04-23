@@ -80,7 +80,7 @@ void XTMR_Manager_BreakHandler (XTMR_Manager *InstancePtr)
 		       XPAR_TMR_MANAGER_0_MAGIC1);
 #else
 	Xil_AssertVoid((InstancePtr->Cr & XTM_CR_MAGIC1_MASK) ==
-		       InstancePtr->Config->Magic1);
+		       InstancePtr->Config.Magic1);
 #endif
 
 	/* Call user defined pre-recovery handler, if any */
