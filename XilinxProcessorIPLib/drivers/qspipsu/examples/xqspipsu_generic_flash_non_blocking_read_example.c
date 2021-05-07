@@ -214,7 +214,7 @@ int main(void)
 #ifndef SDT
 int QspiPsuFlashNonBlockingReadExample(XQspiPsu *QspiPsuInstancePtr, u16 QspiPsuDeviceId)
 #else
-int QspiPsuFlashNonBlockingReadExample(XQspiPsu *QspiPsuInstancePtr, UINPTR BaseAddress)
+int QspiPsuFlashNonBlockingReadExample(XQspiPsu *QspiPsuInstancePtr, UINTPTR BaseAddress)
 #endif
 {
 	int Status;
