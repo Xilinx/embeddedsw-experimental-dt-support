@@ -72,12 +72,22 @@ proc generate {drv_handle} {
 	set isclocking [check_clocking]
 
 	if { $isclocking == 1 &&  $is_zynqmp_fsbl_bsp != true   &&  [llength $cortexa53proc] > 0 && [string match -nocase $clocking "true"] > 0} {
-    ::hsi::utils::define_zynq_config_file $drv_handle "xuartps_g.c" "XUartPs"  "DEVICE_ID" "C_S_AXI_BASEADDR" "C_UART_CLK_FREQ_HZ" "C_HAS_MODEM" "REF_CLK"
+    ::hsi::utils::define_zynq_config_file $drv_handle "xuartps_g.c" "XUartPs"  "DEVICE_ID" "C_S_AXI_BASEADDR" "C_UART_CLK_FREQ_HZ" "C_HAS_MODEM" "REF_CLK" "C_INTERRUPT" "C_INTR_PARENT"
 	} else {
-    ::hsi::utils::define_zynq_config_file $drv_handle "xuartps_g.c" "XUartPs"  "DEVICE_ID" "C_S_AXI_BASEADDR" "C_UART_CLK_FREQ_HZ" "C_HAS_MODEM"
+    ::hsi::utils::define_zynq_config_file $drv_handle "xuartps_g.c" "XUartPs"  "DEVICE_ID" "C_S_AXI_BASEADDR" "C_UART_CLK_FREQ_HZ" "C_HAS_MODEM" "C_INTERRUPT" "C_INTR_PARENT"
 	}
 
     ::hsi::utils::define_zynq_canonical_xpars $drv_handle "xparameters.h" "XUartPs" "DEVICE_ID" "C_S_AXI_BASEADDR" "C_S_AXI_HIGHADDR" "C_UART_CLK_FREQ_HZ" "C_HAS_MODEM"
 
     generate_ref_params $drv_handle "xparameters.h"
+
+    foreach i [get_sw_cores standalone*] {
+	    set intr_wrapper_tcl_file "[get_property "REPOSITORY" $i]/data/intr_wrapper.tcl"
+		    if {[file exists $intr_wrapper_tcl_file]} {
+			    source $intr_wrapper_tcl_file
+				    break
+		    }
+    }
+
+    gen_intr $drv_handle "xparameters.h"
 }
