@@ -36,7 +36,11 @@
  * A table of configuration structures containing the configuration information
  * for each DisplayPort TX core in the system.
  */
+#ifndef SDT
 extern XDpPsu_Config XDpPsu_ConfigTable[XPAR_XDPPSU_NUM_INSTANCES];
+#else
+extern XDpPsu_Config XDpPsu_ConfigTable[];
+#endif
 
 /**************************** Function Definitions ****************************/
 
