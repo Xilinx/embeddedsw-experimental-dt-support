@@ -130,6 +130,8 @@ typedef struct {
 	u32 BitMask; /**< BitMask to be used to identify this CPU */
 	u32 BufferIndex; /**< Index of the IPI Message Buffer */
 	u32 IntId; /**< Interrupt ID on GIC **/
+	UINTPTR IntrParent; 	/** Bit[0] Interrupt parent type Bit[64/32:1]
+				 * Parent base address */
 	u32 TargetCount; /**< Number of available IPI Targets */
 	XIpiPsu_Target TargetList[XIPIPSU_MAX_TARGETS] ; /**< List of IPI Targets */
 } XIpiPsu_Config;
