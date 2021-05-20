@@ -27,14 +27,22 @@
 
 static struct XPm_Proc Proc_APU0 = {
 	.DevId = PM_DEV_ACPU_0,
+#ifndef SDT
 	.PwrCtrl = XPAR_PSV_APU_0_S_AXI_BASEADDR + APU_PWRCTRL_OFFSET,
+#else
+	.PwrCtrl = XPAR_PSV_APU_0_BASEADDR + APU_PWRCTRL_OFFSET,
+#endif
 	.PwrDwnMask = APU_0_PWRCTL_CPUPWRDWNREQ_MASK,
 	.Ipi = NULL,
 };
 
 static struct XPm_Proc Proc_APU1 = {
 	.DevId = PM_DEV_ACPU_1,
+#ifndef SDT
 	.PwrCtrl = XPAR_PSV_APU_0_S_AXI_BASEADDR + APU_PWRCTRL_OFFSET,
+#else
+	.PwrCtrl = XPAR_PSV_APU_0_BASEADDR + APU_PWRCTRL_OFFSET,
+#endif
 	.PwrDwnMask = APU_1_PWRCTL_CPUPWRDWNREQ_MASK,
 	.Ipi = NULL,
 };
