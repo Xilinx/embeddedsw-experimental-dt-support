@@ -77,6 +77,7 @@ XStatus XIpiPsu_CfgInitialize(XIpiPsu *InstancePtr, XIpiPsu_Config * CfgPtr,
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
 	InstancePtr->Config.BitMask = CfgPtr->BitMask;
 	InstancePtr->Config.IntId = CfgPtr->IntId;
+	InstancePtr->Config.IntrParent = CfgPtr->IntrParent;
 	InstancePtr->Config.BufferIndex = CfgPtr->BufferIndex;
 
 	InstancePtr->Config.TargetCount = CfgPtr->TargetCount;
