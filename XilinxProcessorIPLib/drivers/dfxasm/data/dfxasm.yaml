@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Bindings for DFX AXI Shutdown Manager
+
+maintainers:
+  - Nava kishore Manne <nava.manne@xilinx.com>
+
+properties:
+  compatible:
+    items:
+      - const: xlnx,dfx-axi-shutdown-manager-1.0
+  reg:
+    description: Physical base address and size of the controller register map
+
+config:
+    - XDfxasm_Config
+
+required:
+    - compatible
+    - reg
+...    
