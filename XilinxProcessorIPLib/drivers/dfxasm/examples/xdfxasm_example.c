@@ -35,15 +35,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define XDFX_ASM_DEVICE_ID	XPAR_DFX_ASM_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 u32 XDfxasm_Example(u16 DeviceId);
+#else
+u32 XDfxasm_Example(UINTPTR BaseAddress);
+#endif
 u32 XDfxasm_TestState(void);
 
 /************************** Variable Definitions *****************************/
@@ -69,7 +74,11 @@ int main(void)
 	u32 Status;
 
 	/* Run the selftest example */
+#ifndef SDT
 	Status = XDfxasm_Example((u16)XDFX_ASM_DEVICE_ID);
+#else
+	Status = XDfxasm_Example(XPAR_DFX_AXI_SHUTDOWN_MAN_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Dfx Axi Shutdown manager Example is failed\r\n");
 		return XST_FAILURE;
@@ -95,7 +104,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 u32 XDfxasm_Example(u16 DeviceId)
+#else
+u32 XDfxasm_Example(UINTPTR BaseAddress)
+#endif
 {
 	u32 Status;
 	XDfxasm_Config *XDfxasmCfgPtr;
@@ -105,8 +118,11 @@ u32 XDfxasm_Example(u16 DeviceId)
 	 * to use. Look up the configuration in the config table, then initialize
 	 * it.
 	 */
-
+#ifndef SDT
 	XDfxasmCfgPtr = XDfxasm_LookupConfig(DeviceId);
+#else
+	XDfxasmCfgPtr = XDfxasm_LookupConfig(BaseAddress);
+#endif
 	if (NULL == XDfxasmCfgPtr) {
 		return XST_FAILURE;
 	}
