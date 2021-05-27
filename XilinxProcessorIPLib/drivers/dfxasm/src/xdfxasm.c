@@ -71,8 +71,9 @@ s32 XDfxasm_CfgInitialize(XDfxasm *InstancePtr, XDfxasm_Config *ConfigPtr,
 	 * successfully.
 	 */
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
-
+#endif
 	/* Indicate the component is now ready to use */
 	InstancePtr->IsReady = XIL_COMPONENT_IS_READY;
 

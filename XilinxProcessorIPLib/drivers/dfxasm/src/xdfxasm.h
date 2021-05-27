@@ -89,7 +89,11 @@ typedef enum {
 
 /* This typedef contains configuration information for a device */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID of the device */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddress;	/**< Register Base Address */
 } XDfxasm_Config;
 
@@ -107,7 +111,11 @@ typedef struct {
 /************************** Function Prototypes ******************************/
 
 /* Functions in xdfxasm_sinit.c */
+#ifndef SDT
 XDfxasm_Config *XDfxasm_LookupConfig(u16 DeviceId);
+#else
+XDfxasm_Config *XDfxasm_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 /* Functions in xdfxasm.c */
 s32 XDfxasm_CfgInitialize(XDfxasm *InstancePtr, XDfxasm_Config *ConfigPtr,
