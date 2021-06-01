@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: GPL-2.0
 %YAML 1.2
 ---
@@ -12,11 +14,13 @@ properties:
       - const: xlnx,versal-ospi-1.0
   reg:
     description: Physical base address and size of the controller register map
-  xlnx,clock-freq:
+  xlnx,ospi-clk-freq-hz:
     description: Input clock frequency
-  dma-coherent:
+  xlnx,is-cache-coherent:
     description: Present if dma operations are coherent
     type: boolean
+  xlnx,ospi-mode:
+    description: OSPI connection mode.
 
 config:
     - XOspiPsv_Config
@@ -24,7 +28,13 @@ config:
 required:
     - compatible
     - reg: 1
-    - xlnx,clock-freq
-    - dma-coherent
+    - xlnx,ospi-clk-freq-hz
+    - xlnx,is-cache-coherent
     - xlnx,ospi-mode
+    - interrupts
+    - interrupt-parent
+
+examples:
+   xospipsv_flash_intr_example.c:
+    - interrupts
 ...
