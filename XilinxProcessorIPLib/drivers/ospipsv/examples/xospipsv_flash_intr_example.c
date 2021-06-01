@@ -41,7 +41,7 @@
 /***************************** Include Files *********************************/
 
 #include "xospipsv_flash_config.h"
-#include "xscugic.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -50,9 +50,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define OSPIPSV_DEVICE_ID		XPAR_XOSPIPSV_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define OSPIPSV_INTR_ID		XPS_OSPI_INT_ID
+#endif
 
 /*
  * Number of flash pages to be written.
@@ -78,11 +78,11 @@
 
 /************************** Function Prototypes ******************************/
 
-int OspiPsvInterruptFlashExample(XScuGic *IntcInstancePtr, XOspiPsv *OspiPsvInstancePtr,
-		u16 OspiPsvDeviceId);
-static int OspiPsvSetupIntrSystem(XScuGic *IntcInstancePtr,
-		XOspiPsv *OspiPsvInstancePtr);
-static void OspiPsvDisableIntrSystem(XScuGic *IntcInstancePtr, u16 OspiPsvIntrId);
+#ifndef SDT
+int OspiPsvInterruptFlashExample(XOspiPsv *OspiPsvInstancePtr, u16 OspiPsvDeviceId);
+#else
+int OspiPsvInterruptFlashExample(XOspiPsv *OspiPsvInstancePtr, UINTPTR BaseAddress);
+#endif
 void OspiPsvHandler(void *CallBackRef, u32 StatusEvent);
 int FlashReadID(XOspiPsv *OspiPsvPtr);
 int FlashErase(XOspiPsv *OspiPsvPtr, u32 Address, u32 ByteCount, u8 *WriteBfrPtr);
@@ -121,7 +121,8 @@ u32 FCTIndex;	/* Flash configuration table index */
  * but should at least be static so they are zeroed.
  */
 static XOspiPsv OspiPsvInstance;
-static XScuGic IntcInstance;
+u16 IntrId;
+UINTPTR IntrParent;
 
 static XOspiPsv_Msg FlashMsg;
 
@@ -188,8 +189,11 @@ int main(void)
 	/*
 	 * Run the OspiPsv interrupt example.
 	 */
-	Status = OspiPsvInterruptFlashExample(&IntcInstance, &OspiPsvInstance,
-					OSPIPSV_DEVICE_ID);
+#ifndef SDT
+	Status = OspiPsvInterruptFlashExample(&OspiPsvInstance, OSPIPSV_DEVICE_ID);
+#else
+	Status = OspiPsvInterruptFlashExample(&OspiPsvInstance, XPAR_XOSPIPSV_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("OSPIPSV Flash Interrupt Example Failed\r\n");
 		return XST_FAILURE;
@@ -216,8 +220,11 @@ int main(void)
 * @note		None.
 *
 *****************************************************************************/
-int OspiPsvInterruptFlashExample(XScuGic *IntcInstancePtr,
-				XOspiPsv *OspiPsvInstancePtr, u16 OspiPsvDeviceId)
+#ifndef SDT
+int OspiPsvInterruptFlashExample(XOspiPsv *OspiPsvInstancePtr, u16 OspiPsvDeviceId)
+#else
+int OspiPsvInterruptFlashExample(XOspiPsv *OspiPsvInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 UniqueValue;
@@ -234,10 +241,18 @@ int OspiPsvInterruptFlashExample(XScuGic *IntcInstancePtr,
 	/*
 	 * Initialize the OSPIPSV driver so that it's ready to use
 	 */
+#ifndef SDT
 	OspiPsvConfig = XOspiPsv_LookupConfig(OspiPsvDeviceId);
+#else
+	OspiPsvConfig = XOspiPsv_LookupConfig(BaseAddress);
+#endif
 	if (NULL == OspiPsvConfig) {
 		return XST_FAILURE;
 	}
+
+	IntrId = OspiPsvConfig->IntrId;
+	IntrParent = OspiPsvConfig->IntrParent;
+
 	/* To test, change connection mode here if not obtained from HDF */
 
 	Status = XOspiPsv_CfgInitialize(OspiPsvInstancePtr, OspiPsvConfig);
@@ -245,7 +260,10 @@ int OspiPsvInterruptFlashExample(XScuGic *IntcInstancePtr,
 		return XST_FAILURE;
 	}
 
-	Status = OspiPsvSetupIntrSystem(IntcInstancePtr, OspiPsvInstancePtr);
+	Status = XSetupInterruptSystem(OspiPsvInstancePtr, &XOspiPsv_IntrHandler,
+				       OspiPsvConfig->IntrId,
+				       OspiPsvConfig->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -365,7 +383,7 @@ int OspiPsvInterruptFlashExample(XScuGic *IntcInstancePtr,
 		}
 	}
 
-	OspiPsvDisableIntrSystem(IntcInstancePtr, OSPIPSV_INTR_ID);
+	XDisconnectInterruptCntrl(OspiPsvConfig->IntrId, OspiPsvConfig->IntrParent);
 
 	return XST_SUCCESS;
 }
@@ -1377,107 +1395,6 @@ int FlashEnterExit4BAddMode(XOspiPsv *OspiPsvPtr, int Enable)
 /*****************************************************************************/
 /**
  *
- * This function setups the interrupt system for a OspiPsv device.
- *
- * @param	IntcInstancePtr is a pointer to the instance of the Intc
- *		device.
- * @param	OspiPsvInstancePtr is a pointer to the instance of the
- *		OspiPsv device.
- *
- * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
- *
- * @note	None.
- *
- ******************************************************************************/
-static int OspiPsvSetupIntrSystem(XScuGic *IntcInstancePtr,
-			       XOspiPsv *OspiPsvInstancePtr)
-{
-	int Status;
-
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (IntcConfig == NULL) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-			IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-			IntcInstancePtr);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, OSPIPSV_INTR_ID,
-			(Xil_ExceptionHandler)XOspiPsv_IntrHandler,
-			(void *)OspiPsvInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the OspiPsv device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, OSPIPSV_INTR_ID);
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
- *
- * This function disables the interrupts that occur for the OspiPsv device.
- *
- * @param	IntcInstancePtr is a pointer to the instance of the Intc device.
- * @param	OspiPsvInstancePtr is a pointer to the instance of
- *		the OspiPsv device.
- * @param	OspiPsvIntrId is the interrupt Id for an OSPIPSV device.
- *
- * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
- *
- * @note	None.
- *
- ******************************************************************************/
-static void OspiPsvDisableIntrSystem(XScuGic *IntcInstancePtr,
-		u16 OspiPsvIntrId)
-{
-	/*
-	 * Disable the interrupt for the OSPIPSV device.
-	 */
-	XScuGic_Disable(IntcInstancePtr, OspiPsvIntrId);
-
-	/*
-	 * Disconnect and disable the interrupt for the OspiPsv device.
-	 */
-	XScuGic_Disconnect(IntcInstancePtr, OspiPsvIntrId);
-}
-
-/*****************************************************************************/
-/**
- *
  * Callback handler.
  *
  * @param        CallBackRef is the upper layer callback reference passed back
@@ -1650,13 +1567,15 @@ int FlashSetSDRDDRMode(XOspiPsv *OspiPsvPtr, int Mode)
 	}
 
 	/* Disable the interrupt as tuning is always done in polled mode */
-	OspiPsvDisableIntrSystem(&IntcInstance, OSPIPSV_INTR_ID);
+        XDisconnectInterruptCntrl(IntrId, IntrParent);
 
 	Status = XOspiPsv_SetSdrDdrMode(OspiPsvPtr, Mode);
 	if (Status != XST_SUCCESS)
 		return XST_FAILURE;
 
-	Status = OspiPsvSetupIntrSystem(&IntcInstance, OspiPsvPtr);
+        Status = XSetupInterruptSystem(OspiPsvPtr, &XOspiPsv_IntrHandler,
+				       IntrId, IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
