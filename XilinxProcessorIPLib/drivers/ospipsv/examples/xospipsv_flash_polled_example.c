@@ -52,7 +52,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define OSPIPSV_DEVICE_ID		XPAR_XOSPIPSV_0_DEVICE_ID
+#endif
 
 /*
  * Number of flash pages to be written.
@@ -78,7 +80,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int OspiPsvPolledFlashExample(XOspiPsv *OspiPsvInstancePtr, u16 OspiPsvDeviceId);
+#else
+int OspiPsvPolledFlashExample(XOspiPsv *OspiPsvInstancePtr, UINTPTR BaseAddress);
+#endif
 
 int FlashReadID(XOspiPsv *OspiPsvPtr);
 int FlashErase(XOspiPsv *OspiPsvPtr, u32 Address, u32 ByteCount, u8 *WriteBfrPtr);
@@ -171,7 +177,11 @@ int main(void)
 	/*
 	 * Run the OspiPsv Polled example.
 	 */
+#ifndef SDT
 	Status = OspiPsvPolledFlashExample(&OspiPsvInstance, OSPIPSV_DEVICE_ID);
+#else
+	Status = OspiPsvPolledFlashExample(&OspiPsvInstance, XPAR_XOSPIPSV_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("OSPIPSV Flash Polled Ex Failed\r\n");
 		return XST_FAILURE;
@@ -197,7 +207,11 @@ int main(void)
 * @note		None.
 *
 *****************************************************************************/
+#ifndef SDT
 int OspiPsvPolledFlashExample(XOspiPsv *OspiPsvInstancePtr, u16 OspiPsvDeviceId)
+#else
+int OspiPsvPolledFlashExample(XOspiPsv *OspiPsvInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 UniqueValue;
@@ -214,7 +228,11 @@ int OspiPsvPolledFlashExample(XOspiPsv *OspiPsvInstancePtr, u16 OspiPsvDeviceId)
 	/*
 	 * Initialize the OSPIPSV driver so that it's ready to use
 	 */
+#ifndef SDT
 	OspiPsvConfig = XOspiPsv_LookupConfig(OspiPsvDeviceId);
+#else
+	OspiPsvConfig = XOspiPsv_LookupConfig(BaseAddress);
+#endif
 	if (NULL == OspiPsvConfig) {
 		return XST_FAILURE;
 	}

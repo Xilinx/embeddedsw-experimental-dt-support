@@ -24,6 +24,15 @@ proc generate {drv_handle} {
 
     ::hsi::utils::define_zynq_canonical_xpars $drv_handle "xparameters.h" "XOspiPsv" "DEVICE_ID" "C_S_AXI_BASEADDR" "C_S_AXI_HIGHADDR" "C_OSPI_CLK_FREQ_HZ" "IS_CACHE_COHERENT" "C_OSPI_MODE"
 
+    foreach i [get_sw_cores standalone*] {
+        set intr_wrapper_tcl_file "[get_property "REPOSITORY" $i]/data/intr_wrapper.tcl"
+        if {[file exists $intr_wrapper_tcl_file]} {
+            source $intr_wrapper_tcl_file
+            break
+        }
+    }
+
+    gen_intr $drv_handle "xparameters.h"
 }
 
 proc generate_ospipsv_params {drv_handle file_name} {
