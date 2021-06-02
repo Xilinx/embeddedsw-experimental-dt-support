@@ -22,7 +22,10 @@ properties:
     description: Physical base address and size of the controller register map
   clock-frequency:
     description: Input clock frequency
-  xlnx,mio_bank: The value will be 0/1/2 depending on MIO bank selection
+  xlnx,mio-bank: The value will be 0/1/2 depending on MIO bank selection
+  xlnx,has-cd: Indicates Card Detect pin
+  xlnx,has-wp: Write Protect for the device
+  xlnx,has-emio: Indicates if device is connected to EMIO
 
 config:
     - XSdPs_Config
@@ -30,12 +33,12 @@ config:
 required:
     - compatible
     - reg
-    - clock-frequency
-    - xlnx,card-detect
-    - xlnx,write-protect
+    - xlnx,sdio-clk-freq-hz
+    - xlnx,has-cd
+    - xlnx,has-wp
     - xlnx,bus-width
-    - xlnx,mio_bank
+    - xlnx,mio-bank
     - xlnx,has-emio
-    - dma-coherent
-    - ref-clk
+    - xlnx,is-cache-coherent
+    - clocks
 ...
