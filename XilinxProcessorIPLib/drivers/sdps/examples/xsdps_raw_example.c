@@ -32,6 +32,9 @@
 /***************************** Include Files *********************************/
 
 #include "xsdps.h"		/* SD device driver */
+#ifdef SDT
+#include "xsdps_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -120,7 +123,11 @@ static int SdpsRawTest(void)
 	/*
 	 * Initialize the host controller
 	 */
+#ifndef SDT
 	SdConfig = XSdPs_LookupConfig(XPAR_XSDPS_0_DEVICE_ID);
+#else
+	SdConfig = XSdPs_LookupConfig(XSDPS_BASEADDRESS);
+#endif
 	if (NULL == SdConfig) {
 		return XST_FAILURE;
 	}
