@@ -277,13 +277,13 @@ typedef struct {
 	u32 InputClockHz;/**< Input clock frequency */
 	s32 ModemPinsConnected; /** Specifies whether modem pins are connected
 				 *  to MIO or FMIO */
+#if defined  (XCLOCKING) || defined(SDT)
+	u32 RefClk;             /**< Input clock frequency */
+#endif
 	u16 IntrId;             /** Bits[11:0] Interrupt-id Bits[15:12]
 				 * trigger type and level flags */
 	UINTPTR IntrParent;     /** Bit[0] Interrupt parent type Bit[64/32:1]
 				 * Parent base address */
-#if defined  (XCLOCKING) || defined(SDT)
-	u32 RefClk;		/**< Input clock frequency */
-#endif
 } XUartPs_Config;
 
 /* Keep track of state information about a data buffer in the interrupt mode. */

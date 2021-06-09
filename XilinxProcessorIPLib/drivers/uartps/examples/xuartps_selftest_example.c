@@ -39,7 +39,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UART_DEVICE_ID              XPAR_XUARTPS_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -48,9 +50,11 @@
 
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int UartPsSelfTestExample(u16 DeviceId);
-
+#else
+int UartPsSelfTestExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 XUartPs Uart_Ps;		/* Instance of the UART Device */
@@ -71,7 +75,11 @@ int main(void)
 	int Status;
 
 	/* Run the selftest example */
+#ifndef SDT
 	Status = UartPsSelfTestExample(UART_DEVICE_ID);
+#else
+	Status = UartPsSelfTestExample(XPAR_XUARTPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("UART Selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -95,7 +103,11 @@ int main(void)
 * @note     None
 *
 ****************************************************************************/
+#ifndef SDT
 int UartPsSelfTestExample(u16 DeviceId)
+#else
+int UartPsSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XUartPs_Config *Config;
@@ -105,7 +117,11 @@ int UartPsSelfTestExample(u16 DeviceId)
 	 * Look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XUartPs_LookupConfig(DeviceId);
+#else
+	Config = XUartPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
