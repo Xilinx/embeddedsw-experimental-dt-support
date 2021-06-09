@@ -123,6 +123,9 @@ s32 XUartPs_CfgInitialize(XUartPs *InstancePtr,
 #endif
 	InstancePtr->Config.ModemPinsConnected = Config->ModemPinsConnected;
 
+	InstancePtr->Config.IntrId = Config->IntrId;
+	InstancePtr->Config.IntrParent = Config->IntrParent;
+
 	/* Initialize other instance data to default values */
 	InstancePtr->Handler = (XUartPs_Handler)XUartPs_StubHandler;
 

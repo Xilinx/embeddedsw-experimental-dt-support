@@ -36,6 +36,8 @@ required:
     - xlnx,clock-freq
     - cts-override
     - ref-clk
+    - interrupts
+    - interrupt-parent
 
 examples:
     xuartps_intr_example.c:
