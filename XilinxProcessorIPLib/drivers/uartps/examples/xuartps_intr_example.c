@@ -47,6 +47,7 @@
 #include "xil_exception.h"
 #include "xil_printf.h"
 #include "xinterrupt_wrap.h"
+#include "xuartps_example.h"
 
 /************************** Constant Definitions **************************/
 
@@ -55,7 +56,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UART_DEVICE_ID		XPAR_XUARTPS_0_DEVICE_ID
+#endif
 /*
  * The following constant controls the length of the buffers to be sent
  * and received with the UART,
@@ -68,16 +71,18 @@
 
 /************************** Function Prototypes *****************************/
 
-int UartPsIntrExample(INTC *IntcInstPtr, XUartPs *UartInstPtr,
-			u16 DeviceId, u16 UartIntrId);
-
+#ifndef SDT
+int UartPsIntrExample(u16 DeviceId);
+#else
+int UartPsIntrExample(UINTPTR BaseAddress);
+#endif
 void Handler(void *CallBackRef, u32 Event, unsigned int EventData);
 
 
 /************************** Variable Definitions ***************************/
 
 XUartPs UartPs	;		/* Instance of the UART Device */
-INTC InterruptController;	/* Instance of the Interrupt Controller */
+XUartPs *UartInstPtr = &UartPs;
 
 /*
  * The following buffers are used in this example to send and receive data
@@ -111,8 +116,11 @@ int main(void)
 	int Status;
 
 	/* Run the UartPs Interrupt example, specify the the Device ID */
-	Status = UartPsIntrExample(&InterruptController, &UartPs,
-				UART_DEVICE_ID, UART_INT_IRQ_ID);
+#ifndef SDT
+	Status = UartPsIntrExample(UART_DEVICE_ID);
+#else
+	Status = UartPsIntrExample(XPAR_XUARTPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("UART Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -151,8 +159,11 @@ int main(void)
 * working it may never return.
 *
 **************************************************************************/
-int UartPsIntrExample(INTC *IntcInstPtr, XUartPs *UartInstPtr,
-			u16 DeviceId, u16 UartIntrId)
+#ifndef SDT
+int UartPsIntrExample(u16 DeviceId)
+#else
+int UartPsIntrExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XUartPs_Config *Config;
@@ -172,7 +183,11 @@ int UartPsIntrExample(INTC *IntcInstPtr, XUartPs *UartInstPtr,
 	 * Initialize the UART driver so that it's ready to use
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XUartPs_LookupConfig(DeviceId);
+#else
+	Config = XUartPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -195,7 +210,9 @@ int UartPsIntrExample(INTC *IntcInstPtr, XUartPs *UartInstPtr,
 	Status = XSetupInterruptSystem(UartInstPtr, &XUartPs_InterruptHandler,
 					Config->IntrId, Config->IntrParent,
 					XINTERRUPT_DEFAULT_PRIORITY);
+
 	if (Status != XST_SUCCESS) {
+		xil_printf("Failed at XSetupInterruptSystem\n");
 		return XST_FAILURE;
 	}
 
