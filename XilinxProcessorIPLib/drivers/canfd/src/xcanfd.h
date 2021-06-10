@@ -342,7 +342,11 @@ typedef struct {
 	u32 Rx_Mode;			/**< 1-Mailbox 0-sequential */
 	u32 NumofRxMbBuf;	/**< Number of RxBuffers */
 	u32 NumofTxBuf;         /**< Number of TxBuffers */
+#ifndef SDT
 	u32 IsPl;		/**< IsPl, 1= AXI CANFD instance,0= CANFD instance */
+#endif
+	u16 IntrId; /**< Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XCanFd_Config;
 
 /************************** Variable Definitions *****************************/
