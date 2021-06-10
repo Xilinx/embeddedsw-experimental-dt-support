@@ -46,39 +46,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xil_exception.h"
 #include "xttcps.h"
-#include "xscugic.h"
 #include "xil_printf.h"
-
+#include "xttcps_example.h"
+#include "xinterrupt_wrap.h"
 /************************** Constant Definitions *****************************/
 #if defined (PLATFORM_ZYNQ)
 #define NUM_DEVICES    9U
 #else
 #define NUM_DEVICES    12U
 #endif
-
-/*
- * The following constants map to the XPAR parameters created in the
- * xparameters.h file. They are only defined here such that a user can easily
- * change all the needed parameters in one place.
- * Note: To run this example on intended TTC device, following changes
- *       needs to be done
- *       - Map constants given below to the intended TTC devices
- *       - Fill SettingsTable array based on the intended device IDs.
- *         e.g. If intended device IDs are 3 and 4, then SettingsTable[3]
- *              and SettingsTable[4] should be set properly.
- */
-#define TTC_TICK_DEVICE_ID	XPAR_XTTCPS_1_DEVICE_ID
-#define TTC_TICK_INTR_ID	XPAR_XTTCPS_1_INTR
-
-#define TTC_PWM_DEVICE_ID	XPAR_XTTCPS_0_DEVICE_ID
-#define TTC_PWM_INTR_ID		XPAR_XTTCPS_0_INTR
-#define TTCPS_CLOCK_HZ		XPAR_XTTCPS_0_CLOCK_HZ
-
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
 
 /*
  * Constants to set the basic operating parameters.
@@ -90,6 +69,10 @@
 
 #define PWM_DELTA_DUTY	50 /* Initial and increment to duty cycle for PWM */
 #define TICKS_PER_CHANGE_PERIOD TICK_TIMER_FREQ_HZ * 5 /* Tick signals PWM */
+
+#define TTC_TICK_DEVICE	0U
+#define TTC_PWM_DEVICE	1U
+#define TTC_COUNTER_OFFSET	4U
 
 /**************************** Type Definitions *******************************/
 typedef struct {
@@ -109,7 +92,7 @@ static int TmrInterruptExample(void);  /* Main test */
 /* Set up routines for timer counters */
 static int SetupTicker(void);
 static int SetupPWM(void);
-static int SetupTimer(int DeviceID);
+static int SetupTimer(UINTPTR BaseAddr, u16 CounterNum, XTtcPs *TickTimer, u16 DeviceIndex);
 
 /* Interleaved interrupt test for both timer counters */
 static int WaitForDutyCycleFull(void);
@@ -121,14 +104,14 @@ static void PWMHandler(void *CallBackRef, u32 StatusEvent);
 
 /************************** Variable Definitions *****************************/
 
-static XTtcPs TtcPsInst[NUM_DEVICES];	/* Number of available timer counters */
+static XTtcPs TickTimer;
+static XTtcPs PWMTimer;
 
 static TmrCntrSetup SettingsTable[NUM_DEVICES] = {
 	{200, 0, 0, 0}, /* PWM timer counter initial setup, only output freq */
 	{100, 0, 0, 0},	/* Ticker timer counter initial setup, only output freq */
 };
 
-XScuGic InterruptController;  /* Interrupt controller instance */
 
 static u32 MatchValue;  /* Match value for PWM, set by PWM interrupt handler,
 			updated by main test routine */
@@ -192,15 +175,6 @@ static int TmrInterruptExample(void)
 	 */
 
 	/*
-	 * Connect the Intc to the interrupt subsystem such that interrupts can
-	 * occur. This function is application specific.
-	 */
-	Status = SetupInterruptSystem(INTC_DEVICE_ID, &InterruptController);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
 	 * Set up the Ticker timer
 	 */
 	Status = SetupTicker();
@@ -228,9 +202,9 @@ static int TmrInterruptExample(void)
 	/*
 	 * Stop the counters
 	 */
-	XTtcPs_Stop(&(TtcPsInst[TTC_TICK_DEVICE_ID]));
+	XTtcPs_Stop(&TickTimer);
 
-	XTtcPs_Stop(&(TtcPsInst[TTC_PWM_DEVICE_ID]));
+	XTtcPs_Stop(&PWMTimer);
 
 	return XST_SUCCESS;
 }
@@ -253,7 +227,7 @@ int SetupTicker(void)
 	TmrCntrSetup *TimerSetup;
 	XTtcPs *TtcPsTick;
 
-	TimerSetup = &(SettingsTable[TTC_TICK_DEVICE_ID]);
+	TimerSetup = &(SettingsTable[TTC_TICK_DEVICE]);
 
 	/*
 	 * Set up appropriate options for Ticker: interval mode without
@@ -267,30 +241,21 @@ int SetupTicker(void)
 	 *  . initialize device
 	 *  . set options
 	 */
-	Status = SetupTimer(TTC_TICK_DEVICE_ID);
+	Status = SetupTimer(XTTCPS_BASEADDRESS, XTTCPS_COUNTER_NUM1, &TickTimer, TTC_TICK_DEVICE);
 	if(Status != XST_SUCCESS) {
 		return Status;
 	}
 
-	TtcPsTick = &(TtcPsInst[TTC_TICK_DEVICE_ID]);
+	TtcPsTick = &TickTimer;
 
 	/*
 	 * Connect to the interrupt controller
 	 */
-	Status = XScuGic_Connect(&InterruptController, TTC_TICK_INTR_ID,
-		(Xil_ExceptionHandler)XTtcPs_InterruptHandler, (void *)TtcPsTick);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	XTtcPs_SetStatusHandler(&(TtcPsInst[TTC_TICK_DEVICE_ID]), &(TtcPsInst[TTC_TICK_DEVICE_ID]),
+	Status = XSetupInterruptSystem(TtcPsTick, (Xil_ExceptionHandler)XTtcPs_InterruptHandler, \
+	TtcPsTick->Config.IntrId[XTTCPS_COUNTER_NUM1], TtcPsTick->Config.IntrParent, \
+	XINTERRUPT_DEFAULT_PRIORITY);
+	XTtcPs_SetStatusHandler(TtcPsTick, TtcPsTick,
 		              (XTtcPs_StatusHandler)TickHandler);
-
-	/*
-	 * Enable the interrupt for the Timer counter
-	 */
-	XScuGic_Enable(&InterruptController, TTC_TICK_INTR_ID);
-
 	/*
 	 * Enable the interrupts for the tick timer/counter
 	 * We only care about the interval timeout.
@@ -323,7 +288,7 @@ int SetupPWM(void)
 	TmrCntrSetup *TimerSetup;
 	XTtcPs *TtcPsPWM;
 
-	TimerSetup = &(SettingsTable[TTC_PWM_DEVICE_ID]);
+	TimerSetup = &(SettingsTable[TTC_PWM_DEVICE]);
 
 	/*
 	 * Set up appropriate options for PWM: interval mode  and
@@ -337,29 +302,22 @@ int SetupPWM(void)
 	 * 	initialize device
 	 * 	set options
 	 */
-	Status = SetupTimer(TTC_PWM_DEVICE_ID);
+	Status = SetupTimer(XTTCPS_BASEADDRESS, XTTCPS_COUNTER_NUM2, &PWMTimer, TTC_PWM_DEVICE);
 	if(Status != XST_SUCCESS) {
 		return Status;
 	}
 
-	TtcPsPWM = &(TtcPsInst[TTC_PWM_DEVICE_ID]);
+	TtcPsPWM = &PWMTimer;
 
 	/*
 	 * Connect to the interrupt controller
 	 */
-	Status = XScuGic_Connect(&InterruptController, TTC_PWM_INTR_ID,
-		(Xil_ExceptionHandler)XTtcPs_InterruptHandler, (void *)TtcPsPWM);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
+	Status = XSetupInterruptSystem(TtcPsPWM, (Xil_ExceptionHandler)XTtcPs_InterruptHandler, \
+	TtcPsPWM->Config.IntrId[XTTCPS_COUNTER_NUM2], TtcPsPWM->Config.IntrParent, \
+	XINTERRUPT_DEFAULT_PRIORITY);
 
-	XTtcPs_SetStatusHandler(&(TtcPsInst[TTC_PWM_DEVICE_ID]), &(TtcPsInst[TTC_PWM_DEVICE_ID]),
+	XTtcPs_SetStatusHandler(TtcPsPWM, TtcPsPWM,
 		              (XTtcPs_StatusHandler) PWMHandler);
-	/*
-	 * Enable the interrupt for the Timer counter
-	 */
-	XScuGic_Enable(&InterruptController, TTC_PWM_INTR_ID);
-
 	/*
 	 * Enable the interrupts for the tick timer/counter
 	 * We only care about the interval timeout.
@@ -400,8 +358,8 @@ int WaitForDutyCycleFull(void)
 	u8 DutyCycle;		/* The current output duty cycle */
 	XTtcPs *TtcPs_PWM;	/* Pointer to the instance structure */
 
-	TimerSetup = &(SettingsTable[TTC_PWM_DEVICE_ID]);
-	TtcPs_PWM = &(TtcPsInst[TTC_PWM_DEVICE_ID]);
+	TimerSetup = &(SettingsTable[TTC_PWM_DEVICE]);
+	TtcPs_PWM = &PWMTimer;
 
 	/*
 	 * Initialize some variables used by the interrupts and in loops.
@@ -459,28 +417,25 @@ int WaitForDutyCycleFull(void)
 *  . set options
 *  . set interval and prescaler value for given output frequency.
 *
-* @param	DeviceID is the unique ID for the device.
+* @param	BaseAddr is the base address for the device.
 *
 * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
 *
 * @note		None.
 *
 *****************************************************************************/
-int SetupTimer(int DeviceID)
+int SetupTimer(UINTPTR BaseAddr, u16 CounterNum, XTtcPs *Timer, u16 device)
 {
 	int Status;
 	XTtcPs_Config *Config;
-	XTtcPs *Timer;
 	TmrCntrSetup *TimerSetup;
 
-	TimerSetup = &SettingsTable[DeviceID];
-
-	Timer = &(TtcPsInst[DeviceID]);
+	TimerSetup = &SettingsTable[device];
 
 	/*
 	 * Look up the configuration based on the device identifier
 	 */
-	Config = XTtcPs_LookupConfig(DeviceID);
+	Config = XTtcPs_LookupConfig(BaseAddr);
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -488,7 +443,8 @@ int SetupTimer(int DeviceID)
 	/*
 	 * Initialize the device
 	 */
-	Status = XTtcPs_CfgInitialize(Timer, Config, Config->BaseAddress);
+	Status = XTtcPs_CfgInitialize(Timer, Config, Config->BaseAddress +	\
+		TTC_COUNTER_OFFSET*CounterNum);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -512,61 +468,6 @@ int SetupTimer(int DeviceID)
 	 */
 	XTtcPs_SetInterval(Timer, TimerSetup->Interval);
 	XTtcPs_SetPrescaler(Timer, TimerSetup->Prescaler);
-
-	return XST_SUCCESS;
-}
-
-/****************************************************************************/
-/**
-*
-* This function setups the interrupt system such that interrupts can occur.
-* This function is application specific since the actual system may or may not
-* have an interrupt controller.  The TTC could be directly connected to a
-* processor without an interrupt controller.  The user should modify this
-* function to fit the application.
-*
-* @param	IntcDeviceID is the unique ID of the interrupt controller
-* @param	IntcInstacePtr is a pointer to the interrupt controller
-*		instance.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-*****************************************************************************/
-static int SetupInterruptSystem(u16 IntcDeviceID,
-				    XScuGic *IntcInstancePtr)
-{
-	int Status;
-	XScuGic_Config *IntcConfig; /* The configuration parameters of the
-					interrupt controller */
-
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	IntcConfig = XScuGic_LookupConfig(IntcDeviceID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the ARM processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-			IntcInstancePtr);
-
-	/*
-	 * Enable interrupts in the ARM
-	 */
-	Xil_ExceptionEnable();
 
 	return XST_SUCCESS;
 }
@@ -630,7 +531,7 @@ static void PWMHandler(void *CallBackRef, u32 StatusEvent)
 {
 	XTtcPs *Timer;
 
-	Timer = &(TtcPsInst[TTC_PWM_DEVICE_ID]);
+	Timer = &PWMTimer;
 
 	if (0 != (XTTCPS_IXR_INTERVAL_MASK & StatusEvent)) {
 		XTtcPs_SetMatchValue(Timer, 0, MatchValue);
