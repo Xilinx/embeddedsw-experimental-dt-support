@@ -39,8 +39,12 @@
 /***************************** Include Files *********************************/
 
 #include "xcan.h"
-#include "xparameters.h"
 #include "xstatus.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xcan_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 /*
@@ -48,7 +52,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define CAN_DEVICE_ID	XPAR_CAN_0_DEVICE_ID
+#endif
 
 /*
  * Maximum CAN frame length in words.
@@ -83,7 +89,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int XCanPolledExample(u16 DeviceId);
+#else
+int XCanPolledExample(UINTPTR BaseAddress);
+#endif
 static int SendFrame(XCan *InstancePtr);
 static int RecvFrame(XCan *InstancePtr);
 
@@ -122,7 +132,11 @@ int main(void)
 	 * Run the Can Polled example, specify the Device ID that is generated
 	 * in xparameters.h .
 	 */
+#ifndef SDT
 	if (XCanPolledExample(CAN_DEVICE_ID)) {
+#else
+	if (XCanPolledExample(XCAN_BASEADDRESS)) {
+#endif
 		xil_printf("Can polled Example Failed\r\n");
 		return XST_FAILURE;
 	}
@@ -153,14 +167,22 @@ int main(void)
 * loop and will never return to the caller.
 *
 ******************************************************************************/
+#ifndef SDT
 int XCanPolledExample(u16 DeviceId)
+#else
+int XCanPolledExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 
 	/*
 	 * Initialize the XCan driver.
 	 */
+#ifndef SDT
 	Status = XCan_Initialize(&Can, DeviceId);
+#else
+	Status = XCan_Initialize(&Can, BaseAddress);
+#endif
 	if (Status != XST_SUCCESS) {
 		return Status;
 	}
