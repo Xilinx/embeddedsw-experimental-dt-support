@@ -38,9 +38,13 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xwdttb_l.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdttb_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -49,7 +53,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define WDTTB_BASEADDR  XPAR_WDTTB_0_BASEADDR
+#endif
 
 
 /**************************** Type Definitions *******************************/
@@ -60,7 +66,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int XWdtTb_LowLevelExample(u32 WdtTbBaseAddress);
+#else
+int XWdtTb_LowLevelExample(UINTPTR WdtTbBaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -85,7 +95,11 @@ int main(void)
 	 * Run the low level example, specify the Base Address that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = XWdtTb_LowLevelExample(WDTTB_BASEADDR);
+#else
+	Status = XWdtTb_LowLevelExample(XWDTTB_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("WDTTB low level example failed.\n\r");
 		return XST_FAILURE;
@@ -119,7 +133,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int XWdtTb_LowLevelExample(u32 WdtTbBaseAddress)
+#else
+int XWdtTb_LowLevelExample(UINTPTR WdtTbBaseAddress)
+#endif
 {
 	int Count = 0;
 

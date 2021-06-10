@@ -33,22 +33,29 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdttb.h"
 #include "xil_exception.h"
-#include "xscugic.h"
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"
+#include "xscugic.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xwdttb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 /*
  * The following constants map to the XPAR parameters created in the
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #ifndef TESTAPP_GEN
 #define INTC		XScuGic
 #define GWDT_DEVICE_ID		XPAR_WDTTB_0_DEVICE_ID
 #define GWDT_INTR_VEC_ID	XPAR_XGWDT_0_INTR
 #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
+#endif
 #endif
 
 /**************************** Type Definitions *******************************/
@@ -56,19 +63,25 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 int GWdtIntrExample(XScuGic *IntcInstancePtr,
 		    XWdtTb *GWdtInstancePtr, u16 GWdtDeviceId,
 		    u16 GWdtIntrId);
-static void GWdtIntrHandler(void *CallBackRef);
 static int GWdtSetupIntrSystem(XScuGic *IntcInstancePtr,
 			       XWdtTb *GWdtInstancePtr,
 			       u16 GWdtIntrId);
 static void GWdtDisableIntrSystem(XScuGic *IntcInstancePtr,
 				  u16 GWdtIntrId);
+#else
+int WdtTbIntrExample(XWdtTb *GWdtInstancePtr, UINTPTR BaseAddress);
+#endif
+static void GWdtIntrHandler(void *CallBackRef);
 /************************** Variable Definitions *****************************/
 #ifndef TESTAPP_GEN
 XWdtTb GWdtInstance;		/* Instance of Generic WatchDog Timer */
+#ifndef SDT
 INTC IntcInstance;		/* Instance of the Interrupt Controller */
+#endif
 #endif
 static volatile int GWdtExpired;
 #define WDTPSV_GWOR_COUNT     0x00110000U  /*Generic Watchdog offset value*/
@@ -93,8 +106,12 @@ int main(void)
 	 * Call the GWdt interrupt example, specify the parameters generated in
 	 * xparameters.h
 	 */
+#ifndef SDT
 	Status = GWdtIntrExample(&IntcInstance, &GWdtInstance, GWDT_DEVICE_ID,
 				 GWDT_INTR_VEC_ID);
+#else
+	Status = WdtTbIntrExample(&GWdtInstance, XWDTTB_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Generic WDT interrupt example failed.\n\r");
 		return XST_FAILURE;
@@ -141,9 +158,13 @@ int main(void)
 * @note		This example will not return if the interrupts are not working.
 *
 ******************************************************************************/
+#ifndef SDT
 int GWdtIntrExample(XScuGic *IntcInstancePtr, XWdtTb *GWdtInstancePtr,
 		    u16 GWdtDeviceId,
 		    u16 GWdtIntrId)
+#else
+int WdtTbIntrExample(XWdtTb *GWdtInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XWdtTb_Config *Config;
@@ -152,7 +173,11 @@ int GWdtIntrExample(XScuGic *IntcInstancePtr, XWdtTb *GWdtInstancePtr,
 	 * Initialize the WDTTB driver so that it's ready to use look up
 	 * configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XWdtTb_LookupConfig(GWdtDeviceId);
+#else
+	Config = XWdtTb_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -184,8 +209,15 @@ int GWdtIntrExample(XScuGic *IntcInstancePtr, XWdtTb *GWdtInstancePtr,
 	 * Connect the WdtTb to the interrupt subsystem so that interrupts
 	 * can occur
 	 */
+#ifndef SDT
 	Status = GWdtSetupIntrSystem(IntcInstancePtr, GWdtInstancePtr,
 				      GWdtIntrId);
+#else
+	Status = XSetupInterruptSystem(GWdtInstancePtr, &GWdtIntrHandler,
+				       Config->IntrId[1],
+				       Config->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -214,7 +246,11 @@ int GWdtIntrExample(XScuGic *IntcInstancePtr, XWdtTb *GWdtInstancePtr,
 	/*
 	 * Disable and disconnect the interrupt system
 	 */
+#ifndef SDT
 	GWdtDisableIntrSystem(IntcInstancePtr, GWdtIntrId);
+#else
+	XDisconnectInterruptCntrl(Config->IntrId[1], Config->IntrParent);
+#endif
 
 	/*
 	 * Stop the timer
@@ -223,6 +259,7 @@ int GWdtIntrExample(XScuGic *IntcInstancePtr, XWdtTb *GWdtInstancePtr,
 
 	return XST_SUCCESS;
 }
+#ifndef SDT
 /*****************************************************************************/
 /**
 *
@@ -309,6 +346,7 @@ static int GWdtSetupIntrSystem(XScuGic *IntcInstancePtr,
 
 	return XST_SUCCESS;
 }
+#endif
 
 /*****************************************************************************/
 /**
@@ -342,6 +380,7 @@ static void GWdtIntrHandler(void *CallBackRef)
 	XWdtTb_RestartWdt(GWdtInstancePtr);
 }
 
+#ifndef SDT
 /*****************************************************************************/
 /**
 *
@@ -365,3 +404,4 @@ static void GWdtDisableIntrSystem(XScuGic *IntcInstancePtr, u16 GWdtIntrId)
 	XScuGic_Disconnect(IntcInstancePtr, GWdtIntrId);
 
 }
+#endif
