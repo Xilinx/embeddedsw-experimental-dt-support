@@ -216,9 +216,15 @@ extern "C" {
  * This typedef contains configuration information for a device.
  */
 typedef struct {
+#ifndef SDT
 	u16 DeviceId;		/**< Unique ID  of device */
+#else
+	char *Name;             /**< Unique name of the device */
+#endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u8 NumOfAcceptFilters;	/**< Number of Acceptance Filters */
+	u16 IntrId; /**< Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XCan_Config;
 
 /******************************************************************************/
@@ -463,10 +469,11 @@ typedef struct {
  */
 #ifndef SDT
 int XCan_Initialize(XCan *InstancePtr, u16 DeviceId);
+int XCan_VmInitialize(XCan *InstancePtr, u16 DeviceId, UINTPTR VirtAddr);
 #else
 int XCan_Initialize(XCan *InstancePtr, UINTPTR BaseAddress);
+int XCan_VmInitialize(XCan *InstancePtr, UINTPTR BaseAddress, UINTPTR VirtAddr);
 #endif
-int XCan_VmInitialize(XCan *InstancePtr, u16 DeviceId, UINTPTR VirtAddr);
 void XCan_Reset(XCan *InstancePtr);
 u8 XCan_GetMode(XCan *InstancePtr);
 void XCan_EnterMode(XCan *InstancePtr, u8 OperationMode);
