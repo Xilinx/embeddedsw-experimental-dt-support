@@ -53,11 +53,17 @@
 /***************************** Include Files *********************************/
 
 #include "xcanfd.h"
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xil_exception.h"
 #include "sleep.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xcanfd_example.h"
+#endif
 
+#ifndef SDT
 #ifdef XPAR_INTC_0_DEVICE_ID
 #include "xintc.h"
 #include <stdio.h>
@@ -86,6 +92,7 @@
   #define CAN_INTR_VEC_ID	XPAR_FABRIC_CANFD_0_VEC_ID
  #endif
 #endif /* XPAR_INTC_0_DEVICE_ID */
+#endif
 
 /* Maximum CAN frame length in Bytes */
 #define XCANFD_MAX_FRAME_SIZE_IN_BYTES 72
@@ -123,6 +130,7 @@
 #define MAX_TIMEOUT 			100
 #define MAX_USLEEP_VAL                  10*1000
 
+#ifndef SDT
 #ifdef XPAR_INTC_0_DEVICE_ID
 #define INTC		XIntc
 #define INTC_HANDLER	XIntc_InterruptHandler
@@ -130,7 +138,7 @@
 #define INTC		XScuGic
 #define INTC_HANDLER	XScuGic_InterruptHandler
 #endif /* XPAR_INTC_0_DEVICE_ID */
-
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -139,8 +147,12 @@
 
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 static int XCanFdIntrExample(u16 DeviceId);
+static int SetupInterruptSystem(XCanFd  *InstancePtr);
+#else
+static int XCanFdIntrExample(UINTPTR BaseAddress);
+#endif
 static void Config(XCanFd  *InstancePtr);
 static int SendFrame(XCanFd  *InstancePtr);
 
@@ -149,7 +161,6 @@ static void RecvHandler(void *CallBackRef);
 static void ErrorHandler(void *CallBackRef, u32 ErrorMask);
 static void EventHandler(void *CallBackRef, u32 Mask);
 
-static int SetupInterruptSystem(XCanFd  *InstancePtr);
 
 /************************** Variable Definitions *****************************/
 /* Allocate an instance of the XCan driver */
@@ -186,7 +197,11 @@ volatile static int SendDone;
 int main(void)
 {
 	/* Run the Can interrupt example */
+#ifndef SDT
 	if (XCanFdIntrExample(CANFD_DEVICE_ID)) {
+#else
+	if (XCanFdIntrExample(XCANFD_BASEADDRESS)) {
+#endif
 		xil_printf("XCanFd Interrupt Mode example Failed\n\r");
 		return XST_FAILURE;
 	}
@@ -209,7 +224,11 @@ int main(void)
 *		an infinite loop and will never return to the caller.
 *
 ******************************************************************************/
+#ifndef SDT
 static int XCanFdIntrExample(u16 DeviceId)
+#else
+static int XCanFdIntrExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	int TimeOut;
@@ -217,7 +236,11 @@ static int XCanFdIntrExample(u16 DeviceId)
 	XCanFd_Config *ConfigPtr;
 
 	/* Initialize the XCan driver */
+#ifndef SDT
 	ConfigPtr = XCanFd_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XCanFd_LookupConfig(BaseAddress);
+#endif
 	if (CanFdInstPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -253,7 +276,14 @@ static int XCanFdIntrExample(u16 DeviceId)
 	LoopbackError = FALSE;
 
 	/* Connect to the interrupt controller */
+#ifndef SDT
 	Status = SetupInterruptSystem(CanFdInstPtr);
+#else
+	Status = XSetupInterruptSystem(CanFdInstPtr,&XCanFd_IntrHandler,
+				       ConfigPtr->IntrId,
+				       ConfigPtr->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -684,6 +714,7 @@ static void EventHandler(void *CallBackRef, u32 IntrMask)
 
 }
 
+#ifndef SDT
 /*****************************************************************************/
 /**
 *
@@ -797,3 +828,4 @@ static int SetupInterruptSystem(XCanFd *InstancePtr)
 
 	return XST_SUCCESS;
 }
+#endif
