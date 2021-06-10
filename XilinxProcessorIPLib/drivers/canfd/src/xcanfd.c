@@ -141,7 +141,9 @@ int XCanFd_CfgInitialize(XCanFd *InstancePtr, XCanFd_Config *ConfigPtr,
 	InstancePtr->CanFdConfig.Rx_Mode = ConfigPtr->Rx_Mode;
 	InstancePtr->CanFdConfig.NumofRxMbBuf = ConfigPtr->NumofRxMbBuf;
 	InstancePtr->CanFdConfig.NumofTxBuf = ConfigPtr->NumofTxBuf;
+#ifndef SDT
 	InstancePtr->CanFdConfig.IsPl = ConfigPtr->IsPl;
+#endif
 
 	/*
 	 * Set all handlers to stub values, let user configure this data later.
