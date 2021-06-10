@@ -36,9 +36,13 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xgpio_l.h"
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xgpio_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -49,7 +53,12 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define GPIO_REG_BASEADDR	XPAR_GPIO_0_BASEADDR
+#endif
+#ifdef SDT
+#define	GPIO_REG_BASEADDR	XGPIO_BASEADDRESS
+#endif
 
 /*
  * The following constant is used to wait after an LED is turned on to make
