@@ -161,7 +161,11 @@ s32 XWdtTb_SelfTest(const XWdtTb *InstancePtr)
 
 	}
 	else {
+#ifndef SDT
 		if (InstancePtr->Config.IsPl == (u32)0) {
+#else
+		if (!(strcmp(InstancePtr->Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
                 /* Write General Watchdog offset register for Generating interrupt */
                 XWdtTb_WriteReg(InstancePtr->Config.BaseAddr,XWT_GWOR_OFFSET,XWT_GWOR_COUNT);
                 /*Enable GWEN bit for starting General Watchdog timer */

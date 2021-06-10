@@ -225,11 +225,15 @@ s32 XWdtTb_CfgInitialize(XWdtTb *InstancePtr, const XWdtTb_Config *CfgPtr,
         else {
 #ifndef SDT
        InstancePtr->Config.DeviceId = CfgPtr->DeviceId;
-#endif
-	InstancePtr->Config.EnableWinWdt = CfgPtr->EnableWinWdt;
 	InstancePtr->Config.MaxCountWidth = CfgPtr->MaxCountWidth;
 	InstancePtr->Config.SstCountWidth = CfgPtr->SstCountWidth;
+#else
+	InstancePtr->Config.Name = CfgPtr->Name;
+#endif
+	InstancePtr->Config.EnableWinWdt = CfgPtr->EnableWinWdt;
+#ifndef SDT
 	InstancePtr->Config.IsPl = CfgPtr->IsPl;
+#endif
 	if(InstancePtr->Config.EnableWinWdt == 1U) {
 		InstancePtr->Config.BaseAddr = EffectiveAddr + 0xCU;
 	} else {
@@ -237,7 +241,11 @@ s32 XWdtTb_CfgInitialize(XWdtTb *InstancePtr, const XWdtTb_Config *CfgPtr,
 	}
 	InstancePtr->IsStarted = (u32)0;
 	InstancePtr->EnableFailCounter = (u32)0;
+#ifndef SDT
 	if (InstancePtr->Config.IsPl == (u32)0) {
+#else
+	if (!(strcmp(InstancePtr->Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		InstancePtr->EnableWinMode = (u32)0U;
 		/* Reset all the Generic WDT Registers */
 		XWdtTb_WriteReg(InstancePtr->Config.BaseAddr, XWT_GW_WR_OFFSET,XWT_GW_WR_MASK);
@@ -338,7 +346,11 @@ void XWdtTb_Start(XWdtTb *InstancePtr)
                 /* Enable Window WDT */
                 XWdtTb_EnableWinWdt(InstancePtr);
         } else {
+#ifndef SDT
 		if (InstancePtr->Config.IsPl == (u32)0) {
+#else
+		if (!(strcmp(InstancePtr->Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
                 /* WWDT supports Generic watchdog timer & Window WDT features*/
                 /* Enable Generic Watchdog Timer */
                 XWdtTb_EnableGenericWdt(InstancePtr);
@@ -389,7 +401,11 @@ s32 XWdtTb_Stop(XWdtTb *InstancePtr)
                 Status = XWdtTb_DisableWinWdt(InstancePtr);
         }
         else {
+#ifndef SDT
 		if (InstancePtr->Config.IsPl == (u32)0) {
+#else
+		if (!(strcmp(InstancePtr->Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
                 /* Disable Generic Watchdog Timer */
                 Status = XWdtTb_DisableGenericWdt(InstancePtr);
 		} else {
@@ -443,7 +459,11 @@ u32 XWdtTb_IsWdtExpired(const XWdtTb *InstancePtr)
 		}
         }
         else {
+#ifndef SDT
 		if (InstancePtr->Config.IsPl == (u32)0) {
+#else
+		if (!(strcmp(InstancePtr->Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
                /* Read the current contents */
                 ControlStatusRegister0 =XWdtTb_ReadReg (InstancePtr->Config.BaseAddr,XWT_GWCSR_OFFSET);
                 /* Check whether state and reset status */
@@ -546,7 +566,11 @@ void XWdtTb_RestartWdt(const XWdtTb *InstancePtr)
 			ControlStatusRegister0);
 	}
         else {
+#ifndef SDT
 		if (InstancePtr->Config.IsPl == (u32)0) {
+#else
+		if (!(strcmp(InstancePtr->Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		/*  Read enable status register and update Refresh Register  bit */
 		ControlStatusRegister0 =
 				XWdtTb_ReadReg(InstancePtr->Config.BaseAddr,

@@ -209,9 +209,13 @@ typedef struct {
 #endif
 	UINTPTR BaseAddr;	/**< Base address of the device */
 	u32 EnableWinWdt;	/**< Flag for Window WDT enable */
+#ifndef SDT
 	u32 MaxCountWidth;	/**< Maximum width of first timer */
 	u32 SstCountWidth;	/**< Maximum width of Second Sequence Timer */
 	u32 IsPl;		/**< IsPl, 1= AXI Timebase ,0= WWDT  */
+#endif
+	u16 IntrId[2]; /**< Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /**< Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XWdtTb_Config;
 
 /**
