@@ -26,9 +26,13 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"	/* SDK generated parameters */
 #include "xrtcpsu.h"		/* RTCPSU device driver */
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"	/* SDK generated parameters */
+#else
+#include "xrtcpsu_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -37,7 +41,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define RTC_DEVICE_ID              XPAR_XRTCPSU_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -45,8 +51,11 @@
 #define ALARM_PERIOD 10U
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int RtcPsuAlarmPolledExample(u16 DeviceId);
+#else
+int RtcPsuAlarmPolledExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -72,7 +81,11 @@ int main(void)
 	 * Run the Rtc_Psu polled example , specify the the Device ID that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = RtcPsuAlarmPolledExample(RTC_DEVICE_ID);
+#else
+	Status = RtcPsuAlarmPolledExample(XRTCPSU_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("RTC Alarm Polled Mode Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -99,7 +112,11 @@ int main(void)
 * working correctly.
 *
 ****************************************************************************/
+#ifndef SDT
 int RtcPsuAlarmPolledExample(u16 DeviceId)
+#else
+int RtcPsuAlarmPolledExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XRtcPsu_Config *Config;
@@ -110,19 +127,28 @@ int RtcPsuAlarmPolledExample(u16 DeviceId)
 	 * Initialize the RTC driver so that it's ready to use.
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
+	xil_printf("\n NS:DRV:OLD:Lookupconfig\n");
 	Config = XRtcPsu_LookupConfig(DeviceId);
+#else
+	xil_printf("\n NS:DRV:Lookupconfig");
+	Config = XRtcPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
+	xil_printf("\n NS:DRV:Lookupconfig failed");
 		return XST_FAILURE;
 	}
 
 	Status = XRtcPsu_CfgInitialize(&Rtc_Psu, Config, Config->BaseAddr);
 	if (Status != XST_SUCCESS) {
+		xil_printf("\n NS:DRV:Cfgfail");
 		return XST_FAILURE;
 	}
 
 	/* Check hardware build. */
 	Status = XRtcPsu_SelfTest(&Rtc_Psu);
 	if (Status != XST_SUCCESS) {
+		xil_printf("\n NS:DRV: selftest fail ");
 		return XST_FAILURE;
 	}
 

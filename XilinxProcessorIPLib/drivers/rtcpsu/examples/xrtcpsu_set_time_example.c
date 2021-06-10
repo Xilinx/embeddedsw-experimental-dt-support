@@ -27,11 +27,14 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"	/* SDK generated parameters */
 #include "xrtcpsu.h"		/* RTCPSU device driver */
 #include "xil_printf.h"
 #include <stdio.h>
-
+#ifndef SDT
+#include "xparameters.h"	/* SDK generated parameters */
+#else
+#include "xrtcpsu_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 /*
@@ -39,7 +42,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define RTC_DEVICE_ID              XPAR_XRTCPSU_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -47,7 +52,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int RtcPsuSetTimeExample(u16 DeviceId);
+#else
+int RtcPsuSetTimeExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -74,7 +83,11 @@ int main(void)
 	 * Run the Rtc_Psu set time example , specify the the Device ID that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = RtcPsuSetTimeExample(RTC_DEVICE_ID);
+#else
+	Status = RtcPsuSetTimeExample(XRTCPSU_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("RTC Set time Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -99,7 +112,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int RtcPsuSetTimeExample(u16 DeviceId)
+#else
+int RtcPsuSetTimeExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u32 CurrentTime, DesiredTime,LastSetTime;
@@ -109,7 +126,11 @@ int RtcPsuSetTimeExample(u16 DeviceId)
 	 * Initialize the RTC driver so that it's ready to use.
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XRtcPsu_LookupConfig(DeviceId);
+#else
+	Config = XRtcPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
