@@ -46,14 +46,15 @@
 #include "xscugic.h"
 #include "xipipsu.h"
 #include "xipipsu_hw.h"
+#include "xinterrupt_wrap.h"
 
 /************************* Test Configuration ********************************/
 /* IPI device ID to use for this test */
+#ifndef SDT
 #define TEST_CHANNEL_ID	XPAR_XIPIPSU_0_DEVICE_ID
+#endif
 /* Test message length in words. Max is 8 words (32 bytes) */
 #define TEST_MSG_LEN	8
-/* Interrupt Controller device ID */
-#define INTC_DEVICE_ID	XPAR_SCUGIC_0_DEVICE_ID
 /* Time out parameter while polling for response */
 #define TIMEOUT_COUNT 10000
 
@@ -140,54 +141,6 @@ void IpiIntrHandler(void *XIpiPsuPtr)
 
 }
 
-
-static XStatus SetupInterruptSystem(XScuGic *IntcInstancePtr,
-		XIpiPsu *IpiInstancePtr, u32 IpiIntrId) {
-	u32 Status = 0;
-	XScuGic_Config *IntcConfig; /* Config for interrupt controller */
-
-	/* Initialize the interrupt controller driver */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(&GicInst, IntcConfig,
-			IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the
-	 * hardware interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler) XScuGic_InterruptHandler, IntcInstancePtr);
-
-	/*
-	 * Connect a device driver handler that will be called when an
-	 * interrupt for the device occurs, the device driver handler
-	 * performs the specific interrupt processing for the device
-	 */
-	 xil_printf("Interrupt ID: %d\r\n",IpiIntrId);
-	Status = XScuGic_Connect(IntcInstancePtr, IpiIntrId,
-			(Xil_InterruptHandler) IpiIntrHandler, (void *) IpiInstancePtr);
-
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/* Enable the interrupt for the device */
-	XScuGic_Enable(IntcInstancePtr, IpiIntrId);
-
-	/* Enable interrupts */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}
-
-
 /**
  * @brief	Tests the IPI by sending a message and checking the response
  */
@@ -201,7 +154,11 @@ static XStatus DoIpiTest(XIpiPsu *InstancePtr)
 	u32 TmpBuffer[TEST_MSG_LEN] = { 0 };
 
 	XIpiPsu_Config *DestCfgPtr;
+#ifndef SDT
 	DestCfgPtr = XIpiPsu_LookupConfig(TEST_CHANNEL_ID);
+#else
+	DestCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+#endif
 
 	xil_printf("Message Content:\r\n");
 	for (Index = 0; Index < TEST_MSG_LEN; Index++) {
@@ -264,13 +221,23 @@ int main() {
 	Xil_DCacheDisable();
 
 	/* Look Up the config data */
+#ifndef SDT
 	CfgPtr = XIpiPsu_LookupConfig(TEST_CHANNEL_ID);
+#else
+	CfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+#endif
 
 	/* Init with the Cfg Data */
 	XIpiPsu_CfgInitialize(&IpiInst, CfgPtr, CfgPtr->BaseAddress);
 
 	/* Setup the GIC */
-	SetupInterruptSystem(&GicInst, &IpiInst, (IpiInst.Config.IntId));
+	Status = XSetupInterruptSystem(&IpiInst, &IpiIntrHandler,
+			               IpiInst.Config.IntId,
+				       IpiInst.Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
 
 	/* Enable reception of IPIs from all CPUs */
 	XIpiPsu_InterruptEnable(&IpiInst, XIPIPSU_ALL_MASK);
