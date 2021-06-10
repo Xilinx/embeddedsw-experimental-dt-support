@@ -28,8 +28,12 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdttb.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdttb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 /*
@@ -37,7 +41,9 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define WDTTB_DEVICE_ID         XPAR_WDTTB_0_DEVICE_ID
+#endif
 /**************************** Type Definitions *******************************/
 
 
@@ -46,7 +52,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int GWdtTbExample(u16 DeviceId);
+#else
+int GWdtTbExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 XWdtTb GWatchdog;       /* The instance of the WatchDog Time Base */
@@ -74,7 +84,11 @@ int main(void)
          * Run the Generic Watchdog  example , specify the device ID that is generated in
          * xparameters.h
          */
+#ifndef SDT
         Status = GWdtTbExample(WDTTB_DEVICE_ID);
+#else
+	Status = GWdtTbExample(XWDTTB_BASEADDRESS);
+#endif
         if (Status != XST_SUCCESS)
         {
                 xil_printf("Generic WdtTb example failed\n\r");
@@ -105,7 +119,11 @@ int main(void)
  *
  ****************************************************************************/
 
+#ifndef SDT
 int GWdtTbExample(u16 DeviceId)
+#else
+int GWdtTbExample(UINTPTR BaseAddress)
+#endif
 {
         int Status;
         int RefreshReg=0;
@@ -115,7 +133,11 @@ int GWdtTbExample(u16 DeviceId)
          * Initialize the WDTPSV driver so that it's ready to use look up
          * configuration in the config table, then initialize it.
          */
+#ifndef SDT
         Config = XWdtTb_LookupConfig(DeviceId);
+#else
+	Config = XWdtTb_LookupConfig(BaseAddress);
+#endif
         if (NULL == Config) {
                 return XST_FAILURE;
         }

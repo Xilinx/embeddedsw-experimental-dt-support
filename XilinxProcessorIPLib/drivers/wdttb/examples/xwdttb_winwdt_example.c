@@ -32,8 +32,12 @@
 *****************************************************************************/
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdttb.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdttb_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -42,7 +46,9 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define WDTTB_DEVICE_ID		XPAR_WDTTB_0_DEVICE_ID
+#endif
 
 /*
  * These constants are user modifiable to enable or disable Secondary Sequence
@@ -84,7 +90,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int WinWdtTbExample(u16 DeviceId);
+#else
+int WinWdtTbExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -113,7 +123,11 @@ int main(void)
 	 * Call the example, specify the device ID that is generated
 	 * in xparameters.h
 	 */
+#ifndef SDT
 	Status = WinWdtTbExample(WDTTB_DEVICE_ID);
+#else
+	Status = WinWdtTbExample(XWDTTB_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Window WDT example failed\n\r");
 		return XST_FAILURE;
@@ -148,7 +162,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int WinWdtTbExample(u16 DeviceId)
+#else
+int WinWdtTbExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	int Count = 0;
@@ -158,7 +176,11 @@ int WinWdtTbExample(u16 DeviceId)
 	 * Initialize the WDTTB driver so that it's ready to use look up
 	 * configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XWdtTb_LookupConfig(DeviceId);
+#else
+	Config = XWdtTb_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -173,7 +195,11 @@ int WinWdtTbExample(u16 DeviceId)
 		return XST_FAILURE;
 	}
 
+#ifndef SDT
 	if(!WatchdogTimebase.Config.IsPl) {
+#else
+	if (!(strcmp(WatchdogTimebase.Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		/*Enable Window Watchdog Feature in WWDT */
 		XWdtTb_ConfigureWDTMode(&WatchdogTimebase, XWT_WWDT);
 	}
@@ -201,7 +227,11 @@ int WinWdtTbExample(u16 DeviceId)
 
 #if (WDTTB_EN_SST)
 	/* Configure Second sequence timer */
+#ifndef SDT
 	if(!WatchdogTimebase.Config.IsPl) {
+#else
+	if (!(strcmp(WatchdogTimebase.Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		XWdtTb_SetSSTWindow(&WatchdogTimebase, WDTTB_SST_COUNT);
 	}
 #endif
@@ -222,7 +252,11 @@ int WinWdtTbExample(u16 DeviceId)
 	XWdtTb_EnablePsm(&WatchdogTimebase);
 
 	/* Write TSR0 with signature */
+#ifndef SDT
 	if(WatchdogTimebase.Config.IsPl) {
+#else
+	if (!(strcmp(WatchdogTimebase.Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		XWdtTb_WriteReg(WatchdogTimebase.Config.BaseAddr, XWT_TSR0_OFFSET,
 			WDTTB_TSR_VAL);
 	} else {
@@ -266,7 +300,11 @@ int WinWdtTbExample(u16 DeviceId)
 			XWdtTb_SetRegSpaceAccessMode(&WatchdogTimebase, 1);
 
 			/* Write TSR1 with signature */
+#ifndef SDT
 			if(WatchdogTimebase.Config.IsPl) {
+#else
+			if (!(strcmp(WatchdogTimebase.Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 				XWdtTb_WriteReg(WatchdogTimebase.Config.BaseAddr,
 					XWT_TSR1_OFFSET, WDTTB_TSR_VAL);
 			} else {
@@ -321,7 +359,11 @@ int WinWdtTbExample(u16 DeviceId)
 
 	/* Clear reset pending */
 	XWdtTb_ClearResetPending(&WatchdogTimebase);
+#ifndef SDT
 	if(WatchdogTimebase.Config.IsPl) {
+#else
+	if (!(strcmp(WatchdogTimebase.Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		xil_printf("\n\rSST counter value is 0x%x\n\r",
 			XWdtTb_ReadReg(WatchdogTimebase.Config.BaseAddr,
 				XWT_STR_OFFSET));

@@ -25,8 +25,12 @@
 *****************************************************************************/
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdttb.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdttb_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -35,7 +39,9 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define WDTTB_DEVICE_ID         XPAR_WDTTB_0_DEVICE_ID
+#endif
 /**************************** Type Definitions *******************************/
 
 
@@ -43,7 +49,11 @@
 
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 int GWdtTbSelfTestExample(u16 DeviceId);
+#else
+int GWdtTbSelfTestExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 XWdtTb GWatchdog; /* The instance of the WatchDog Timer  */
@@ -69,7 +79,11 @@ int main(void)
          * Run the GWDT Self Test example , specify the device ID that is generated in
          * xparameters.h
          */
+#ifndef SDT
         Status = GWdtTbSelfTestExample(WDTTB_DEVICE_ID);
+#else
+	Status = GWdtTbSelfTestExample(XWDTTB_BASEADDRESS);
+#endif
         if (Status != XST_SUCCESS){
                 xil_printf("GWDT self test example failed\n\r");
                 return XST_FAILURE;
@@ -96,7 +110,11 @@ int main(void)
  *
  ****************************************************************************/
 
+#ifndef SDT
 int GWdtTbSelfTestExample(u16 DeviceId)
+#else
+int GWdtTbSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
         int Status;
         XWdtTb_Config *Config;
@@ -105,7 +123,11 @@ int GWdtTbSelfTestExample(u16 DeviceId)
          * Initialize the WDTTB driver so that it's ready to use look up
          * configuration in the config table, then initialize it.
          */
+#ifndef SDT
         Config = XWdtTb_LookupConfig(DeviceId);
+#else
+	Config = XWdtTb_LookupConfig(BaseAddress);
+#endif
         if (NULL == Config)
         {
                 return XST_FAILURE;

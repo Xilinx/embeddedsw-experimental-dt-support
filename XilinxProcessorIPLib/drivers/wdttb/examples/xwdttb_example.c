@@ -37,8 +37,12 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdttb.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdttb_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -47,8 +51,9 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define WDTTB_DEVICE_ID		XPAR_WDTTB_0_DEVICE_ID
-
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -57,9 +62,11 @@
 
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int WdtTbExample(u16 DeviceId);
-
+#else
+int WdtTbExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 XWdtTb WatchdogTimebase; /* Instance of WatchDog Timer Base */
@@ -85,7 +92,11 @@ int main(void)
 	 * Call the example , specify the device ID that is generated in
 	 * xparameters.h.
 	 */
+#ifndef SDT
 	Status = WdtTbExample(WDTTB_DEVICE_ID);
+#else
+	Status = WdtTbExample(XWDTTB_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("WDTTB example failed\n\r");
 		return XST_FAILURE;
@@ -122,7 +133,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int WdtTbExample(u16 DeviceId)
+#else
+int WdtTbExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	int Count = 0;
@@ -132,7 +147,11 @@ int WdtTbExample(u16 DeviceId)
 	 * Initialize the WDTTB driver so that it's ready to use look up
 	 * configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XWdtTb_LookupConfig(DeviceId);
+#else
+	Config = XWdtTb_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
