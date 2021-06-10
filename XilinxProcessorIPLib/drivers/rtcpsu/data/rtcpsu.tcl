@@ -22,4 +22,13 @@ proc generate {drv_handle} {
 
     ::hsi::utils::define_zynq_canonical_xpars $drv_handle "xparameters.h" "XRtcPsu" "DEVICE_ID" "C_S_AXI_BASEADDR" "C_S_AXI_HIGHADDR"
 
+    foreach i [get_sw_cores standalone*] {
+        set intr_wrapper_tcl_file "[get_property "REPOSITORY" $i]/data/intr_wrapper.tcl"
+        if {[file exists $intr_wrapper_tcl_file]} {
+            source $intr_wrapper_tcl_file
+            break
+        }
+    }
+
+    gen_intr $drv_handle "xparameters.h"
 }
