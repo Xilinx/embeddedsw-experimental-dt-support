@@ -28,11 +28,16 @@
 
 /***************************** Include Files *******************************/
 
-#include "xparameters.h"	/* SDK generated parameters */
 #include "xrtcpsu.h"		/* RTCPSU device driver */
 #include "xscugic.h"		/* Interrupt controller device driver */
 #include "xil_exception.h"
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"	/* SDK generated parameters */
+#else
+#include "xinterrupt_wrap.h"
+#include "xrtcpsu_example.h"
+#endif
 
 /************************** Constant Definitions **************************/
 
@@ -42,10 +47,11 @@
  * change all the needed parameters in one place.
  */
 
+#ifndef SDT
 #define RTC_DEVICE_ID         XPAR_XRTCPSU_0_DEVICE_ID
 #define INTC_DEVICE_ID			XPAR_SCUGIC_SINGLE_DEVICE_ID
 #define RTC_SEC_INT_IRQ_ID	XPAR_XRTCPSU_SECONDS_INTR
-
+#endif
 
 /**************************** Type Definitions ******************************/
 
@@ -54,6 +60,7 @@
 
 /************************** Function Prototypes *****************************/
 
+#ifndef SDT
 int RtcPsuSecondsIntrExample(XScuGic *IntcInstPtr, XRtcPsu *RtcInstPtr,
 			u16 DeviceId, u16 RtcIntrId);
 
@@ -61,6 +68,9 @@ int RtcPsuSecondsIntrExample(XScuGic *IntcInstPtr, XRtcPsu *RtcInstPtr,
 static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
 				XRtcPsu *RtcInstancePtr,
 				u16 RtcIntrId);
+#else
+int RtcPsuSecondsIntrExample(XRtcPsu *RtcInstPtr, UINTPTR BaseAddress);
+#endif
 
 void Handler(void *CallBackRef, u32 Event);
 
@@ -68,7 +78,9 @@ void Handler(void *CallBackRef, u32 Event);
 /************************** Variable Definitions ***************************/
 
 XRtcPsu RtcPsu;		/* Instance of the RTC Device */
+#ifndef SDT
 XScuGic InterruptController;	/* Instance of the Interrupt Controller */
+#endif
 volatile u32 Seconds = 0;
 
 
@@ -89,8 +101,12 @@ int main(void)
 	int Status;
 
 	/* Run the RtcPsu Interrupt example, specify the the Device ID */
+#ifndef SDT
 	Status = RtcPsuSecondsIntrExample(&InterruptController, &RtcPsu,
 				RTC_DEVICE_ID, RTC_SEC_INT_IRQ_ID);
+#else
+	Status = RtcPsuSecondsIntrExample(&RtcPsu, XRTCPSU_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("RTC Seconds Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -125,8 +141,12 @@ int main(void)
 * In this function ,if interrupts are not working it may never return.
 *
 **************************************************************************/
+#ifndef SDT
 int RtcPsuSecondsIntrExample(XScuGic *IntcInstPtr, XRtcPsu *RtcInstPtr,
 			u16 DeviceId, u16 RtcIntrId)
+#else
+int RtcPsuSecondsIntrExample(XRtcPsu *RtcInstPtr,UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XRtcPsu_Config *Config;
@@ -135,7 +155,11 @@ int RtcPsuSecondsIntrExample(XScuGic *IntcInstPtr, XRtcPsu *RtcInstPtr,
 	 * Initialize the RTC driver so that it's ready to use
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XRtcPsu_LookupConfig(DeviceId);
+#else
+	Config = XRtcPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -155,7 +179,14 @@ int RtcPsuSecondsIntrExample(XScuGic *IntcInstPtr, XRtcPsu *RtcInstPtr,
 	 * Connect the RTC to the interrupt subsystem such that interrupts
 	 * can occur. This function is application specific.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(IntcInstPtr, RtcInstPtr, RtcIntrId);
+#else
+	Status = XSetupInterruptSystem(RtcInstPtr,&XRtcPsu_InterruptHandler,
+				       Config->IntrId[1],
+				       Config->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -210,7 +241,7 @@ void Handler(void *CallBackRef, u32 Event)
 	}
 }
 
-
+#ifndef SDT
 /*****************************************************************************/
 /**
 *
@@ -283,3 +314,4 @@ static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
 
 	return XST_SUCCESS;
 }
+#endif
