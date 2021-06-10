@@ -36,8 +36,12 @@
 *****************************************************************************/
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdttb.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdttb_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -46,7 +50,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define TIMEBASE_WDT_DEVICE_ID  XPAR_WDTTB_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -56,7 +62,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int WdtTbSelfTestExample(u16 DeviceId);
+#else
+int WdtTbSelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -84,7 +94,11 @@ int main(void)
 	 * Run the Self Test example , specify the device ID that is generated in
 	 * xparameters.h
 	 */
+#ifndef SDT
 	Status = WdtTbSelfTestExample(TIMEBASE_WDT_DEVICE_ID);
+#else
+	Status = WdtTbSelfTestExample(XWDTTB_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS){
 		xil_printf("WDTTB self test example failed\n\r");
 		return XST_FAILURE;
@@ -122,7 +136,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int WdtTbSelfTestExample(u16 DeviceId)
+#else
+int WdtTbSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XWdtTb_Config *Config;
@@ -131,7 +149,11 @@ int WdtTbSelfTestExample(u16 DeviceId)
 	 * Initialize the WDTTB driver so that it's ready to use look up
 	 * configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XWdtTb_LookupConfig(DeviceId);
+#else
+	Config = XWdtTb_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -147,7 +169,11 @@ int WdtTbSelfTestExample(u16 DeviceId)
 	}
 
 	/*Enable Window Watchdog Feature in WWDT*/
+#ifndef SDT
 	if(!WatchdogTimebase.Config.IsPl) {
+#else
+	if (!(strcmp(WatchdogTimebase.Config.Name, "xlnx,versal-wwdt-1.0"))) {
+#endif
 		XWdtTb_ConfigureWDTMode(&WatchdogTimebase, XWT_WWDT);
 	}
 
