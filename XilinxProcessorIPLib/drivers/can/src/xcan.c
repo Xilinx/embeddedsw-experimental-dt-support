@@ -160,7 +160,11 @@ int XCan_Initialize(XCan *InstancePtr, UINTPTR BaseAddress)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XCan_VmInitialize(XCan *InstancePtr, u16 DeviceId, UINTPTR VirtAddr)
+#else
+int XCan_VmInitialize(XCan *InstancePtr, UINTPTR BaseAddress, UINTPTR VirtAddr)
+#endif
 {
 	XCan_Config *ConfigPtr;
 
@@ -1053,9 +1057,11 @@ XCan_Config *XCan_GetConfig(unsigned int InstanceIndex)
 {
 	XCan_Config *CfgPtr;
 
+#ifndef SDT
 	/* Check parameter */
 	if (InstanceIndex >= XPAR_XCAN_NUM_INSTANCES)
 		return NULL;
+#endif
 
 	CfgPtr = &XCan_ConfigTable[InstanceIndex];
 
