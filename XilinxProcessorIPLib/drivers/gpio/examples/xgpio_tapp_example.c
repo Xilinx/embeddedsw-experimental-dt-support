@@ -35,11 +35,15 @@
 
 /***************************** Include Files ********************************/
 
-#include "xparameters.h"
 #include "xgpio.h"
 #include "stdio.h"
 #include "xstatus.h"
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xgpio_example.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 
@@ -66,10 +70,12 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #ifndef TESTAPP_GEN
 #define GPIO_OUTPUT_DEVICE_ID	XPAR_GPIO_0_DEVICE_ID
 #define GPIO_INPUT_DEVICE_ID	XPAR_GPIO_0_DEVICE_ID
 #endif /* TESTAPP_GEN */
+#endif
 
 /**************************** Type Definitions ******************************/
 
@@ -79,9 +85,14 @@
 
 /************************** Function Prototypes ****************************/
 
+#ifndef SDT
 int GpioOutputExample(u16 DeviceId, u32 GpioWidth);
 
 int GpioInputExample(u16 DeviceId, u32 *DataRead);
+#else
+int GpioOutputExample(UINTPTR BaseAddress, u32 GpioWidth);
+int GpioInputExample(UINTPTR BaseAddress, u32 *DataRead);
+#endif
 
 void GpioDriverHandler(void *CallBackRef);
 
@@ -114,13 +125,21 @@ int main(void)
 	int Status;
 	u32 InputData;
 
+#ifndef SDT
 	Status = GpioOutputExample(GPIO_OUTPUT_DEVICE_ID, GPIO_BITWIDTH);
+#else
+	Status = GpioOutputExample(XGPIO_BASEADDRESS, GPIO_BITWIDTH);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Gpio tapp Example Failed\r\n");
 		  return XST_FAILURE;
 	}
 
+#ifndef SDT
 	Status = GpioInputExample(GPIO_INPUT_DEVICE_ID, &InputData);
+#else
+	Status = GpioInputExample(XGPIO_BASEADDRESS, &InputData);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Gpio tapp Example Failed\r\n");
 		  return XST_FAILURE;
@@ -152,7 +171,11 @@ int main(void)
 * @note		None
 *
 ****************************************************************************/
+#ifndef SDT
 int GpioOutputExample(u16 DeviceId, u32 GpioWidth)
+#else
+int GpioOutputExample(UINTPTR BaseAddress, u32 GpioWidth)
+#endif
 {
 	volatile int Delay;
 	u32 LedBit;
@@ -163,7 +186,11 @@ int GpioOutputExample(u16 DeviceId, u32 GpioWidth)
 	 * Initialize the GPIO driver so that it's ready to use,
 	 * specify the device ID that is generated in xparameters.h
 	 */
+#ifndef SDT
 	 Status = XGpio_Initialize(&GpioOutput, DeviceId);
+#else
+	Status = XGpio_Initialize(&GpioOutput, BaseAddress);
+#endif
 	 if (Status != XST_SUCCESS)  {
 		  return XST_FAILURE;
 	 }
@@ -224,7 +251,11 @@ int GpioOutputExample(u16 DeviceId, u32 GpioWidth)
 * @note	  	None.
 *
 ******************************************************************************/
+#ifndef SDT
 int GpioInputExample(u16 DeviceId, u32 *DataRead)
+#else
+int GpioInputExample(UINTPTR BaseAddress, u32 *DataRead)
+#endif
 {
 	 int Status;
 
@@ -232,7 +263,11 @@ int GpioInputExample(u16 DeviceId, u32 *DataRead)
 	  * Initialize the GPIO driver so that it's ready to use,
 	  * specify the device ID that is generated in xparameters.h
 	  */
+#ifndef SDT
 	 Status = XGpio_Initialize(&GpioInput, DeviceId);
+#else
+	 Status = XGpio_Initialize(&GpioInput, BaseAddress);
+#endif
 	 if (Status != XST_SUCCESS) {
 		  return XST_FAILURE;
 	 }

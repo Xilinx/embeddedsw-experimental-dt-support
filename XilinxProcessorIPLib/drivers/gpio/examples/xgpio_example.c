@@ -37,9 +37,13 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xgpio.h"
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xgpio_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -50,7 +54,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define GPIO_EXAMPLE_DEVICE_ID  XPAR_GPIO_0_DEVICE_ID
+#endif
 
 /*
  * The following constant is used to wait after an LED is turned on to make
@@ -122,7 +128,11 @@ int main(void)
 	volatile int Delay;
 
 	/* Initialize the GPIO driver */
+#ifndef SDT
 	Status = XGpio_Initialize(&Gpio, GPIO_EXAMPLE_DEVICE_ID);
+#else
+	Status = XGpio_Initialize(&Gpio, XGPIO_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Gpio Initialization Failed\r\n");
 		return XST_FAILURE;
