@@ -30,10 +30,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xttcps.h"
 #include "xil_printf.h"
+#include "xttcps_example.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -42,12 +42,11 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
-#define PCLK_FREQ_HZ		XPAR_XTTCPS_0_CLOCK_HZ /* Input freq */
 #define TTC_NUM_DEVICES		2
 
 #define TABLE_OFFSET		6
 #define MAX_LOOP_COUNT		0xFF
-
+#define TTC_COUNTER_OFFSET	4U
 /**************************** Type Definitions *******************************/
 
 typedef struct {
@@ -72,9 +71,9 @@ static int TmrCtrLowLevelExample(u8 SettingsTableOffset);
  * Convert from a 0-2 index to the correct timer counter number as defined in
  * xttcps_hw.h
  */
-static u32 TimerCounterBaseAddr[] = {
-	XPAR_XTTCPS_0_BASEADDR,
-	XPAR_XTTCPS_1_BASEADDR
+static u32 TimerCounterBaseAddr[2][2] = {
+	{XTTCPS_BASEADDRESS,XTTCPS_COUNTER_NUM1},
+	{XTTCPS_BASEADDRESS,XTTCPS_COUNTER_NUM2}
 };
 
 /*
@@ -178,6 +177,7 @@ int TmrCtrLowLevelExample(u8 SettingsTableOffset)
 	u32 TmrCtrBaseAddress;
 	u32 IntervalValue, MatchValue;
 	TmrCntrSetup *CurrSetup;
+	XTtcPs_Config *CfgPtr = NULL;
 
 	/*
 	 * Assert on the value of constants calculated above
@@ -191,7 +191,15 @@ int TmrCtrLowLevelExample(u8 SettingsTableOffset)
 		/*
 		 * Set the timer counter number to use
 		 */
-		TmrCtrBaseAddress = TimerCounterBaseAddr[LoopCount];
+		TmrCtrBaseAddress = TimerCounterBaseAddr[LoopCount][0];
+
+		CfgPtr = XTtcPs_LookupConfig(TmrCtrBaseAddress);
+		if (CfgPtr == NULL) {
+			return XST_FAILURE;
+		}
+			
+
+		TmrCtrBaseAddress += (TimerCounterBaseAddr[LoopCount][1] * TTC_COUNTER_OFFSET); 
 
 		/* And get the setup for that counter
 		 */
@@ -222,7 +230,7 @@ int TmrCtrLowLevelExample(u8 SettingsTableOffset)
 		 * the waveform. The counter will be reset to 0 each time this
 		 * value is reached.
 		 */
-		IntervalValue = PCLK_FREQ_HZ /
+		IntervalValue = CfgPtr->InputClockHz /
 			(u32) (PrescalerSettings[CurrSetup->PrescalerValue] *
 			       CurrSetup->OutputHz);
 

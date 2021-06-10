@@ -43,30 +43,20 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xil_io.h"
 #include "xil_exception.h"
 #include "xttcps.h"
-#include "xscugic.h"
 #include "xil_printf.h"
 #include "xil_util.h"
+#include "xttcps_example.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
-/*
- * The following constants map to the XPAR parameters created in the
- * xparameters.h file. They are only defined here such that a user can easily
- * change all the needed parameters in one place.
- */
-#ifndef TESTAPP_GEN
-#define TTC_TICK_DEVICE_ID	XPAR_XTTCPS_0_DEVICE_ID
-#define TTC_TICK_INTR_ID	XPAR_XTTCPS_0_INTR
-#endif
-
-#define INTC_DEVICE_ID		XPAR_SCUGIC_0_DEVICE_ID
 #define	TICK_TIMER_FREQ_HZ	100  /* Tick timer counter's output frequency */
 #define XTTCPS_SW_TIMEOUT_VAL	10000000U /* Wait for 10 sec */
+#define TTC_COUNTER_OFFSET	4U
 
 /**************************** Type Definitions *******************************/
 typedef struct {
@@ -81,16 +71,11 @@ typedef struct {
 
 /************************** Function Prototypes ******************************/
 
-int TmrInterruptExample(XTtcPs *TtcPsInst,u16 DeviceID, u16 TtcTickIntrID,
-						XScuGic *InterruptController);  /* Main test */
+int TmrInterruptExample(XTtcPs *TtcPsInst,UINTPTR BaseAddr);  /* Main test */
 
 /* Set up routines for timer counters */
-static int SetupTicker(XTtcPs *TtcPsInst,u16 DeviceID, u16 TtcTickIntrID,
-						XScuGic *InterruptController);
-static int SetupTimer(u16 DeviceID, XTtcPs *TtcPsInst);
-
-static int SetupInterruptSystem(u16 IntcDeviceID, XScuGic *IntcInstancePtr);
-
+static int SetupTicker(XTtcPs *TtcPsInst, UINTPTR BaseAddr, u16 CounterNum);
+static int SetupTimer(UINTPTR BaseAddr, XTtcPs *TtcPsInst, u16 CounterNum);
 static void TickHandler(void *CallBackRef, u32 StatusEvent);
 
 /************************** Variable Definitions *****************************/
@@ -101,7 +86,6 @@ static TmrCntrSetup SettingsTable=
 static volatile u32 UpdateFlag;	/* Flag to update the seconds counter */
 
 #ifndef TESTAPP_GEN
-XScuGic InterruptController;  	/* Interrupt controller instance */
 static XTtcPs TtcPsInst;  /* Timer counter instance */
 #endif
 
@@ -126,8 +110,7 @@ int main(void)
 	int Status;
 
 	xil_printf("Starting Timer interrupt Example \r\n");
-	Status = TmrInterruptExample(&TtcPsInst, TTC_TICK_DEVICE_ID,
-								TTC_TICK_INTR_ID, &InterruptController);
+	Status = TmrInterruptExample(&TtcPsInst, XTTCPS_BASEADDRESS);
 	if (Status != XST_SUCCESS) {
 		xil_printf("ttcps tapp Example Failed\r\n!");
 		return XST_FAILURE;
@@ -144,33 +127,22 @@ int main(void)
 *
 *
 * @param	TtcPsInst is a pointer to the ttc instance.
-* @param	DeviceID is the unique ID for the device.
-* @param	TtcTickIntrID is the unique interrupt ID for the timer.
-* @param	InterruptController is a pointer to the interrupt controller
-*			instance..
+* @param	BaseAddr is the base address for the device..
 *
 * @return	XST_SUCCESS to indicate success, else XST_FAILURE to indicate
 *		a Failure.
 *
 ****************************************************************************/
-int TmrInterruptExample(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
-						XScuGic *InterruptController)
+int TmrInterruptExample(XTtcPs *TtcPsInst,UINTPTR BaseAddr)
 {
-	int Status,Index;
+	int Status;
+	u16 CounterNum = 0;
 
-	/*
-	 * Connect the Intc to the interrupt subsystem such that interrupts can
-	 * occur.  This function is application specific.
-	 */
-	Status = SetupInterruptSystem(INTC_DEVICE_ID, InterruptController);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
 	/*
 	 * TTC interrupt example is setup and run for all the three timer/counter
 	 * one after another.
 	 */
-	for(Index = 0; Index < 3; Index++){
+	for(CounterNum = 0; CounterNum < 3; CounterNum++){
 
 		UpdateFlag = 0;
 
@@ -178,8 +150,7 @@ int TmrInterruptExample(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 		 * Set up  the Ticker timer
 		 */
 
-		Status = SetupTicker(TtcPsInst,DeviceID,TtcTickIntrID,
-						InterruptController);
+		Status = SetupTicker(TtcPsInst,BaseAddr,CounterNum);
 		if (Status != XST_SUCCESS) {
 				return XST_FAILURE;
 		}
@@ -195,6 +166,7 @@ int TmrInterruptExample(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 		}
 		DeviceID++;
 		TtcTickIntrID++;
+		CounterNum++;
 
 		/*
 		 * Stop the counter
@@ -212,7 +184,7 @@ int TmrInterruptExample(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 * This function sets up the Ticker timer.
 *
 * @param	TtcPsInst is a pointer to the ttc instance.
-* @param	DeviceID is the unique ID for the device.
+* @param	BaseAddr is the unique ID for the device.
 * @param	TtcTickIntrID is the unique interrupt ID for the timer.
 * @param	InterruptController is a pointer to the interrupt controller
 *			instance..
@@ -220,8 +192,7 @@ int TmrInterruptExample(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 * @return	XST_SUCCESS if everything sets up well, XST_FAILURE otherwise.
 *
 *****************************************************************************/
-int SetupTicker(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
-				XScuGic *InterruptController)
+int SetupTicker(XTtcPs *TtcPsInst,UINTPTR BaseAddr,u16 CounterNum)
 {
 	int Status;
 	TmrCntrSetup *TimerSetup;
@@ -241,7 +212,7 @@ int SetupTicker(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 	 *  . initialize device
 	 *  . set options
 	 */
-	Status = SetupTimer(DeviceID,TtcPsInst);
+	Status = SetupTimer(BaseAddr,TtcPsInst,CounterNum);
 	if(Status != XST_SUCCESS) {
 		return Status;
 	}
@@ -251,18 +222,15 @@ int SetupTicker(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 	/*
 	 * Connect to the interrupt controller
 	 */
-	Status = XScuGic_Connect(InterruptController, TtcTickIntrID,
-		(Xil_InterruptHandler)XTtcPs_InterruptHandler, (void *)TtcPsTick);
+	Status = XSetupInterruptSystem(TtcPsTick, (Xil_ExceptionHandler)XTtcPs_InterruptHandler, \
+			TtcPsTick->Config.IntrId[CounterNum], TtcPsTick->Config.IntrParent, \
+			XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
+
 	XTtcPs_SetStatusHandler(TtcPsInst, TtcPsInst,
 					 (XTtcPs_StatusHandler) TickHandler);
-
-	/*
-	 * Enable the interrupt for the Timer counter
-	 */
-	XScuGic_Enable(InterruptController, TtcTickIntrID);
 
 	/*
 	 * Enable the interrupts for the tick timer/counter
@@ -281,22 +249,22 @@ int SetupTicker(XTtcPs *TtcPsInst,u16 DeviceID,u16 TtcTickIntrID,
 *
 * This function sets up a timer counter device, using the information in its
 * setup structure.
-*  . initialize device
 *  . set options
 *  . set interval and prescaler value for given output frequency.
 *
-* @param	DeviceID is the unique ID for the device.
+* @param	BaseAddr is the base address for the device.
 * @param	TtcPsInst is a pointer to the ttc instance.
 *
 * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
 *
 *****************************************************************************/
-int SetupTimer(u16 DeviceID,XTtcPs *TtcPsInst)
+int SetupTimer(UINTPTR BaseAddr,XTtcPs *TtcPsInst,u16 CounterNum)
 {
 	int Status;
 	XTtcPs_Config *Config;
 	XTtcPs *Timer;
 	TmrCntrSetup *TimerSetup;
+	UINTPTR EffectiveAddr;
 
 	TimerSetup = &SettingsTable;
 
@@ -305,15 +273,17 @@ int SetupTimer(u16 DeviceID,XTtcPs *TtcPsInst)
 	/*
 	 * Look up the configuration based on the device identifier
 	 */
-	Config = XTtcPs_LookupConfig(DeviceID);
+	Config = XTtcPs_LookupConfig(BaseAddr);
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
 	/*
 	 * Initialize the device
 	 */
-	Status = XTtcPs_CfgInitialize(Timer, Config, Config->BaseAddress);
-	if (Status != XST_SUCCESS) {
+	EffectiveAddr = (Config->BaseAddress + CounterNum * TTC_COUNTER_OFFSET);
+
+	Status = XTtcPs_CfgInitialize(Timer, Config, EffectiveAddr);
+	if (Status == XST_FAILURE) {
 		return XST_FAILURE;
 	}
 
@@ -336,61 +306,6 @@ int SetupTimer(u16 DeviceID,XTtcPs *TtcPsInst)
 	 */
 	XTtcPs_SetInterval(Timer, TimerSetup->Interval);
 	XTtcPs_SetPrescaler(Timer, TimerSetup->Prescaler);
-
-	return XST_SUCCESS;
-}
-
-/****************************************************************************/
-/**
-*
-* This function setups the interrupt system such that interrupts can occur.
-* This function is application specific since the actual system may or may not
-* have an interrupt controller.  The TTC could be directly connected to a
-* processor without an interrupt controller.  The user should modify this
-* function to fit the application.
-*
-* @param	IntcDeviceID is the unique ID of the interrupt controller
-* @param	IntcInstacePtr is a pointer to the interrupt controller
-*		instance.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-*****************************************************************************/
-static int SetupInterruptSystem(u16 IntcDeviceID,
-				    XScuGic *IntcInstancePtr)
-{
-	int Status;
-	XScuGic_Config *IntcConfig; /* The configuration parameters of the
-					   interrupt controller */
-
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	IntcConfig = XScuGic_LookupConfig(IntcDeviceID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the ARM processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-				IntcInstancePtr);
-
-
-	/*
-	 * Enable interrupts in the ARM
-	 */
-	Xil_ExceptionEnable();
 
 	return XST_SUCCESS;
 }
