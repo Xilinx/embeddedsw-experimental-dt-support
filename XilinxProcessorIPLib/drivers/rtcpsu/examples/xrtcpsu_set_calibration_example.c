@@ -30,12 +30,15 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"	/* SDK generated parameters */
 #include "xrtcpsu.h"		/* RTCPSU device driver */
 #include "xil_printf.h"
 #include <stdio.h>
 #include "sleep.h"
-
+#ifndef SDT
+#include "xparameters.h"	/* SDK generated parameters */
+#else
+#include "xrtcpsu_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 /*
@@ -43,7 +46,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define RTC_DEVICE_ID              XPAR_XRTCPSU_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -51,7 +56,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int RtcPsuSetCalibrationExample(u16 DeviceId);
+#else
+int RtcPsuSetCalibrationExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -78,7 +87,11 @@ int main(void)
 	 * Run the Rtc_Psu set calibration example , specify the the Device ID
 	 * that is generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = RtcPsuSetCalibrationExample(RTC_DEVICE_ID);
+#else
+	Status = RtcPsuSetCalibrationExample(XRTCPSU_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("RTC Set Calibration Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -103,7 +116,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int RtcPsuSetCalibrationExample(u16 DeviceId)
+#else
+int RtcPsuSetCalibrationExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u32 NetworkTime;
@@ -114,7 +131,11 @@ int RtcPsuSetCalibrationExample(u16 DeviceId)
 	 * Initialize the RTC driver so that it's ready to use.
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XRtcPsu_LookupConfig(DeviceId);
+#else
+	Config = XRtcPsu_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
