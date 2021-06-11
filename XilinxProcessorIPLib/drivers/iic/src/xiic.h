@@ -385,6 +385,10 @@ typedef struct {
 	UINTPTR BaseAddress;  /**< Device base address */
 	int Has10BitAddr; /**< Does device have 10 bit address decoding */
 	u8 GpOutWidth;	  /**< Number of bits in general purpose output */
+	u16 IntrId;             /** Bits[11:0] Interrupt-id Bits[15:12]
+				 * trigger type and level flags */
+	UINTPTR IntrParent;     /** Bit[0] Interrupt parent type Bit[64/32:1]
+				 * Parent base address */
 } XIic_Config;
 
 /****************************************************************************/
