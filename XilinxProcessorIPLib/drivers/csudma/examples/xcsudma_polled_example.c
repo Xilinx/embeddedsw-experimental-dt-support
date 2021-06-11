@@ -28,7 +28,11 @@
 /***************************** Include Files *********************************/
 
 #include "xcsudma.h"
+#ifndef SDT
 #include "xparameters.h"
+#else
+#include "xcsudma_example.h"
+#endif
 
 /************************** Function Prototypes ******************************/
 
@@ -92,7 +96,7 @@ int main(void)
 #ifndef SDT
 	Status = XCsuDma_PolledExample((u16)CSUDMA_DEVICE_ID);
 #else
-	Status = XCsuDma_PolledExample(XPAR_CSUDMA_0_BASEADDR);
+	Status = XCsuDma_PolledExample(XCSUDMA_BASEADDRESS);
 #endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CSU_DMA Polled Example Failed\r\n");

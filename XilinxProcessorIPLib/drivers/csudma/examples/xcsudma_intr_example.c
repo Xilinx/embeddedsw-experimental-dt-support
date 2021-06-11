@@ -40,7 +40,11 @@
 /***************************** Include Files *********************************/
 
 #include "xcsudma.h"
+#ifndef SDT
 #include "xparameters.h"
+#else
+#include "xcsudma_example.h"
+#endif
 #include "xil_exception.h"
 #include "xinterrupt_wrap.h"
 
@@ -121,7 +125,7 @@ int main(void)
 #ifndef SDT
 	Status = XCsuDma_IntrExample(&CsuDma, (u16)CSUDMA_DEVICE_ID);
 #else
-	Status = XCsuDma_IntrExample(&CsuDma, XPAR_XCSUDMA_0_BASEADDR);
+	Status = XCsuDma_IntrExample(&CsuDma, XCSUDMA_BASEADDRESS);
 #endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("CSU_DMA Interrupt Example Failed\r\n");
