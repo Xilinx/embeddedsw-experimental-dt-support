@@ -48,9 +48,12 @@
 
 #include "xparameters.h"
 #include "xiic.h"
-#include "xintc.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
+#ifdef SDT
+#include "xiic_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -59,10 +62,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define IIC_DEVICE_ID		XPAR_IIC_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#define IIC_INTR_ID		XPAR_INTC_0_IIC_0_VEC_ID
-
+#endif
 /*
  * The following constant defines the address of the IIC device on the IIC bus.
  * Since the address is 10 bits, this constant is the address divided by 2.
@@ -81,7 +83,6 @@
 int IicTenBitAddrExample();
 int TenBitAddrWriteData(u16 ByteCount);
 int TenBitAddrReadData(u8 *BufferPtr, u16 ByteCount);
-static int SetupInterruptSystem(XIic *IicInstPtr);
 static void StatusHandler(XIic *InstancePtr, int Event);
 static void SendHandler(XIic *InstancePtr);
 static void ReceiveHandler(XIic *InstancePtr);
@@ -89,8 +90,6 @@ static void ReceiveHandler(XIic *InstancePtr);
 /************************** Variable Definitions *****************************/
 
 XIic IicInstance;		/* The instance of the IIC device. */
-XIntc InterruptController;	/* The instance of the Interrupt Controller */
-
 
 u8 WriteBuffer[SEND_COUNT];	/* Write buffer for writing a page. */
 u8 ReadBuffer[RECEIVE_COUNT];	/* Read buffer for reading a page. */
@@ -152,7 +151,11 @@ int IicTenBitAddrExample(void)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
+#ifndef SDT
 	ConfigPtr = XIic_LookupConfig(IIC_DEVICE_ID);
+#else
+	ConfigPtr = XIic_LookupConfig(XIIC_BASEADDRESS);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -171,7 +174,9 @@ int IicTenBitAddrExample(void)
 	/*
 	 * Setup the Interrupt System.
 	 */
-	Status = SetupInterruptSystem(&IicInstance);
+	Status = XSetupInterruptSystem(&IicInstance,  &XIic_InterruptHandler,
+					ConfigPtr->IntrId, ConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -410,80 +415,3 @@ static void ReceiveHandler(XIic *InstancePtr)
 	ReceiveComplete = 0;
 }
 
-/****************************************************************************/
-/**
-* This function setups the interrupt system so interrupts can occur for the
-* IIC. The function is application-specific since the actual system may or
-* may not have an interrupt controller. The IIC device could be directly
-* connected to a processor without an interrupt controller. The user should
-* modify this function to fit the application.
-*
-* @param	IicInstPtr contains a pointer to the instance of the IIC  which
-*		is going to be connected to the interrupt controller.
-*
-* @return	XST_SUCCESS if successful else XST_FAILURE.
-*
-* @note		None.
-*
-****************************************************************************/
-static int SetupInterruptSystem(XIic * IicInstPtr)
-{
-	int Status;
-
-	if (InterruptController.IsStarted == XIL_COMPONENT_IS_STARTED) {
-		return XST_SUCCESS;
-	}
-
-	/*
-	 * Initialize the interrupt controller driver so that it's ready to use.
-	 */
-	Status = XIntc_Initialize(&InterruptController, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XIntc_Connect(&InterruptController, IIC_INTR_ID,
-				   (XInterruptHandler) XIic_InterruptHandler,
-				   IicInstPtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Start the interrupt controller so interrupts are enabled for all
-	 * devices that cause interrupts.
-	 */
-	Status = XIntc_Start(&InterruptController, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Enable the interrupts for the IIC device.
-	 */
-	XIntc_Enable(&InterruptController, IIC_INTR_ID);
-
-	/*
-	 * Initialize the exception table.
-	 */
-	Xil_ExceptionInit();
-
-	/*
-	 * Register the interrupt controller handler with the exception table.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				 (Xil_ExceptionHandler) XIntc_InterruptHandler,
-				 &InterruptController);
-
-	/*
-	 * Enable non-critical exceptions.
-	 */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}

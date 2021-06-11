@@ -35,6 +35,9 @@
 #include "xparameters.h"
 #include "xiic.h"
 #include "xil_printf.h"
+#ifdef SDT
+#include "xiic_example.h"
+#endif
 
 /************************** Constant Definitions ******************************/
 
@@ -43,8 +46,10 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #ifndef TESTAPP_GEN
 #define IIC_DEVICE_ID	   XPAR_IIC_0_DEVICE_ID
+#endif
 #endif
 
 /**************************** Type Definitions ********************************/
@@ -54,9 +59,11 @@
 
 
 /************************** Function Prototypes *******************************/
-
+#ifndef SDT
 int IicSelfTestExample(u16 DeviceId);
-
+#else
+int IicSelfTestExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions ******************************/
 
 /*
@@ -86,7 +93,11 @@ int main(void)
 	 * Run the example, specify the device ID that is generated in
 	 * xparameters.h.
 	 */
+#ifndef SDT
 	Status = IicSelfTestExample(IIC_DEVICE_ID);
+#else
+	Status = IicSelfTestExample(XIIC_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("IIC selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -112,7 +123,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int IicSelfTestExample(u16 DeviceId)
+#else
+int IicSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XIic_Config *ConfigPtr;	/* Pointer to configuration data */
@@ -120,7 +135,11 @@ int IicSelfTestExample(u16 DeviceId)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
+#ifndef SDT
 	ConfigPtr = XIic_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XIic_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
