@@ -38,6 +38,9 @@
 
 #include "xparameters.h"
 #include "xiic_l.h"
+#ifdef SDT
+#include "xiic_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -46,8 +49,11 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define IIC_BASE_ADDRESS	XPAR_IIC_0_BASEADDR
-
+#else
+#define IIC_BASE_ADDRESS	XIIC_BASEADDRESS
+#endif
 
 /*
  * The following constant defines the address of the IIC

@@ -108,11 +108,9 @@
 #include "xiic.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
-
-#ifdef XPAR_INTC_0_DEVICE_ID
- #include "xintc.h"
-#else
- #include "xscugic.h"
+#include "xinterrupt_wrap.h"
+#ifdef SDT
+#include "xiic_example.h"
 #endif
 
 /************************** Constant Definitions *****************************/
@@ -122,22 +120,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define IIC_DEVICE_ID	XPAR_IIC_0_DEVICE_ID
-
-
-
-#ifdef XPAR_INTC_0_DEVICE_ID
- #define INTC_DEVICE_ID	XPAR_INTC_0_DEVICE_ID
- #define IIC_INTR_ID	XPAR_INTC_0_IIC_0_VEC_ID
- #define INTC			XIntc
- #define INTC_HANDLER	XIntc_InterruptHandler
-#else
- #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
- #define IIC_INTR_ID		XPAR_FABRIC_IIC_0_VEC_ID
- #define INTC			 	XScuGic
- #define INTC_HANDLER		XScuGic_InterruptHandler
 #endif
-
 
 /*
  * The following constant defines the address of the IIC Slave device on the
@@ -151,7 +136,6 @@
  */
 #define EEPROM_ADDRESS 		0x54	/* 0xA0 as an 8 bit number. */
 
-
 /*
  * The IIC_MUX_ADDRESS defines the address of the IIC MUX device on the
  * IIC bus. Note that since the address is only 7 bits, this constant is the
@@ -163,7 +147,7 @@
  * boards for further information about the Channel number to use EEPROM.
  */
 #define IIC_MUX_ADDRESS 		0x74
-#define IIC_EEPROM_CHANNEL		0x08
+#define IIC_EEPROM_CHANNEL		0x01
 
 /*
  * This define should be uncommented if there is IIC MUX on the board to which
@@ -204,8 +188,6 @@ int EepromWriteData(u16 ByteCount);
 
 int EepromReadData(u8 *BufferPtr, u16 ByteCount);
 
-static int SetupInterruptSystem(XIic *IicInstPtr);
-
 static void SendHandler(XIic *InstancePtr);
 
 static void ReceiveHandler(XIic *InstancePtr);
@@ -218,7 +200,6 @@ static int MuxInit(void);
 /************************** Variable Definitions *****************************/
 
 XIic IicInstance;	/* The instance of the IIC device. */
-INTC Intc; 	/* The instance of the Interrupt Controller Driver */
 
 /*
  * Write buffer for writing a page.
@@ -282,7 +263,11 @@ int IicEepromExample(void)
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
+#ifndef SDT
 	ConfigPtr = XIic_LookupConfig(IIC_DEVICE_ID);
+#else
+	ConfigPtr = XIic_LookupConfig(XIIC_BASEADDRESS);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -296,7 +281,9 @@ int IicEepromExample(void)
 	/*
 	 * Setup the Interrupt System.
 	 */
-	Status = SetupInterruptSystem(&IicInstance);
+	Status = XSetupInterruptSystem(&IicInstance, &XIic_InterruptHandler,
+					ConfigPtr->IntrId, ConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -583,120 +570,6 @@ int EepromReadData(u8 *BufferPtr, u16 ByteCount)
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
-* This function setups the interrupt system so interrupts can occur for the
-* IIC device. The function is application-specific since the actual system may
-* or may not have an interrupt controller. The IIC device could be directly
-* connected to a processor without an interrupt controller. The user should
-* modify this function to fit the application.
-*
-* @param	IicInstPtr contains a pointer to the instance of the IIC device
-*		which is going to be connected to the interrupt controller.
-*
-* @return	XST_SUCCESS if successful else XST_FAILURE.
-*
-* @note		None.
-*
-******************************************************************************/
-static int SetupInterruptSystem(XIic *IicInstPtr)
-{
-	int Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-
-	/*
-	 * Initialize the interrupt controller driver so that it's ready to use.
-	 */
-	Status = XIntc_Initialize(&Intc, INTC_DEVICE_ID);
-
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XIntc_Connect(&Intc, IIC_INTR_ID,
-				   (XInterruptHandler) XIic_InterruptHandler,
-				   IicInstPtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Start the interrupt controller so interrupts are enabled for all
-	 * devices that cause interrupts.
-	 */
-	Status = XIntc_Start(&Intc, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Enable the interrupts for the IIC device.
-	 */
-	XIntc_Enable(&Intc, IIC_INTR_ID);
-
-#else
-
-	XScuGic_Config *IntcConfig;
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(&Intc, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	XScuGic_SetPriorityTriggerType(&Intc, IIC_INTR_ID,
-					0xA0, 0x3);
-
-	/*
-	 * Connect the interrupt handler that will be called when an
-	 * interrupt occurs for the device.
-	 */
-	Status = XScuGic_Connect(&Intc, IIC_INTR_ID,
-				 (Xil_InterruptHandler)XIic_InterruptHandler,
-				 IicInstPtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the IIC device.
-	 */
-	XScuGic_Enable(&Intc, IIC_INTR_ID);
-
-#endif
-
-	/*
-	 * Initialize the exception table and register the interrupt
-	 * controller handler with the exception table
-	 */
-	Xil_ExceptionInit();
-
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			 (Xil_ExceptionHandler)INTC_HANDLER, &Intc);
-
-	/* Enable non-critical exceptions */
-	Xil_ExceptionEnable();
-
-
 
 	return XST_SUCCESS;
 }
