@@ -26,9 +26,13 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xwdtps.h"
 #include "xil_printf.h"
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xwdtps_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -37,7 +41,9 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define WDT_DEVICE_ID  		XPAR_XWDTPS_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -47,8 +53,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int WdtPsPolledExample(u16 DeviceId);
-
+#else
+int WdtPsPolledExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 XWdtPs Watchdog;		/* Instance of WatchDog Timer  */
@@ -74,7 +83,11 @@ int main(void)
 	 * Call the example , specify the device ID that is generated in
 	 * xparameters.h.
 	 */
+#ifndef SDT
 	Status = WdtPsPolledExample(WDT_DEVICE_ID);
+#else
+	Status = WdtPsPolledExample(XWDTPS_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("WDT Polled Mode Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -106,7 +119,11 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int WdtPsPolledExample(u16 DeviceId)
+#else
+int WdtPsPolledExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u32 ExpiredTimeDelta1 = 0;
@@ -117,8 +134,11 @@ int WdtPsPolledExample(u16 DeviceId)
 	/*
 	 * Initialize the Watchdog Timer so that it is ready to use
 	 */
+#ifndef SDT
 	ConfigPtr = XWdtPs_LookupConfig(DeviceId);
-
+#else
+	ConfigPtr = XWdtPs_LookupConfig(BaseAddress);
+#endif
 	/*
 	 * This is where the virtual address would be used, this example
 	 * uses physical address.
