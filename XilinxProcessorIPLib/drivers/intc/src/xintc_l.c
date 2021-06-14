@@ -59,10 +59,12 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xil_types.h"
 #include "xil_assert.h"
 #include "xintc.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 #include "xintc_i.h"
 
 /************************** Constant Definitions *****************************/
@@ -332,10 +334,18 @@ void XIntc_SetIntrSvcOption(UINTPTR BaseAddress, int Option)
 		/* If Cascade mode set the option for all Slaves */
 		if (CfgPtr->IntcType != XIN_INTC_NOCASCADE) {
 			int Index;
+#ifndef SDT
 			for (Index = 1; Index <= XPAR_XINTC_NUM_INSTANCES - 1;
 					Index++) {
 				CfgPtr = XIntc_LookupConfig(Index);
 				CfgPtr->Options = Option;
+			}
+#else
+			for (Index = 1;  XIntc_ConfigTable[Index].Name != NULL;
+					Index++) {
+				CfgPtr = XIntc_LookupConfig(XIntc_ConfigTable[Index].BaseAddress);
+				CfgPtr->Options = Option;
+#endif
 			}
 		}
 	}
@@ -429,7 +439,11 @@ static XIntc_Config *LookupConfigByBaseAddress(UINTPTR BaseAddress)
 	XIntc_Config *CfgPtr = NULL;
 	int Index;
 
+#ifndef SDT
 	for (Index = 0; Index < XPAR_XINTC_NUM_INSTANCES; Index++) {
+#else
+	for (Index = 0; XIntc_ConfigTable[Index].Name != NULL; Index++) {
+#endif
 		if (XIntc_ConfigTable[Index].BaseAddress == BaseAddress) {
 			CfgPtr = &XIntc_ConfigTable[Index];
 			if (CfgPtr == NULL) {

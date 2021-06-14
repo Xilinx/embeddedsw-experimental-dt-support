@@ -69,7 +69,10 @@ extern "C" {
 
 #include "xil_types.h"
 #include "xil_assert.h"
+#include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xil_io.h"
 
 /*

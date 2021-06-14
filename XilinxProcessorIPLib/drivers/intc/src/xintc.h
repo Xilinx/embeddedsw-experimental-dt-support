@@ -273,6 +273,10 @@ extern "C" {
 #define XINTC_STANDARD_VECTOR_ADDRESS_WIDTH	32U
 /*@}*/
 
+#ifdef SDT
+#define XPAR_INTC_MAX_NUM_INTR_INPUTS 32
+#endif
+
 /**************************** Type Definitions *******************************/
 
 /**
@@ -329,7 +333,11 @@ typedef struct {
 /*
  * Required functions in xintc.c
  */
+#ifndef SDT
 int XIntc_Initialize(XIntc * InstancePtr, u16 DeviceId);
+#else
+int XIntc_Initialize(XIntc * InstancePtr, UINTPTR BaseAddr);
+#endif
 
 int XIntc_Start(XIntc * InstancePtr, u8 Mode);
 void XIntc_Stop(XIntc * InstancePtr);
@@ -348,6 +356,8 @@ XIntc_Config *XIntc_LookupConfig(u16 DeviceId);
 #else
 XIntc_Config *XIntc_LookupConfig(UINTPTR BaseAddr);
 #endif
+
+extern XIntc_Config XIntc_ConfigTable[];
 
 int XIntc_ConnectFastHandler(XIntc *InstancePtr, u8 Id,
 				XFastInterruptHandler Handler);
