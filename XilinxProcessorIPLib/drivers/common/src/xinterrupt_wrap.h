@@ -32,7 +32,7 @@
 #include "xstatus.h"
 #include "xil_exception.h"
 
-#if defined(XPAR_AXI_INTC)
+#if defined(AXI_INTC)
 #include "xintc.h"
 #endif
 
