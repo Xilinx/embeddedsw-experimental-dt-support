@@ -26,6 +26,7 @@ extern "C" {
 /***************************** Include Files *********************************/
 
 #include "xbasic_types.h"
+#include "bspconfig.h"
 
 /************************** Constant Definitions *****************************/
 
