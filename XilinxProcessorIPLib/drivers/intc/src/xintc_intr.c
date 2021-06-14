@@ -73,8 +73,10 @@
 
 #include "xil_types.h"
 #include "xil_assert.h"
-#include "xparameters.h"
 #include "xintc.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -146,7 +148,12 @@ void XIntc_InterruptHandler(XIntc * InstancePtr)
 	/* Use the instance's device ID to call the main interrupt handler.
 	 * (the casts are to avoid a compiler warning)
 	 */
+#ifndef SDT
 	XIntc_DeviceInterruptHandler((void *)
 				     ((UINTPTR) (InstancePtr->CfgPtr->DeviceId)));
+#else
+	XIntc_DeviceInterruptHandler((void *)
+				     ((UINTPTR) (InstancePtr->CfgPtr->BaseAddress)));
+#endif
 }
 /** @} */

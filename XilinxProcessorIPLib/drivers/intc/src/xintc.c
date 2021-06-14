@@ -321,7 +321,11 @@ int XIntc_Start(XIntc * InstancePtr, u8 Mode)
 
 	/* Start the Slaves for Cascade Mode */
 	if (InstancePtr->CfgPtr->IntcType != XIN_INTC_NOCASCADE) {
+#ifndef SDT
 		for (Index = 1; Index <= XPAR_XINTC_NUM_INSTANCES - 1; Index++)
+#else
+		for (Index = 1; XIntc_ConfigTable[Index].Name != NULL; Index++)
+#endif
 		{
 			CfgPtr = XIntc_LookupConfig(Index);
 			XIntc_Out32(CfgPtr->BaseAddress + XIN_MER_OFFSET,
@@ -1115,8 +1119,13 @@ static void XIntc_InitializeSlaves(XIntc * InstancePtr)
 	 */
 	XIntc_Out32(InstancePtr->CfgPtr->BaseAddress + XIN_IER_OFFSET, Mask);
 
+#ifndef SDT
 	for (Index = 1; Index <= XPAR_XINTC_NUM_INSTANCES - 1; Index++) {
 		CfgPtr = XIntc_LookupConfig(Index);
+#else
+	for (Index = 1; XIntc_ConfigTable[Index].Name != NULL; Index++) {
+		CfgPtr = XIntc_LookupConfig(XIntc_ConfigTable[Index].BaseAddress);
+#endif
 		if (CfgPtr == NULL) {
 			return;
 		}
