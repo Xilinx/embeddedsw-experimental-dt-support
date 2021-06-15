@@ -34,6 +34,9 @@
 #include "xparameters.h"
 #include "xuartlite.h"
 #include "xil_printf.h"
+#ifdef SDT
+#include "xuartlite_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -42,8 +45,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UARTLITE_DEVICE_ID		XPAR_UARTLITE_0_DEVICE_ID
-
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -52,8 +56,11 @@
 
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int UartLiteSelfTestExample(u16 DeviceId);
+#else
+int UartLiteSelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -80,7 +87,11 @@ int main(void)
 	 * Run the UartLite self test example, specify the Device ID that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = UartLiteSelfTestExample(UARTLITE_DEVICE_ID);
+#else
+	Status = UartLiteSelfTestExample(XUARTLITE_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Uartlite selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -108,14 +119,25 @@ int main(void)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 int UartLiteSelfTestExample(u16 DeviceId)
+#else
+int UartLiteSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 
 	/*
 	 * Initialize the UartLite driver so that it is ready to use.
 	 */
+#ifndef SDT
 	Status = XUartLite_Initialize(&UartLite, DeviceId);
+#else
+	XUartLite_Config *CfgPtr;
+	CfgPtr = XUartLite_LookupConfig(BaseAddress);
+	Status = XUartLite_CfgInitialize(&UartLite, CfgPtr,
+				CfgPtr->RegBaseAddr);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
