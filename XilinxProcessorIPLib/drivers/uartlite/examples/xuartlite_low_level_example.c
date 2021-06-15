@@ -37,6 +37,9 @@
 #include "xstatus.h"
 #include "xuartlite_l.h"
 #include "xil_printf.h"
+#ifdef SDT
+#include "xuartlite_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -46,7 +49,11 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UARTLITE_BASEADDR	   XPAR_UARTLITE_0_BASEADDR
+#else
+#define UARTLITE_BASEADDR	   XUARTLITE_BASEADDRESS
+#endif
 
 /*
  * The following constant controls the length of the buffers to be sent
@@ -63,8 +70,11 @@
 
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int UartLiteLowLevelExample(u32 UartliteBaseAddress);
+#else
+int UartLiteLowLevelExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -123,7 +133,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int UartLiteLowLevelExample(u32 UartliteBaseAddress)
+#else
+int UartLiteLowLevelExample(UINTPTR UartliteBaseAddress)
+#endif
 {
 	int Index;
 
