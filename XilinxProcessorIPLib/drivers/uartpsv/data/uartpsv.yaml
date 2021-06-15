@@ -32,8 +32,8 @@ required:
     - reg
     - xlnx,clock-freq
     - cts-override
-    - interrupts
-    - interrupt-parent
+    - xlnx,baudrate
+
 examples:
     xuartpsv_intr_example.c:
         - interrupts
