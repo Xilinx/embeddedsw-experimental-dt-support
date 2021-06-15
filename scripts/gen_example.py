@@ -30,7 +30,6 @@ def main():
         f.write("project(%s)\n\n" % name)
         f.write("enable_language(C ASM)\n")
         f.write("collect(PROJECT_LIB_DEPS xilstandalone)\n")
-        f.write("collect(PROJECT_LIB_DEPS xilmem)\n")
         f.write("collect(PROJECT_LIB_DEPS xil)\n")
         f.write("collect(PROJECT_LIB_DEPS xiltimer)\n")
         if lib:
