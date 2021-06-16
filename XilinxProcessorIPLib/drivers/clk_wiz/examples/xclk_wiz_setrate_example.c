@@ -36,7 +36,9 @@
 * They are only defined here such that a user can easily change all the
 * needed device IDs in one place.
 */
+#ifndef SDT
 #define XCLK_WIZARD_DEVICE_ID		XPAR_CLK_WIZ_0_DEVICE_ID
+#endif
 #define XCLK_US_WIZ_RECONFIG_OFFSET	0x0000025C  /**< Reconfig Register */
 
 /*
@@ -53,7 +55,7 @@
 
 /************************** Function Prototypes ******************************/
 
-u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, u32 DeviceId);
+u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, UINTPTR BaseAddress);
 
 /************************** Variable Definitions *****************************/
 XClk_Wiz ClkWiz_Dynamic; /* The instance of the ClkWiz_Dynamic */
@@ -83,7 +85,7 @@ int main()
 	xil_printf("CLK_WIZARD example\n\r");
 	xil_printf("-------------------------------------------\n\r\n\r");
 
-	Status = ClkWiz_Example(&ClkWiz_Dynamic, XCLK_WIZARD_DEVICE_ID);
+	Status = ClkWiz_Example(&ClkWiz_Dynamic, XCLK_WIZARD_BASEADDR);
 	if (Status != XST_SUCCESS) {
 		xil_printf("CLK_WIZARD example Failed");
 		return XST_FAILURE;
@@ -109,7 +111,7 @@ int main()
 *		- XST_SUCCESS if successful.
 *
 ******************************************************************************/
-u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, u32 DeviceId)
+u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, UINTPTR BaseAddress)
 {
 	XClk_Wiz_Config *CfgPtr_Dynamic;
 	u32 Status = XST_FAILURE;
@@ -118,7 +120,7 @@ u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, u32 DeviceId)
 	/*
 	 * Get the CLK_WIZ Dynamic reconfiguration driver instance
 	 */
-	CfgPtr_Dynamic = XClk_Wiz_LookupConfig(DeviceId);
+	CfgPtr_Dynamic = XClk_Wiz_LookupConfig(BaseAddress);
 	if (!CfgPtr_Dynamic) {
 		return XST_FAILURE;
 	}
