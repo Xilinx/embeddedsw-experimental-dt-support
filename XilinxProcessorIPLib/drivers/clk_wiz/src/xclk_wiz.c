@@ -31,8 +31,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 #include "xclk_wiz.h"
 
 /************************** Constant Definitions *****************************/
@@ -296,8 +298,8 @@ static u32  XClk_Wiz_CalculateDivisorsHz (XClk_Wiz  *InstancePtr, u64 SetRate)
 *****************************************************************************/
 void XClk_Wiz_SetMinErr(XClk_Wiz  *InstancePtr, u64 Minerr)
 {
-	Xil_AssertNonvoid(InstancePtr != NULL);
-	Xil_AssertNonvoid(InstancePtr->IsReady == XIL_COMPONENT_IS_READY);
+	Xil_AssertVoid(InstancePtr != NULL);
+	Xil_AssertVoid(InstancePtr->IsReady == XIL_COMPONENT_IS_READY);
 	InstancePtr->MinErr  = Minerr;
 }
 /****************************************************************************/

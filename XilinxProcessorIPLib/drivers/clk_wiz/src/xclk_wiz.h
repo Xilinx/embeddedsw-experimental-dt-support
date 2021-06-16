@@ -141,7 +141,11 @@ extern "C" {
 *
 */
 typedef struct {
+#ifndef SDT
 	u32 DeviceId;	         /**< Device Id */
+#else
+	char *Name;
+#endif
 	UINTPTR BaseAddr;        /**< Base address of CLK_WIZ Controller */
 	u32 EnableClkMon;        /**< It enables the Clock Monitor*/
 	u32 EnableUserClkWiz0;   /**< Enable user clk 0 */
@@ -419,7 +423,11 @@ static inline void XClk_Wiz_IntrAckIrq(XClk_Wiz *InstancePtr, u32 Value) {
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 XClk_Wiz_Config *XClk_Wiz_LookupConfig(u32 DeviceId);
+#else
+XClk_Wiz_Config *XClk_Wiz_LookupConfig(UINTPTR BaseAddress);
+#endif
 
 u32 XClk_Wiz_SetRate(XClk_Wiz *InstancePtr, u64 SetRate);
 
