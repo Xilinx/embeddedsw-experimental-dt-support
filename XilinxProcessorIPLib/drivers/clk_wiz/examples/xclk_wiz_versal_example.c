@@ -37,8 +37,9 @@
 * They are only defined here such that a user can easily change all the
 * needed device IDs in one place.
 */
+#ifndef SDT
 #define XCLK_WIZARD_DEVICE_ID		XPAR_TX_SUBSYSTEM_VID_CLK_RST_HIER_CLK_WIZARD_1_DEVICE_ID
-
+#endif
 /*
 * The following constants are part of clock dynamic reconfiguration
 * They are only defined here such that a user can easily change
@@ -58,7 +59,7 @@
 
 /************************** Function Prototypes ******************************/
 
-u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, u32 DeviceId);
+u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr);
 u32 XClk_WaitForLock(XClk_Wiz_Config *CfgPtr_Dynamic);
 
 /************************** Variable Definitions *****************************/
@@ -119,7 +120,7 @@ int main()
 	xil_printf("CLK_WIZARD example\n\r");
 	xil_printf("-------------------------------------------\n\r\n\r");
 
-	Status = ClkWiz_Example(&ClkWiz_Dynamic, XCLK_WIZARD_DEVICE_ID);
+	Status = ClkWiz_Example(&ClkWiz_Dynamic);
 	if (Status != XST_SUCCESS) {
 		xil_printf("CLK_WIZARD Monitor interrupt example Failed");
 		return XST_FAILURE;
@@ -146,7 +147,7 @@ int main()
 *		- XST_SUCCESS if successful.
 *
 ******************************************************************************/
-u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, u32 DeviceId)
+u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr)
 {
 	XClk_Wiz_Config *CfgPtr_Dynamic;
 	u32 Status = XST_FAILURE;
@@ -155,7 +156,11 @@ u32 ClkWiz_Example(XClk_Wiz *IntcInstancePtr, u32 DeviceId)
 	/*
 	 * Get the CLK_WIZ Dynamic reconfiguration driver instance
 	 */
-	CfgPtr_Dynamic = XClk_Wiz_LookupConfig(DeviceId);
+#ifndef SDT
+	CfgPtr_Dynamic = XClk_Wiz_LookupConfig(XCLK_WIZARD_DEVICE_ID);
+#else
+	CfgPtr_Dynamic = XClk_Wiz_LookupConfig(XPAR_CLK_WIZARD_0_BASEADDR);
+#endif
 	if (!CfgPtr_Dynamic) {
 		return XST_FAILURE;
 	}
