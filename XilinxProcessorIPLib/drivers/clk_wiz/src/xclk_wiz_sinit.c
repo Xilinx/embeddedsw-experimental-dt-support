@@ -26,7 +26,10 @@
 
 /***************************** Include Files *********************************/
 
+#include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xclk_wiz.h"
 
 /*****************************************************************************/
@@ -42,6 +45,7 @@
  * @note	None
  *
  *****************************************************************************/
+#ifndef SDT
 XClk_Wiz_Config *XClk_Wiz_LookupConfig(u32 DeviceId)
 {
 	extern XClk_Wiz_Config XClk_Wiz_ConfigTable[];
@@ -57,4 +61,22 @@ XClk_Wiz_Config *XClk_Wiz_LookupConfig(u32 DeviceId)
 
 	return CfgPtr;
 }
+#else
+XClk_Wiz_Config *XClk_Wiz_LookupConfig(UINTPTR BaseAddress)
+{
+	extern XClk_Wiz_Config XClk_Wiz_ConfigTable[];
+	XClk_Wiz_Config *CfgPtr = NULL;
+	u32 Index;
+
+	for (Index = 0; XClk_Wiz_ConfigTable[Index].Name != NULL; Index++) {
+		if (XClk_Wiz_ConfigTable[Index].BaseAddr == BaseAddress ||
+		    !BaseAddress) {
+			CfgPtr = &XClk_Wiz_ConfigTable[Index];
+			break;
+		}
+	}
+
+	return (XClk_Wiz_Config *)CfgPtr;
+}
+#endif
 /** @} */

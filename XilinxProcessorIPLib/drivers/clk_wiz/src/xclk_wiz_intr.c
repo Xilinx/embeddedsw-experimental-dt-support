@@ -25,8 +25,10 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 #include "xclk_wiz_hw.h"
 #include "xclk_wiz.h"
 
