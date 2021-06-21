@@ -44,7 +44,7 @@
 #include "xcsudma.h"
 #ifndef SDT
 #include "xparameters.h"
-#else
+#elif !defined(TESTAPP_GEN)
 #include "xcsudma_example.h"
 #endif
 #include "xil_exception.h"
