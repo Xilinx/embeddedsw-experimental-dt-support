@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+title: Xilinx clocking wizard
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+properties:
+  compatible:
+    OneOf:
+    items:
+      - items:
+        - enum:
+          - xlnx,clocking-wizard
+          - xlnx,clocking-wizard-6.0
+
+  reg:
+    description: Physical base address and size of the controller register map
+  xlnx,prim-in-freq:
+    description: Input clock frequency
+
+config:
+    - XClk_Wiz_Config
+ 
+required:
+  - compatible
+  - reg
+  - xlnx,prim-in-freq
+
+...
