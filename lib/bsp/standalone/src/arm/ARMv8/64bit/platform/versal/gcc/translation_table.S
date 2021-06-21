@@ -343,6 +343,27 @@ MMUTableL1:
 #warning "There's no DDR_CH_1 in the HW design. MMU translation table marks 1 TB DDR address space as undefined"
 #endif
 
+#ifdef XPAR_AXI_NOC_DDR_CH_1_BASEADDRESS
+.set DDR_CH_1_START, XPAR_AXI_NOC_DDR_CH_1_BASEADDRESS
+.set DDR_CH_1_END, XPAR_AXI_NOC_DDR_CH_1_HIGHADDRESS
+
+.if DDR_CH_1_START > DDR_CH_1_REGION_START_ADDR
+.set UNDEF_START, (DDR_CH_1_START - DDR_CH_1_REGION_START_ADDR)
+.set UNDEF_START, (UNDEF_START)/0x40000000
+.endif
+
+.set DDR_CH_1_SIZE, (DDR_CH_1_END - DDR_CH_1_START)+1
+.if DDR_CH_1_SIZE > 0x010000000000
+/* If DDR size is larger than 1TB, truncate to 1 TB */
+.set DDR_CH_1_REG, 0x400		/* 0x500_0000_0000 - 0x5FF_FFFF_FFFF */
+.else
+.set DDR_CH_1_REG, DDR_CH_1_SIZE/0x40000000
+.endif
+#else
+.set DDR_CH_1_REG, 0
+#warning "There's no DDR_CH_1 in the HW design. MMU translation table marks 1 TB DDR address space as undefined"
+#endif
+
 .set UNDEF_CH_1_REG, (0x400 - DDR_CH_1_REG - UNDEF_START)
 
 .rept	UNDEF_START				/* reserved for region where ddr is absent */
@@ -382,6 +403,27 @@ MMUTableL1:
 #warning "There's no DDR_CH_2 in the HW design. MMU translation table marks 1 TB DDR address space as undefined"
 #endif
 
+#ifdef XPAR_AXI_NOC_DDR_CH_2_BASEADDRESS
+.set DDR_CH_2_START, XPAR_AXI_NOC_DDR_CH_2_BASEADDRESS
+.set DDR_CH_2_END, XPAR_AXI_NOC_DDR_CH_2_HIGHADDRESS
+
+.if DDR_CH_2_START > DDR_CH_2_REGION_START_ADDR
+.set UNDEF_START, (DDR_CH_2_START - DDR_CH_2_REGION_START_ADDR)
+.set UNDEF_START, (UNDEF_START)/0x40000000
+.endif
+
+.set DDR_CH_2_SIZE, (DDR_CH_2_END - DDR_CH_2_START)+1
+.if DDR_CH_2_SIZE > 0x010000000000
+/* If DDR_CH_2 size is larger than 1TB, truncate to 1 TB */
+.set DDR_CH_2_REG, 0x400		/* 0x600_0000_0000 - 0x6FF_FFFF_FFFF */
+.else
+.set DDR_CH_2_REG, DDR_CH_2_SIZE/0x40000000
+.endif
+#else
+.set DDR_CH_2_REG, 0
+#warning "There's no DDR_CH_2 in the HW design. MMU translation table marks 1 TB DDR address space as undefined"
+#endif
+
 .set UNDEF_CH_2_REG, (0x400 - DDR_CH_2_REG - UNDEF_START)
 
 .rept	UNDEF_START				/* reserved for region where ddr is absent */
@@ -403,6 +445,27 @@ MMUTableL1:
 #ifdef XPAR_AXI_NOC_DDR_CH_3_BASEADDR
 .set DDR_CH_3_START, XPAR_AXI_NOC_DDR_CH_3_BASEADDR
 .set DDR_CH_3_END, XPAR_AXI_NOC_DDR_CH_3_HIGHADDR
+
+.if DDR_CH_3_START > DDR_CH_3_REGION_START_ADDR
+.set UNDEF_START, (DDR_CH_3_START - DDR_CH_3_REGION_START_ADDR)
+.set UNDEF_START, (UNDEF_START)/0x40000000
+.endif
+
+.set DDR_CH_3_SIZE, (DDR_CH_3_END - DDR_CH_3_START)+1
+.if DDR_CH_3_SIZE > 0x010000000000
+/* If DDR_CH_3 size is larger than 1TB, truncate to 1 TB */
+.set DDR_CH_3_REG, 0x400		/* 0x700_0000_0000 - 0x7FF_FFFF_FFFF */
+.else
+.set DDR_CH_3_REG, DDR_CH_3_SIZE/0x40000000
+.endif
+#else
+.set DDR_CH_3_REG, 0
+#warning "There's no DDR_CH_3 in the HW design. MMU translation table marks 1 TB DDR address space as undefined"
+#endif
+
+#ifdef XPAR_AXI_NOC_DDR_CH_3_BASEADDRESS
+.set DDR_CH_3_START, XPAR_AXI_NOC_DDR_CH_3_BASEADDRESS
+.set DDR_CH_3_END, XPAR_AXI_NOC_DDR_CH_3_HIGHADDRESS
 
 .if DDR_CH_3_START > DDR_CH_3_REGION_START_ADDR
 .set UNDEF_START, (DDR_CH_3_START - DDR_CH_3_REGION_START_ADDR)
