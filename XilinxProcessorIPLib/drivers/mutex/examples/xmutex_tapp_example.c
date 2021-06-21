@@ -62,7 +62,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define MUTEX_DEVICE_ID		XPAR_MUTEX_0_DEVICE_ID
+#endif
 
 #define MUTEX_NUM 		0 /**< The Mutex number on which this
 				   *   example is run
@@ -82,7 +84,11 @@ XMutex Mutex;	/* Mutex instance */
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int MutexExample (u16 MutexDeviceID);
+#else
+int MutexExample (UINTPTR BaseAddress);
+#endif
 
 /*****************************************************************************/
 /**
@@ -102,8 +108,11 @@ int MutexExample (u16 MutexDeviceID);
 int main(void)
 {
 	printf ("MutexExample :\tStarts.\r\n");
-
+#ifndef SDT
 	if (MutexExample (MUTEX_DEVICE_ID) != XST_SUCCESS) {
+#else
+	if (MutexExample (XPAR_MUTEX_0_BASEADDR) != XST_SUCCESS) {
+#endif
 		printf ("MutexExample :\tMutex tapp Example Failed.\r\n");
 		printf ("MutexExample :\tEnds.\r\n");
 		return XST_FAILURE;
@@ -134,7 +143,11 @@ int main(void)
 * @note		None
 *
 ******************************************************************************/
+#ifndef SDT
 int MutexExample(u16 MutexDeviceID)
+#else
+int MutexExample (UINTPTR BaseAddress)
+#endif
 {
 	XMutex_Config *ConfigPtr;
 	XStatus Status;
@@ -145,7 +158,11 @@ int MutexExample(u16 MutexDeviceID)
 	 * Use this configuration info down below when initializing this
 	 * driver instance.
 	 */
+#ifndef SDT
 	ConfigPtr = XMutex_LookupConfig(MutexDeviceID);
+#else
+	ConfigPtr = XMutex_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == (XMutex_Config *)NULL) {
 		return XST_FAILURE;
 	}
