@@ -222,7 +222,7 @@ typedef struct {
 #endif
 	UINTPTR BaseAddress;	/**< Register base address */
 	u32 SysClockFreqHz;	/**< The AXI bus clock frequency */
-#ifdef XIL_INTERRUPT
+#if defined(XIL_INTERRUPT) || defined(SDT)
 	u16 IntrId;
 	UINTPTR IntrParent;		/** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 #endif
