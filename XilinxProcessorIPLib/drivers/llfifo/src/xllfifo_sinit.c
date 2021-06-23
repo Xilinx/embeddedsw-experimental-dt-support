@@ -65,7 +65,7 @@ XLlFifo_Config *XLlFfio_LookupConfig(u32 DeviceId)
 #else
 XLlFifo_Config *XLlFfio_LookupConfig(UINTPTR BaseAddress)
 {
-	extern XLlFifo_Config XLlfifo_ConfigTable[];
+	extern XLlFifo_Config XLlFifo_ConfigTable[];
 	XLlFifo_Config *CfgPtr;
 	u32 Index;
 

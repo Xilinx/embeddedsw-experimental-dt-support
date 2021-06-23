@@ -701,7 +701,7 @@ void XLlFifo_Initialize(XLlFifo *InstancePtr, UINTPTR BaseAddress);
 #ifndef SDT
 XLlFifo_Config *XLlFfio_LookupConfig(u32 DeviceId);
 #else
-XLlFifo_Config *XLlFfio_LookupConfig(u32 BaseAddress);
+XLlFifo_Config *XLlFfio_LookupConfig(UINTPTR BaseAddress);
 #endif
 u32 XLlFifo_iRxOccupancy(XLlFifo *InstancePtr);
 u32 XLlFifo_iRxGetLen(XLlFifo *InstancePtr);
