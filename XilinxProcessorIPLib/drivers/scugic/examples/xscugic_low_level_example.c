@@ -51,6 +51,10 @@
 #include "xplatform_info.h"
 #endif
 
+#ifdef SDT
+#include "xscugic_example.h"
+#endif
+
 /************************** Constant Definitions *****************************/
 
 /*
@@ -58,8 +62,15 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
+#define INTC_DEVICE_ID          XPAR_SCUGIC_0_DEVICE_ID
 #define CPU_BASEADDR		XPAR_SCUGIC_0_CPU_BASEADDR
 #define DIST_BASEADDR		XPAR_SCUGIC_0_DIST_BASEADDR
+#else
+#define DIST_BASEADDR		XSCUGIC_BASEADDRESS
+#endif
+
+#define TARGETED_SGI_ID	0x3U
 
 #if defined (GICv3)
 #define GIC_DEVICE_INT_MASK        0x11000001 /* Bit [27:24] SGI Interrupt ID
@@ -77,15 +88,11 @@
 
 /************************** Function Prototypes ******************************/
 
-static int ScuGicLowLevelExample(u32 CpuBaseAddress, u32 DistBaseAddress);
+static int ScuGicLowLevelExample();
 
 void SetupInterruptSystem();
 
 void LowInterruptHandler(u32 CallbackRef);
-
-static void GicDistInit(u32 BaseAddress);
-
-static void GicCPUInit(u32 BaseAddress);
 
 
 /************************** Variable Definitions *****************************/
@@ -118,7 +125,8 @@ int main(void)
 	 * Address generated in xparameters.h
 	 */
 	xil_printf("Low Level GIC Example Test\r\n");
-	Status = ScuGicLowLevelExample(CPU_BASEADDR, DIST_BASEADDR);
+	Status = ScuGicLowLevelExample();
+
 	if (Status != XST_SUCCESS) {
 		xil_printf("Low Level GIC Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -142,15 +150,12 @@ int main(void)
 * has come out of the reset state such that it will allow interrupts to be
 * simulated by the software.
 *
-* @param	CpuBaseAddress is Base Address of the Interrupt Controller
-*		Device
-*
 * @return	XST_SUCCESS to indicate success, otherwise XST_FAILURE
 *
 * @note		None.
 *
 ******************************************************************************/
-static int ScuGicLowLevelExample(u32 CpuBaseAddress, u32 DistBaseAddress)
+static int ScuGicLowLevelExample()
 {
 	int Status;
 #if defined (GICv3)
@@ -165,7 +170,7 @@ static int ScuGicLowLevelExample(u32 CpuBaseAddress, u32 DistBaseAddress)
 #if !defined (GICv3)
 		GicCPUInit(CpuBaseAddress);
 #endif
-
+	
 	/*
 	 * This step is processor specific, connect the handler for the
 	 * interrupt controller to the interrupt source for the processor
@@ -173,7 +178,7 @@ static int ScuGicLowLevelExample(u32 CpuBaseAddress, u32 DistBaseAddress)
 	SetupInterruptSystem();
 
 	/*
-	 * Enable the software interrupts only.
+	 * Enable targeted SGI
 	 */
 #if defined (GICv3)
 	 RedistBaseAddr = XScuGic_GetRedistBaseAddr();
@@ -248,13 +253,19 @@ static int ScuGicLowLevelExample(u32 CpuBaseAddress, u32 DistBaseAddress)
 ******************************************************************************/
 void SetupInterruptSystem(void)
 {
+	XScuGic_Config *CfgPtr;
+	#ifndef SDT
+	XScuGic_LookupConfigBaseAddr(DIST_BASEADDR);
+	#else
+	CfgPtr = XScuGic_LookupConfig(DIST_BASEADDR);
+	#endif
 	/*
 	 * Connect the interrupt controller interrupt handler to the hardware
 	 * interrupt handling logic in the ARM processor.
 	 */
 	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
 			(Xil_ExceptionHandler) LowInterruptHandler,
-			(void *)CPU_BASEADDR);
+			(void *)CfgPtr->CpuBaseAddress);
 
 	/*
 	 * Enable interrupts in the ARM
