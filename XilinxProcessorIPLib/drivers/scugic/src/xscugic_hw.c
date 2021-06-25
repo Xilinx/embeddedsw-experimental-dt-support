@@ -321,6 +321,7 @@ static void CPUInit(XScuGic_Config *Config)
 * None.
 *
 ******************************************************************************/
+#ifndef SDT
 s32 XScuGic_DeviceInitialize(u32 DeviceId)
 {
 	XScuGic_Config *Config;
@@ -333,7 +334,23 @@ s32 XScuGic_DeviceInitialize(u32 DeviceId)
 
 	return XST_SUCCESS;
 }
+#else
+s32 XScuGic_DeviceInitialize(u32 DistBaseAddr)
+{
+        XScuGic_Config *Config;
 
+        Config = XScuGic_LookupConfig(DistBaseAddr);
+	if ( Config == NULL ) {
+		return XST_FAILURE;
+	}
+        DistInit(Config);
+#if !defined (GICv3)
+        CPUInit(Config);
+#endif
+
+        return XST_SUCCESS;
+}
+#endif
 /*****************************************************************************/
 /**
 * This function is the primary interrupt handler for the driver.  It must be
