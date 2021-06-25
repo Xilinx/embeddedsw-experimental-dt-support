@@ -81,7 +81,7 @@ XPmonPsv_Config *XPmonPsv_LookupConfig(u16 DeviceId)
 	return (XPmonPsv_Config *)CfgPtr;
 }
 #else
-XPmonPsv_Config *XpsvPmon_LookupConfig(u32 BaseAddress)
+XPmonPsv_Config *XPmonPsv_LookupConfig(u32 BaseAddress)
 {
 	XPmonPsv_Config *CfgPtr = NULL;
 	u32 Index;
