@@ -37,7 +37,9 @@
 #include "xil_printf.h"
 #include "xil_types.h"
 #include "xscugic.h"
-
+#ifdef SDT
+#include "xscugic_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 /*
@@ -45,7 +47,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define INTC_DEVICE_ID		XPAR_SCUGIC_0_DEVICE_ID
+#endif
 #define INTC_DEVICE_INT_ID	0x0E
 
 /**************************** Type Definitions *******************************/
@@ -53,7 +57,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 int ScuGicExample(u16 DeviceId);
+#else
+int ScuGicExample(UINTPTR BaseAddr);
+#endif
 int SetUpInterruptSystem(XScuGic *XScuGicInstancePtr);
 void DeviceDriverHandler(void *CallbackRef);
 
@@ -101,7 +109,11 @@ int main(void)
 	/*
 	 *  Run the Gic example , specify the Device ID generated in xparameters.h
 	 */
+	#ifndef SDT
 	Status = ScuGicExample(INTC_DEVICE_ID);
+	#else
+        Status = ScuGicExample(XSCUGIC_BASEADDRESS);
+	#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("GIC Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -133,7 +145,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int ScuGicExample(u16 DeviceId)
+#else
+int ScuGicExample(UINTPTR BaseAddr)
+#endif
 {
 	int Status;
 
@@ -141,7 +157,7 @@ int ScuGicExample(u16 DeviceId)
 	 * Initialize the interrupt controller driver so that it is ready to
 	 * use.
 	 */
-	GicConfig = XScuGic_LookupConfig(DeviceId);
+	GicConfig = XScuGic_LookupConfig(BaseAddr);
 	if (NULL == GicConfig) {
 		return XST_FAILURE;
 	}
