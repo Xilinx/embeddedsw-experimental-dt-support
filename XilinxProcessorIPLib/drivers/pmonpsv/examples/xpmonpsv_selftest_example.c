@@ -37,10 +37,13 @@
 #include "xpmonpsv.h"
 #include "xil_assert.h"
 #include "sleep.h"
+#include "xparameters.h"
 
 /************************** Constant Definitions ****************************/
 #define TESTADDRESS  0x80000000; /* LPD AFI interface */
+#ifndef SDT
 #define PMON_DEVICE_ID XPAR_XPMONPSV_1_DEVICE_ID
+#endif
 
 
 /**************************** Type Definitions ******************************/
@@ -133,7 +136,11 @@ static u32 XPmonPsv_SelfTest(XPmonPsv *InstancePtr)
 * @note		None.
 *
 ****************************************************************************/
+#ifndef SDT
 static u32 XpmonpsvSelfTestExample(u16 DeviceId)
+#else
+static u32 XpmonpsvSelfTestExample(u32 BaseAddress)
+#endif
 {
 	u32 Status;
 	XPmonPsv_Config *ConfigPtr;/* Pointer to configuration data */
@@ -142,7 +149,11 @@ static u32 XpmonpsvSelfTestExample(u16 DeviceId)
 	 * Initialize the PmonPsv driver so that it is ready
 	 * to use.
 	 */
+#ifndef SDT
 	ConfigPtr = XPmonPsv_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XPmonPsv_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -179,7 +190,11 @@ int main(void)
 	 * Run the example, specify the device ID that is generated in
 	 * xparameters.h.
 	 */
+#ifndef SDT
 	Status = XpmonpsvSelfTestExample(PMON_DEVICE_ID);
+#else
+	Status = XpmonpsvSelfTestExample(XPAR_XPMONPSV_1_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("PmonPsv selftest Example Failed\r\n");
 		return XST_FAILURE;
