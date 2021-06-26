@@ -27,6 +27,8 @@ required:
     - reg
     - dma-coherent
     - xlnx,enable-superspeed
+    - interrupts: 3
+    - interrupt-parent
 
 examples:
         xusb_intr_example.c:
