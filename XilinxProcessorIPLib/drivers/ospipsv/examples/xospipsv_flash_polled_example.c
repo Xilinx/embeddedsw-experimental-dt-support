@@ -180,7 +180,7 @@ int main(void)
 #ifndef SDT
 	Status = OspiPsvPolledFlashExample(&OspiPsvInstance, OSPIPSV_DEVICE_ID);
 #else
-	Status = OspiPsvPolledFlashExample(&OspiPsvInstance, XPAR_XOSPIPSV_0_BASEADDR);
+	Status = OspiPsvPolledFlashExample(&OspiPsvInstance, XOSPIPSV_BASEADDRESS);
 #endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("OSPIPSV Flash Polled Ex Failed\r\n");

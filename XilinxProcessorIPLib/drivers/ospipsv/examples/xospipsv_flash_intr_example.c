@@ -192,7 +192,7 @@ int main(void)
 #ifndef SDT
 	Status = OspiPsvInterruptFlashExample(&OspiPsvInstance, OSPIPSV_DEVICE_ID);
 #else
-	Status = OspiPsvInterruptFlashExample(&OspiPsvInstance, XPAR_XOSPIPSV_0_BASEADDR);
+	Status = OspiPsvInterruptFlashExample(&OspiPsvInstance, XOSPIPSV_BASEADDRESS);
 #endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("OSPIPSV Flash Interrupt Example Failed\r\n");

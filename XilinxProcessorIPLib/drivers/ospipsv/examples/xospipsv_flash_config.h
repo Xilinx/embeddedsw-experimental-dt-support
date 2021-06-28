@@ -35,10 +35,14 @@
 #define XOSPIPSV_FLASH_CONFIG_H
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"	/* SDK generated parameters */
 #include "xospipsv.h"		/* OSPIPSV device driver */
 #include "xil_printf.h"
 #include "xil_cache.h"
+#ifndef SDT
+#include "xparameters.h"        /* SDK generated parameters */
+#else
+#include "xospipsv_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
