@@ -175,7 +175,7 @@ int main(void)
 #ifndef SDT
 	Status = OspiPsvFlashNonBlockingReadExample(&OspiPsvInstance, OSPIPSV_DEVICE_ID);
 #else
-	Status = OspiPsvFlashNonBlockingReadExample(&OspiPsvInstance, XPAR_XOSPIPSV_0_BASEADDR);
+	Status = OspiPsvFlashNonBlockingReadExample(&OspiPsvInstance, XOSPIPSV_BASEADDRESS);
 #endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("OSPIPSV non-blocking read Polled Ex Failed\r\n");
