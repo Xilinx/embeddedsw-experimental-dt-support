@@ -36,6 +36,7 @@
 
 #include "xaxipmon.h"
 #include "xil_cache.h"
+#include "xparameters.h"
 
 /************************** Constant Definitions ****************************/
 
@@ -44,7 +45,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define AXIPMON_DEVICE_ID		XPAR_PSU_APM_1_DEVICE_ID
+#endif
 
 /* Sampling interval */
 #define SAMPLE_INTERVAL			0x100
@@ -90,7 +93,11 @@ int main(void)
 	XAxiPmon_Config *ConfigPtr = NULL;
 	u32 Status;
 
+#ifndef SDT
 	ConfigPtr = XAxiPmon_LookupConfig(AXIPMON_DEVICE_ID);
+#else
+	ConfigPtr = XAxiPmon_LookupConfig(XPAR_PERF_MONITOR_OCM_BASEADDR);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
