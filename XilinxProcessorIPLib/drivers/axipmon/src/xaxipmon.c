@@ -147,7 +147,9 @@ s32 XAxiPmon_CfgInitialize(XAxiPmon *InstancePtr, XAxiPmon_Config *ConfigPtr,
 	/*
 	 * Set the values read from the device config and the base address.
 	 */
+#ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 	InstancePtr->Config.GlobalClkCounterWidth =
 				ConfigPtr->GlobalClkCounterWidth;
@@ -172,6 +174,8 @@ s32 XAxiPmon_CfgInitialize(XAxiPmon *InstancePtr, XAxiPmon_Config *ConfigPtr,
 	InstancePtr->Config.Is32BitFiltering = ConfigPtr->Is32BitFiltering;
 
 	InstancePtr->Config.ScaleFactor = ConfigPtr->ScaleFactor;
+	InstancePtr->Config.IntId = ConfigPtr->IntId;
+	InstancePtr->Config.IntrParent = ConfigPtr->IntrParent;
 
 	if ((ConfigPtr->ModeProfile == ConfigPtr->ModeTrace)
 			|| (ConfigPtr->ModeAdvanced == 1U))
