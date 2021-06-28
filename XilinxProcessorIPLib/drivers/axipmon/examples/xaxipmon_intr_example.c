@@ -49,12 +49,8 @@
 #include "xstatus.h"
 #include "xil_exception.h"
 #include "stdio.h"
+#include "xinterrupt_wrap.h"
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
-#endif
 /************************** Constant Definitions ****************************/
 
 /*
@@ -62,6 +58,7 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #ifdef XPAR_INTC_0_DEVICE_ID
 #define INTC						XIntc
 #define INTC_HANDLER				XIntc_InterruptHandler
@@ -75,6 +72,7 @@
 #define INTC_DEVICE_ID				XPAR_SCUGIC_0_DEVICE_ID
 #define INTC_AXIPMON_INTERRUPT_ID	XPAR_XAPMPS_0_INTR
 #endif
+#endif
 
 /**************************** Type Definitions ******************************/
 
@@ -83,17 +81,17 @@
 
 /************************** Function Prototypes *****************************/
 
+#ifndef SDT
 int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics);
+#else
+int AxiPmonInterruptExample(UINTPTR BaseAddress, u32 *Metrics);
+#endif
 
 static void AxiPmonInterruptHandler(void *CallBackRef);
-
-static int AxiPmonSetupIntrSystem(INTC* IntcInstancePtr,
-					XAxiPmon* InstancePtr, u16 IntrId);
 
 /************************** Variable Definitions ****************************/
 
 static XAxiPmon AxiPmonInst;	/* AXI Performance Monitor driver instance */
-INTC Intc;	/* The Instance of the Interrupt Controller Driver */
 
 /*
  * Shared variables used to test the callbacks.
@@ -127,7 +125,11 @@ int main(void)
 	 * Run the AxiPmon Interrupt example, specify the Device ID that is
 	 * generated in xparameters.h .
 	 */
+#ifndef SDT
 	Status = AxiPmonInterruptExample(AXIPMON_DEVICE_ID, &Metrics);
+#else
+	Status = AxiPmonInterruptExample(XPAR_XAXIPMON_0_BASEADDR, &Metrics);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("AXI Performance Monitor Interrupt example \
@@ -172,7 +174,11 @@ int main(void)
 * @note   	None
 *
 ******************************************************************************/
+#ifndef SDT
 int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics)
+#else
+int AxiPmonInterruptExample(UINTPTR BaseAddress, u32 *Metrics)
+#endif
 {
 	int Status;
 	XAxiPmon_Config *ConfigPtr;
@@ -185,7 +191,11 @@ int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics)
 	/*
 	 * Initialize the AxiPmon driver.
 	 */
+#ifndef SDT
 	ConfigPtr = XAxiPmon_LookupConfig(AxiPmonDeviceId);
+#else
+	ConfigPtr = XAxiPmon_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -200,10 +210,13 @@ int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics)
 		return XST_FAILURE;
 	}
 
-
-	Status = AxiPmonSetupIntrSystem(&Intc, AxiPmonInstPtr,
-					INTC_AXIPMON_INTERRUPT_ID);
-
+	Status = XSetupInterruptSystem(&AxiPmonInst, AxiPmonInterruptHandler,
+			               AxiPmonInst.Config.IntId,
+				       AxiPmonInst.Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
 
 	/*
 	 * Select Agent and required set of Metrics for a Counter.
@@ -230,7 +243,6 @@ int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics)
 	 */
 	XAxiPmon_EnableMetricsCounter(AxiPmonInstPtr);
 
-
 	/*
 	 * Enable Sample Interval Counter Overflow Interrupt
 	 */
@@ -240,7 +252,6 @@ int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics)
 	 * Enable Global Interrupt
 	 */
 	XAxiPmon_IntrGlobalEnable(AxiPmonInstPtr);
-
 
 	/*
 	 * Application for which Metrics has to be computed should be
@@ -252,10 +263,8 @@ int AxiPmonInterruptExample(u16 AxiPmonDeviceId, u32 *Metrics)
 	 */
 	XAxiPmon_EnableSampleIntervalCounter(AxiPmonInstPtr);
 
-
 	/** Wait until Sample Interval Overflow occurs */
 	while(!(SampleCounterIntr));
-
 
 	/** Disable Sample Interval Counter */
 	XAxiPmon_DisableSampleIntervalCounter(AxiPmonInstPtr);
@@ -341,6 +350,7 @@ static void AxiPmonInterruptHandler(void *CallBackRef)
 
 
 
+#ifndef SDT
 /*****************************************************************************/
 /**
 *
@@ -445,3 +455,4 @@ static int AxiPmonSetupIntrSystem(INTC* IntcInstancePtr, XAxiPmon* InstancePtr,
 
 	return XST_SUCCESS;
 }
+#endif

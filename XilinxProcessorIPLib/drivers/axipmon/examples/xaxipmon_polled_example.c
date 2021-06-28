@@ -52,7 +52,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define AXIPMON_DEVICE_ID 	XPAR_AXIPMON_0_DEVICE_ID
+#endif
 
 
 /**************************** Type Definitions ******************************/
@@ -62,8 +64,13 @@
 
 /************************** Function Prototypes *****************************/
 
+#ifndef SDT
 int AxiPmonPolledExample(u16 AxiPmonDeviceId, u32 *Metrics, u32 *ClkCntHigh,
 							     u32 *ClkCntLow);
+#else
+int AxiPmonPolledExample(UINTPTR BaseAddress, u32 *Metrics, u32 *ClkCntHigh,
+							     u32 *ClkCntLow);
+#endif
 
 /************************** Variable Definitions ****************************/
 
@@ -95,8 +102,13 @@ int main(void)
 	 * Run the AxiPmonitor polled example, specify the Device ID that is
 	 * generated in xparameters.h .
 	 */
+#ifndef SDT
 	Status = AxiPmonPolledExample(AXIPMON_DEVICE_ID, &Metrics, &ClkCntHigh,
 								   &ClkCntLow);
+#else
+	Status = AxiPmonPolledExample(XPAR_XAXIPMON_0_BASEADDR, &Metrics, &ClkCntHigh,
+								   &ClkCntLow);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("AXI Performance Monitor Polled example failed\r\n");
@@ -140,8 +152,13 @@ int main(void)
 * @note   	None
 *
 ****************************************************************************/
+#ifndef SDT
 int AxiPmonPolledExample(u16 AxiPmonDeviceId, u32 *Metrics, u32 *ClkCntHigh,
 							     u32 *ClkCntLow)
+#else
+int AxiPmonPolledExample(UINTPTR BaseAddress, u32 *Metrics, u32 *ClkCntHigh,
+							     u32 *ClkCntLow)
+#endif
 {
 	int Status;
 	XAxiPmon_Config *ConfigPtr;
@@ -153,7 +170,11 @@ int AxiPmonPolledExample(u16 AxiPmonDeviceId, u32 *Metrics, u32 *ClkCntHigh,
 	/*
 	 * Initialize the AxiPmon driver.
 	 */
+#ifndef SDT
 	ConfigPtr = XAxiPmon_LookupConfig(AxiPmonDeviceId);
+#else
+	ConfigPtr = XAxiPmon_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
