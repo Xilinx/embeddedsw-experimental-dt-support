@@ -149,7 +149,14 @@ DSTATUS disk_status (
 		if (SdInstance[pdrv].Config.BaseAddress == (u32)0) {
 				XSdPs_Config *SdConfig;
 
+#ifndef SDT
 				SdConfig = XSdPs_LookupConfig((u16)pdrv);
+#else
+				if (pdrv < XPAR_XSDPS_NUM_INSTANCES)
+					SdConfig = XSdPs_LookupConfig(XSdPs_ConfigTable[pdrv].BaseAddress);
+				else
+					SdConfig = NULL;
+#endif
 				if (NULL == SdConfig) {
 					s |= STA_NOINIT;
 					return s;
