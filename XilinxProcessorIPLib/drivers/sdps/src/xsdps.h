@@ -328,6 +328,12 @@ typedef struct {
 #endif
 /** @} */
 
+#ifndef SDT
+extern XSdPs_Config XSdPs_ConfigTable[XPAR_XSDPS_NUM_INSTANCES];
+#else
+extern XSdPs_Config XSdPs_ConfigTable[];
+#endif
+
 /************************** Function Prototypes ******************************/
 #ifndef SDT
 XSdPs_Config *XSdPs_LookupConfig(u16 DeviceId);
