@@ -183,7 +183,11 @@ int XTmrCtr_InitHw(XTmrCtr *InstancePtr)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int XTmrCtr_Initialize(XTmrCtr *InstancePtr, u16 DeviceId)
+#else
+int XTmrCtr_Initialize(XTmrCtr *InstancePtr, UINTPTR BaseAddr)
+#endif
 {
 	XTmrCtr_Config *ConfigPtr;
 
@@ -197,7 +201,11 @@ int XTmrCtr_Initialize(XTmrCtr *InstancePtr, u16 DeviceId)
 	}
 
 	/* Retrieve configuration of timer counter core with matching ID. */
+	#ifndef SDT
 	ConfigPtr = XTmrCtr_LookupConfig(DeviceId);
+	#else	
+	ConfigPtr = XTmrCtr_LookupConfig(BaseAddr);
+	#endif
 	if (!ConfigPtr) {
 		return XST_DEVICE_NOT_FOUND;
 	}
