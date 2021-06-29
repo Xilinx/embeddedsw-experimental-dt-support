@@ -103,7 +103,9 @@ int XTrafGen_CfgInitialize(XTrafGen * InstancePtr,
 	/* Setup the instance */
 	memset(InstancePtr, 0, sizeof(XTrafGen));
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
+#ifndef SDT
 	InstancePtr->Config.DeviceId = Config->DeviceId;
+#endif
 	InstancePtr->Config.AddressWidth = Config->AddressWidth;
 		
 	if((Config->BusType == 1) && (Config->Mode == 1 || 
