@@ -24,13 +24,19 @@
  *****************************************************************************/
 
 /***************************** Include Files ********************************/
-#include "xparameters.h"
 #include "xil_printf.h"
 #include "sleep.h"
 #include <stdio.h>
 #include "xusb_ch9_storage.h"
 #include "xusb_class_storage.h"
 #include "xusb_wrapper.h"
+
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xusbpsu_example.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 #define MEMORY_SIZE (64U * 1024U)
@@ -135,7 +141,11 @@ int main(void)
 	/* Initialize the USB driver so that it's ready to use,
 	 * specify the controller ID that is generated in xparameters.h
 	 */
+#ifndef SDT
 	UsbConfigPtr = LookupConfig(USB_DEVICE_ID);
+#else
+	UsbConfigPtr = LookupConfig(XUSBPSU_BASEADDRESS);
+#endif
 	if (NULL == UsbConfigPtr) {
 		return XST_FAILURE;
 	}

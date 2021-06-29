@@ -23,10 +23,12 @@
  ******************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xparameters.h"		/* XPAR parameters */
 #include "xusb_ch9_audio_dfu.h"
 #include "xusb_class_audio_dfu.h"
 
+#ifndef SDT
+#include "xparameters.h"		/* XPAR parameters */
+#endif
 /************************** Constant Definitions *****************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/

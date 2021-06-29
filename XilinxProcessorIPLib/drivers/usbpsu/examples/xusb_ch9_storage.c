@@ -27,10 +27,12 @@
 
 /***************************** Include Files *********************************/
 #include <string.h>
-#include "xparameters.h"		/* XPAR parameters */
 #include "xusb_ch9_storage.h"
 #include "xusb_class_storage.h"
 
+#ifndef SDT
+#include "xparameters.h"		/* XPAR parameters */
+#endif
 /************************** Constant Definitions *****************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/

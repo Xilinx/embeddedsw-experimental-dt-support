@@ -36,10 +36,17 @@
 struct XUsbPsu PrivateData;
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 Usb_Config* LookupConfig(u16 DeviceId)
 {
 	return XUsbPsu_LookupConfig(DeviceId);
 }
+#else
+Usb_Config *LookupConfig(UINTPTR BaseAddress)
+{
+	return XUsbPsu_LookupConfig(BaseAddress);
+}
+#endif
 
 void CacheInit(void)
 {

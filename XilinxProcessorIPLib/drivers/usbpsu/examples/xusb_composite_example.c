@@ -23,15 +23,27 @@
  *****************************************************************************/
 
 /***************************** Include Files ********************************/
-#include "xparameters.h"
-#include "xscugic.h"
+
 #include "xusb_ch9_composite.h"
 #include "xusb_class_composite.h"
 
+#ifndef SDT
+#include "xparameters.h"
+#include "xscugic.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xusbpsu_example.h"
+#endif
 /************************** Constant Definitions ****************************/
+#ifndef SDT
 #define INTC_DEVICE_ID          XPAR_SCUGIC_SINGLE_DEVICE_ID
 #define USB_INTR_ID             XPAR_XUSBPS_0_INTR
 #define USB_WAKEUP_INTR_ID      XPAR_XUSBPS_0_WAKE_INTR
+#else
+/* Interrupt-names */
+#define INTRNAME_DWC3USB3	0
+#define INTRNAME_HIBER		2
+#endif
 
 /************************** Function Prototypes ******************************/
 
@@ -321,6 +333,7 @@ static void Usb_KeyboardInHabdler(void *CallBackRef, u32 RequestedBytes, u32 Byt
 	KeySent = 1;
 }
 
+#ifndef SDT
 /****************************************************************************/
 /**
 * This function setups the interrupt system such that interrupts can occur.
@@ -411,6 +424,7 @@ static s32 SetupInterruptSystem(struct XUsbPsu *InstancePtr, u16 IntcDeviceID,
 
 	return XST_SUCCESS;
 }
+#endif
 
 /****************************************************************************/
 /**
@@ -427,20 +441,31 @@ static s32 SetupInterruptSystem(struct XUsbPsu *InstancePtr, u16 IntcDeviceID,
 * @note		None.
 *
 *****************************************************************************/
+#ifndef SDT
 static int XUsbCompositeExample(struct Usb_DevData *UsbInstPtr,
 		XScuGic *IntrInstPtr, u16 DeviceId, u16 IntcDeviceID, u16 UsbIntrId)
+#else
+static int XUsbCompositeExample(struct Usb_DevData *UsbInstPtr)
+#endif
 {
 	s32 Status;
 	u8 SendKey = 1;
 	u8 NoKeyData[8]= {0,0,0,0,0,0,0,0};
 	Usb_Config *UsbConfigPtr;
+#ifdef SDT
+	struct XUsbPsu *InstancePtr = UsbInstance.PrivateData;
+#endif
 
 	xil_printf("USB Composite Device Start...\r\n");
 
 	/* Initialize the USB driver so that it's ready to use,
 	 * specify the controller ID that is generated in xparameters.h
 	 */
+#ifndef SDT
 	UsbConfigPtr = LookupConfig(DeviceId);
+#else
+	UsbConfigPtr = LookupConfig(XUSBPSU_BASEADDRESS);
+#endif
 	if (NULL == UsbConfigPtr)
 		return XST_FAILURE;
 
@@ -496,6 +521,9 @@ static int XUsbCompositeExample(struct Usb_DevData *UsbInstPtr,
 	/* Keyboard endpoint event hadler */
 	SetEpHandler(UsbInstPtr->PrivateData, KEYBOARD_EP, USB_EP_DIR_IN,
 			Usb_KeyboardInHabdler);
+
+
+#ifndef SDT
 	/* setup interrupts */
 	Status = SetupInterruptSystem(UsbInstPtr->PrivateData, IntcDeviceID,
 			UsbIntrId, (void *)IntrInstPtr);
@@ -504,7 +532,46 @@ static int XUsbCompositeExample(struct Usb_DevData *UsbInstPtr,
 
 	/* Start the controller so that Host can see our device */
 	Usb_Start(UsbInstPtr->PrivateData);
+#else
+	Status = XSetupInterruptSystem(UsbInstance.PrivateData,
+					&XUsbPsu_IntrHandler,
+					UsbConfigPtr->IntrId[INTRNAME_DWC3USB3],
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
 
+#ifdef XUSBPSU_HIBERNATION_ENABLE
+	Status = XSetupInterruptSystem(UsbInstance.PrivateData,
+					&XUsbPsu_WakeUpIntrHandler,
+					UsbConfigPtr->IntrId[INTRNAME_HIBER],
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+#endif
+	/*
+	 * Enable interrupts for Reset, Disconnect, ConnectionDone, Link State
+	 * Wakeup and Overflow events.
+	 */
+	XUsbPsu_EnableIntr(UsbInstance.PrivateData,
+			XUSBPSU_DEVTEN_EVNTOVERFLOWEN |
+			XUSBPSU_DEVTEN_WKUPEVTEN |
+			XUSBPSU_DEVTEN_ULSTCNGEN |
+			XUSBPSU_DEVTEN_CONNECTDONEEN |
+			XUSBPSU_DEVTEN_USBRSTEN |
+			XUSBPSU_DEVTEN_DISCONNEVTEN);
+
+#ifdef XUSBPSU_HIBERNATION_ENABLE
+	if (InstancePtr->HasHibernation)
+		XUsbPsu_EnableIntr(UsbInstance.PrivateData,
+				XUSBPSU_DEVTEN_HIBERNATIONREQEVTEN);
+#endif
+	/* Start the controller so that Host can see our device */
+	Usb_Start(UsbInstance.PrivateData);
+#endif
 	while (1) {
 
 		/* After configuration done start sending key */
@@ -544,8 +611,12 @@ static int XUsbCompositeExample(struct Usb_DevData *UsbInstPtr,
 *****************************************************************************/
 int main(void)
 {
+#ifndef SDT
 	if (XUsbCompositeExample(&UsbInstance, &InterruptController,
 			USB_DEVICE_ID, INTC_DEVICE_ID, USB_INTR_ID)) {
+#else
+	if (XUsbCompositeExample(&UsbInstance)) {
+#endif
 		xil_printf("USB Composite Example failed\r\n");
 		return XST_FAILURE;
 	}

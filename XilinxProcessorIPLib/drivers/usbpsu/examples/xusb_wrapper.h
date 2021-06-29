@@ -118,7 +118,11 @@ extern "C" {
 /************************** Variable Definitions *****************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
+#ifndef SDT
 Usb_Config* LookupConfig(u16 DeviceId);
+#else
+Usb_Config *LookupConfig(UINTPTR BaseAddress);
+#endif
 void CacheInit(void);
 s32 CfgInitialize(struct Usb_DevData *InstancePtr,
 			Usb_Config *ConfigPtr, u32 BaseAddress);
