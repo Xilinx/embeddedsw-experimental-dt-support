@@ -97,6 +97,8 @@ int XUsb_CfgInitialize(XUsb *InstancePtr, XUsb_Config *ConfigPtr,
 	 */
 #ifndef SDT
 	InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
+#else
+	InstancePtr->Config.Name = ConfigPtr->Name;
 #endif
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 	InstancePtr->Config.DmaEnabled = ConfigPtr->DmaEnabled;

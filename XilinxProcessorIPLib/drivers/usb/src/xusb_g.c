@@ -31,8 +31,11 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
+#include "xstatus.h"
 #include "xusb.h"
+#ifndef SDT
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 

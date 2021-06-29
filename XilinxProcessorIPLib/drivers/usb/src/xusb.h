@@ -322,6 +322,10 @@ typedef struct {
 	UINTPTR BaseAddress;	/**< Core register base address. */
 	u8 DmaEnabled;		/**< DMA support Enabled */
 	u8 AddrWidth;		/**< DMA Address Width */
+	u16 IntrId;		/**< Bits[11:0] Interrupt-id Bits[15:12] trigger
+				     type and level flags */
+	UINTPTR IntrParent;	/**< Bit[0] Interrupt parent type Bit[64/32:1]
+				     Parent base address */
 } XUsb_Config;
 
 
