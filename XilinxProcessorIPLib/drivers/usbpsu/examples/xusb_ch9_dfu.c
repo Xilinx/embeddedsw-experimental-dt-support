@@ -26,9 +26,11 @@
 
 /***************************** Include Files *********************************/
 #include "xusb_ch9_dfu.h"
-#include "xparameters.h"		/* XPAR parameters */
 #include "xusb_class_dfu.h"
 
+#ifndef SDT
+#include "xparameters.h"		/* XPAR parameters */
+#endif
 /************************** Constant Definitions *****************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
