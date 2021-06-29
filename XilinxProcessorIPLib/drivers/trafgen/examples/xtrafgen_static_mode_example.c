@@ -49,15 +49,25 @@
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
+#ifndef SDT
 #define TRAFGEN_DEV_ID	XPAR_XTRAFGEN_0_DEVICE_ID
+#endif
 #define BURST_LEN	255
+#ifndef SDT
 #define MEM_ADDR	XPAR_AXI_BRAM_CTRL_2_S_AXI_BASEADDR
+#else
+#define MEM_ADDR	XPAR_AXI_BRAM_0_BASEADDRESS
+#endif
 #define DATA 		0xc0015afe
 
 #undef DEBUG
 
 /************************** Function Prototypes ******************************/
+#ifndef SDT
 int XTrafGenStaticModeExample(XTrafGen *InstancePtr, u16 DeviceId);
+#else
+int XTrafGenStaticModeExample(XTrafGen *InstancePtr, UINTPTR BaseAddress);
+#endif
 #ifdef XPAR_UARTNS550_0_BASEADDR
 static void Uart550_Setup(void);
 #endif
@@ -90,7 +100,11 @@ int main()
 
 	xil_printf("--- Entering main() ---\n\r");
 
+#ifndef SDT
 	Status = XTrafGenStaticModeExample(&XTrafGenInstance, TRAFGEN_DEV_ID);
+#else
+	Status = XTrafGenStaticModeExample(&XTrafGenInstance, XPAR_XTRAFGEN_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("TrafficGen Static mode Example Test Failed\n\r");
 		xil_printf("--- Exiting main() ---\n\r");
@@ -131,7 +145,11 @@ int main()
 *		-XST_FAILURE to indicate failure
 *
 ******************************************************************************/
+#ifndef SDT
 int XTrafGenStaticModeExample(XTrafGen *InstancePtr, u16 DeviceId)
+#else
+int XTrafGenStaticModeExample(XTrafGen *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 
 	XTrafGen_Config *Config;
@@ -148,9 +166,15 @@ int XTrafGenStaticModeExample(XTrafGen *InstancePtr, u16 DeviceId)
 #endif
 
 	/* Initialize the Device Configuration Interface driver */
+#ifndef SDT
 	Config = XTrafGen_LookupConfig(DeviceId);
+#else
+	Config = XTrafGen_LookupConfig(BaseAddress);
+#endif
 	if (!Config) {
+#ifndef SDT
 		xil_printf("No config found for %d\r\n", DeviceId);
+#endif
 		return XST_FAILURE;
 	}
 
