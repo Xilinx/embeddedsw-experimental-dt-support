@@ -52,7 +52,10 @@
 #include "xtrafgen.h"
 #include "xparameters.h"
 #include "xil_exception.h"
+
+#ifdef XPAR_AXI_FIFO_0_BASEADDR
 #include "xllfifo.h"
+#endif
 
 #ifdef XPAR_UARTNS550_0_BASEADDR
 #include "xuartns550_l.h"       /* to use uartns550 */

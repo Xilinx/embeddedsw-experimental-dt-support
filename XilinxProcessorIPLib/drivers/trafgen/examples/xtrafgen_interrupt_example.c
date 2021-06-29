@@ -55,11 +55,14 @@
  #include "xscugic.h"
 #endif
 
+#include "xinterrupt_wrap.h"
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
+#ifndef SDT
 #define TRAFGEN_DEV_ID	XPAR_XTRAFGEN_0_DEVICE_ID
+#endif
 
 #ifdef XPAR_V6DDR_0_S_AXI_BASEADDR
 #define DDR_BASE_ADDR	XPAR_V6DDR_0_S_AXI_BASEADDR
@@ -83,12 +86,14 @@
 #define TEST_LENGTH		0x8
 #define MSTRRAM_INDEX	(TEST_LENGTH) * 4
 
+#ifndef SDT
 #ifdef XPAR_INTC_0_DEVICE_ID
 #define ERR_INTR_ID              XPAR_INTC_0_TRAFGEN_0_ERR_OUT_VEC_ID
 #define CMP_INTR_ID              XPAR_INTC_0_TRAFGEN_0_IRQ_OUT_VEC_ID
 #else
 #define ERR_INTR_ID              XPAR_FABRIC_TRAFGEN_0_ERR_OUT_VEC_ID
 #define CMP_INTR_ID              XPAR_FABRIC_TRAFGEN_0_IRQ_OUT_VEC_ID
+#endif
 #endif
 
 #ifdef XPAR_INTC_0_DEVICE_ID
@@ -112,12 +117,16 @@
 static void Uart550_Setup(void);
 #endif
 
+#ifndef SDT
 int XTrafGenInterruptExample(XTrafGen *InstancePtr, u16 DeviceId);
+static int SetupIntrSystem(INTC * IntcInstancePtr,
+                           XTrafGen * InstancePtr, u16 CmpIntrId, u16 ErrIntrId);
+#else
+int XTrafGenInterruptExample(XTrafGen *InstancePtr, UINTPTR BaseAddress);
+#endif
 void InitDefaultCommands(XTrafGen_Cmd *CmdPtr);
 static void MasterCompleteIntrHandler(void *Callback);
 static void ErrIntrHandler(void *Callback);
-static int SetupIntrSystem(INTC * IntcInstancePtr,
-                           XTrafGen * InstancePtr, u16 CmpIntrId, u16 ErrIntrId);
 static void DisableIntrSystem(INTC * IntcInstancePtr,
                                         u16 CmpIntrId, u16 ErrIntrId);
 
@@ -177,7 +186,11 @@ int main()
 
 	xil_printf("Entering main\n\r");
 
+#ifndef SDT
 	Status = XTrafGenInterruptExample(&XTrafGenInstance, TRAFGEN_DEV_ID);
+#else
+	Status = XTrafGenInterruptExample(&XTrafGenInstance, XPAR_XTRAFGEN_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Traffic Generator Interrupt Example Test Failed\n\r");
 		xil_printf("--- Exiting main() ---\n\r");
@@ -217,7 +230,11 @@ int main()
 *		-XST_FAILURE to indicate failure
 *
 ******************************************************************************/
+#ifndef SDT
 int XTrafGenInterruptExample(XTrafGen *InstancePtr, u16 DeviceId)
+#else
+int XTrafGenInterruptExample(XTrafGen *InstancePtr, UINTPTR BaseAddress)
+#endif
 {
 
 	XTrafGen_Config *Config;
@@ -235,9 +252,15 @@ int XTrafGenInterruptExample(XTrafGen *InstancePtr, u16 DeviceId)
 #endif
 
 	/* Initialize the Device Configuration Interface driver */
+#ifndef SDT
 	Config = XTrafGen_LookupConfig(DeviceId);
+#else
+	Config = XTrafGen_LookupConfig(BaseAddress);
+#endif
 	if (!Config) {
+#ifndef SDT
 		xil_printf("No config found for %d\r\n", DeviceId);
+#endif
 		return XST_FAILURE;
 	}
 
@@ -353,7 +376,18 @@ int XTrafGenInterruptExample(XTrafGen *InstancePtr, u16 DeviceId)
 	XTrafGen_EnableMasterCmpInterrupt(InstancePtr);
 
 	/* Set up Interrupt system  */
+#ifndef SDT
 	Status = SetupIntrSystem(&Intc, InstancePtr, CMP_INTR_ID, ERR_INTR_ID);
+#else
+	Status = XSetupInterruptSystem(InstancePtr, &MasterCompleteIntrHandler,
+			               InstancePtr->Config.IntId[0],
+				       InstancePtr->Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+	Status = XSetupInterruptSystem(InstancePtr, &ErrIntrHandler,
+			               InstancePtr->Config.IntId[1],
+				       InstancePtr->Config.IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Failed intr setup\r\n");
 		return Status;
@@ -385,7 +419,10 @@ int XTrafGenInterruptExample(XTrafGen *InstancePtr, u16 DeviceId)
 		}
 	}
 
-	DisableIntrSystem(&Intc, CMP_INTR_ID, ERR_INTR_ID);
+	XDisconnectInterruptCntrl(InstancePtr->Config.IntId[0],
+				       InstancePtr->Config.IntrParent);
+	XDisconnectInterruptCntrl(InstancePtr->Config.IntId[1],
+				       InstancePtr->Config.IntrParent);
 	return Status;
 }
 
