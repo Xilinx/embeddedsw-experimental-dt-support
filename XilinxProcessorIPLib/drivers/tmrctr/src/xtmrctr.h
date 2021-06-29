@@ -275,7 +275,11 @@ typedef struct {
 void XTmrCtr_CfgInitialize(XTmrCtr *InstancePtr, XTmrCtr_Config *ConfigPtr,
 		UINTPTR EffectiveAddr);
 int XTmrCtr_InitHw(XTmrCtr *InstancePtr);
+#ifndef SDT
 int XTmrCtr_Initialize(XTmrCtr * InstancePtr, u16 DeviceId);
+#else
+int XTmrCtr_Initialize(XTmrCtr * InstancePtr, UINTPTR BaseAddr);
+#endif
 void XTmrCtr_Start(XTmrCtr * InstancePtr, u8 TmrCtrNumber);
 void XTmrCtr_Stop(XTmrCtr * InstancePtr, u8 TmrCtrNumber);
 u32 XTmrCtr_GetValue(XTmrCtr * InstancePtr, u8 TmrCtrNumber);
