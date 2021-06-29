@@ -31,9 +31,11 @@
 
 /***************************** Include Files *********************************/
 #include "xusb_class_storage.h"
-#include "xparameters.h"
 #include "xusb_ch9_storage.h"
 
+#ifndef SDT
+#include "xparameters.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/

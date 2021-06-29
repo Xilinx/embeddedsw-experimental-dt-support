@@ -24,10 +24,12 @@
  *****************************************************************************/
 
 /***************************** Include Files *********************************/
-#include "xparameters.h"	/* XPAR parameters */
 #include "xusb_ch9_composite.h"
 #include "xusb_class_composite.h"
 
+#ifndef SDT
+#include "xparameters.h"	/* XPAR parameters */
+#endif
 /************************** Constant Definitions *****************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
