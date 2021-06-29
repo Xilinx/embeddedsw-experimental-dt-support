@@ -30,10 +30,14 @@
 *****************************************************************************/
 
 /***************************** Include Files ********************************/
-
-#include "xparameters.h"
 #include "xtmrctr.h"
 #include "xil_printf.h"
+
+#ifdef SDT
+#include "xtmrctr_example.h"
+#else
+#include "xparameters.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 
@@ -42,7 +46,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define TMRCTR_DEVICE_ID  XPAR_TMRCTR_0_DEVICE_ID
+#endif
 
 /*
  * This example only uses the 1st of the 2 timer counters contained in a
@@ -57,8 +63,11 @@
 
 
 /************************** Function Prototypes ****************************/
-
+#ifndef SDT
 int TmrCtrSelfTestExample(u16 DeviceId, u8 TmrCtrNumber);
+#else
+int TmrCtrSelfTestExample(UINTPTR BaseAddr, u8 TmrCtrNumber);
+#endif
 
 /************************** Variable Definitions **************************/
 
@@ -82,8 +91,11 @@ XTmrCtr TimerCounter; /* The instance of the timer counter */
 int main(void)
 {
 	int Status;
-
+#ifndef SDT
 	Status = TmrCtrSelfTestExample(TMRCTR_DEVICE_ID, TIMER_COUNTER_0);
+#else
+	Status = TmrCtrSelfTestExample(XTMRCTR_BASEADDRESS, TIMER_COUNTER_0);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Tmrctr selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -115,7 +127,11 @@ int main(void)
 * @note		None
 *
 ****************************************************************************/
+#ifndef SDT
 int TmrCtrSelfTestExample(u16 DeviceId, u8 TmrCtrNumber)
+#else
+int TmrCtrSelfTestExample(UINTPTR BaseAddr, u8 TmrCtrNumber)
+#endif
 {
 	int Status;
 	XTmrCtr *TmrCtrInstancePtr = &TimerCounter;
@@ -123,7 +139,11 @@ int TmrCtrSelfTestExample(u16 DeviceId, u8 TmrCtrNumber)
 	/*
 	 * Initialize the TmrCtr driver so that it iss ready to use
 	 */
+	#ifndef SDT
 	Status = XTmrCtr_Initialize(TmrCtrInstancePtr, DeviceId);
+	#else
+	Status = XTmrCtr_Initialize(TmrCtrInstancePtr, BaseAddr);
+	#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}

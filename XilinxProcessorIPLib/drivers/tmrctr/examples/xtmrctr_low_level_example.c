@@ -33,10 +33,15 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xtmrctr_l.h"
 #include "xil_printf.h"
+
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xtmrctr_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -45,7 +50,11 @@
  * xparameters.h file. They are only defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define TMRCTR_BASEADDR		XPAR_TMRCTR_0_BASEADDR
+#else
+#define TMRCTR_BASEADDR		XTMRCTR_BASEADDRESS
+#endif
 
 /*
  * This example only uses the 1st of the 2 timer counters contained in a
@@ -61,7 +70,7 @@
 
 /************************** Function Prototypes ******************************/
 
-int TmrCtrLowLevelExample(u32 TmrCtrBaseAddress, u8 TimerCounter);
+int TmrCtrLowLevelExample(UINTPTR TmrCtrBaseAddress, u8 TimerCounter);
 
 /************************** Variable Definitions *****************************/
 
@@ -120,7 +129,7 @@ int main(void)
 * return.
 *
 ****************************************************************************/
-int TmrCtrLowLevelExample(u32 TmrCtrBaseAddress, u8 TmrCtrNumber)
+int TmrCtrLowLevelExample(UINTPTR TmrCtrBaseAddress, u8 TmrCtrNumber)
 {
 	u32 Value1;
 	u32 Value2;
