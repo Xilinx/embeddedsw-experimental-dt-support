@@ -59,11 +59,14 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xintc_l.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
+
+
+#ifndef SDT
+#include "xparameters.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -76,17 +79,21 @@
 #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
 #define INTC_DEVICE_INTR_ID	XPAR_INTC_0_UARTLITE_0_VEC_ID
 #define INTC_DEVICE_INT_MASK	XPAR_RS232_UART_1_INTERRUPT_MASK
-
+#else
+#include "xintc_example.h"
+#define INTC_BASEADDR	XINTC_BASEADDRESS
+#define INTC_DEVICE_INTR_ID 0x0U
+#define INTC_DEVICE_INT_MASK 0x1U
+#endif
 
 /**************************** Type Definitions *******************************/
-
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 
 /************************** Function Prototypes ******************************/
 
-int IntcLowLevelExample(u32 IntcBaseAddress);
+int IntcLowLevelExample(UINTPTR IntcBaseAddress);
 
 void SetupInterruptSystem();
 
@@ -153,7 +160,7 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
-int IntcLowLevelExample(u32 IntcBaseAddress)
+int IntcLowLevelExample(UINTPTR IntcBaseAddress)
 {
 
 	/*
@@ -237,9 +244,15 @@ void SetupInterruptSystem()
 	/*
 	 * Register the interrupt controller handler with the exception table.
 	 */
+	#ifndef SDT
 	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
 			(Xil_ExceptionHandler)XIntc_DeviceInterruptHandler,
 			INTC_DEVICE_ID);
+	#else
+	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
+                      (Xil_ExceptionHandler)XIntc_DeviceInterruptHandler,
+                      INTC_BASEADDR);
+	#endif
 
 	/*
 	 * Enable exceptions.
