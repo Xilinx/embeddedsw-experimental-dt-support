@@ -303,6 +303,9 @@ typedef struct {
 				               2 - secondary instance
 				               3 - last instance */
 
+	u16 IntrId;		/** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent;		/** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+
 /** Static vector table of interrupt handlers */
 #if XPAR_INTC_0_INTC_TYPE != XIN_INTC_NOCASCADE
 	XIntc_VectorTableEntry HandlerTable[XIN_CONTROLLER_MAX_INTRS];
