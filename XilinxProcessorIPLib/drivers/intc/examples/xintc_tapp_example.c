@@ -48,7 +48,8 @@
 #include "xil_exception.h"
 #include "xil_printf.h"
 
-
+#ifndef SDT
+#include "xparameters.h"
 /************************** Constant Definitions *****************************/
 
 /*
@@ -60,17 +61,23 @@
 #ifndef TESTAPP_GEN
 #define INTC_DEVICE_ID		  XPAR_INTC_0_DEVICE_ID
 #endif
+#else
+#include "xintc_example.h"
+#endif
 
 /**************************** Type Definitions *******************************/
-
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int IntcSelfTestExample(u16 DeviceId);
 int IntcInterruptSetup(XIntc *IntcInstancePtr, u16 DeviceId);
+#else
+int IntcSelfTestExample(UINTPTR BaseAddr);
+int IntcInterruptSetup(XIntc *IntcInstancePtr, UINTPTR BaseAddr);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -100,7 +107,11 @@ int main(void)
 	 *  Run the Intc example , specify the Device ID generated in
 	 * xparameters.h.
 	 */
+	#ifndef SDT
 	Status = IntcSelfTestExample(INTC_DEVICE_ID);
+	#else
+	Status = IntcSelfTestExample(XINTC_BASEADDRESS);
+	#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("Intc tapp Example Failed\r\n");
 		return XST_FAILURE;
@@ -135,14 +146,22 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int IntcSelfTestExample(u16 DeviceId)
+#else
+int IntcSelfTestExample(UINTPTR BaseAddr)
+#endif
 {
 	int Status;
 
 	/*
 	 * Initialize the interrupt controller driver so that it is ready to use.
 	 */
+	#ifndef SDT
 	Status = XIntc_Initialize(&InterruptController, DeviceId);
+	#else
+	Status = XIntc_Initialize(&InterruptController, BaseAddr);
+	#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -178,7 +197,11 @@ int IntcSelfTestExample(u16 DeviceId)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int IntcInterruptSetup(XIntc *IntcInstancePtr, u16 DeviceId)
+#else
+int IntcInterruptSetup(XIntc *IntcInstancePtr, UINTPTR BaseAddr)
+#endif
 {
 
 	int Status;
@@ -187,7 +210,11 @@ int IntcInterruptSetup(XIntc *IntcInstancePtr, u16 DeviceId)
 	 * Initialize the interrupt controller driver so that it is
 	 * ready to use.
 	 */
+	#ifndef SDT
 	Status = XIntc_Initialize(IntcInstancePtr, DeviceId);
+	#else
+	Status = XIntc_Initialize(IntcInstancePtr, BaseAddr);
+	#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
