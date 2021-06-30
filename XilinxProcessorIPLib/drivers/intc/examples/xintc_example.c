@@ -60,12 +60,13 @@
 
 /***************************** Include Files *********************************/
 
-#include "xparameters.h"
 #include "xstatus.h"
 #include "xintc.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
 
+#ifndef SDT
+#include "xparameters.h"
 /************************** Constant Definitions *****************************/
 
 /*
@@ -80,6 +81,10 @@
  *  connected to the Input of the Interrupt Controller
  */
 #define INTC_DEVICE_INT_ID	  XPAR_INTC_0_UARTLITE_0_VEC_ID
+#else
+#include "xintc_example.h"
+#define INTC_DEVICE_INT_ID	  0U
+#endif
 
 
 /**************************** Type Definitions *******************************/
@@ -87,10 +92,12 @@
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
-
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int IntcExample(u16 DeviceId);
+#else
+int IntcExample(UINTPTR BaseAddr);
+#endif
 
 int SetUpInterruptSystem(XIntc *XIntcInstancePtr);
 
@@ -127,7 +134,12 @@ int main(void)
 	 * Run the Intc example , specify the Device ID generated in
 	 * xparameters.h
 	 */
+	#ifndef SDT
 	Status = IntcExample(INTC_DEVICE_ID);
+	#else
+	Status = IntcExample(XINTC_BASEADDRESS);
+	#endif
+
 	if (Status != XST_SUCCESS) {
 		xil_printf("Intc Example Failed\r\n");
 		return XST_FAILURE;
@@ -161,7 +173,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int IntcExample(u16 DeviceId)
+#else
+int IntcExample(UINTPTR BaseAddr)
+#endif
 {
 	int Status;
 
@@ -169,7 +185,11 @@ int IntcExample(u16 DeviceId)
 	 * Initialize the interrupt controller driver so that it is ready to
 	 * use.
 	 */
+	#ifndef SDT
 	Status = XIntc_Initialize(&InterruptController, DeviceId);
+	#else
+	Status = XIntc_Initialize(&InterruptController, BaseAddr);
+	#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
