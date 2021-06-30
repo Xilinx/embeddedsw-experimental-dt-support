@@ -36,6 +36,8 @@
 #include <xil_printf.h>
 #include <xparameters.h>
 #include "xnandpsu.h"
+#include "xnandpsu_example.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 /*
@@ -43,7 +45,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define NAND_DEVICE_ID		0U
+#endif
 #define TEST_BUF_SIZE		0x8000U
 #define TEST_PAGE_START		0x2U
 
@@ -52,8 +56,11 @@
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 s32 NandReadWriteExample(u16 NandDeviceId);
+#else
+s32 NandReadWriteExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -99,7 +106,11 @@ int main(void)
 	 * Run the NAND read write example, specify the Base Address that
 	 * is generated in xparameters.h .
 	 */
+#ifndef SDT
 	Status = NandReadWriteExample(NAND_DEVICE_ID);
+#else
+	Status = NandReadWriteExample(XNANDPSU_BASEADDRESS);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("Nand Flash Read Write Example Test Failed\r\n");
@@ -135,7 +146,11 @@ Out:
 *		None
 *
 ****************************************************************************/
+#ifndef SDT
 s32 NandReadWriteExample(u16 NandDeviceId)
+#else
+s32 NandReadWriteExample(UINTPTR BaseAddress)
+#endif
 {
 	s32 Status = XST_FAILURE;
 	XNandPsu_Config *Config;
@@ -143,7 +158,12 @@ s32 NandReadWriteExample(u16 NandDeviceId)
 	u64 Offset;
 	u32 Length;
 
+#ifndef SDT
 	Config = XNandPsu_LookupConfig(NandDeviceId);
+#else
+	Config = XNandPsu_LookupConfig(BaseAddress);
+#endif
+
 	if (Config == NULL) {
 		Status = XST_FAILURE;
 		goto Out;
