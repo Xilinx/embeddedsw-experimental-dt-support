@@ -16,7 +16,19 @@ set periph_ninstances    0
 proc generate {drv_handle} {
   ::hsi::utils::define_include_file $drv_handle "xparameters.h" "XAxiDma" "NUM_INSTANCES" "DEVICE_ID" "C_BASEADDR" "C_HIGHADDR" "C_SG_INCLUDE_STSCNTRL_STRM" "C_INCLUDE_MM2S_DRE" "C_INCLUDE_S2MM_DRE" "C_INCLUDE_MM2S" "C_INCLUDE_S2MM" "C_M_AXI_MM2S_DATA_WIDTH" "C_M_AXI_S2MM_DATA_WIDTH" "C_INCLUDE_SG" "C_ENABLE_MULTI_CHANNEL" "C_NUM_MM2S_CHANNELS" "C_NUM_S2MM_CHANNELS" "C_MM2S_BURST_SIZE" "C_S2MM_BURST_SIZE" "C_MICRO_DMA" "c_addr_width" "c_sg_length_width"
   ::hsi::utils::define_canonical_xpars $drv_handle "xparameters.h" "AxiDma" "DEVICE_ID" "C_BASEADDR" "C_SG_INCLUDE_STSCNTRL_STRM" "C_INCLUDE_MM2S" "C_INCLUDE_MM2S_DRE" "C_M_AXI_MM2S_DATA_WIDTH" "C_INCLUDE_S2MM" "C_INCLUDE_S2MM_DRE" "C_M_AXI_S2MM_DATA_WIDTH" "C_INCLUDE_SG" "C_ENABLE_MULTI_CHANNEL" "C_NUM_MM2S_CHANNELS" "C_NUM_S2MM_CHANNELS" "C_MM2S_BURST_SIZE" "C_S2MM_BURST_SIZE" "C_MICRO_DMA" "c_addr_width" "c_sg_length_width"
-  ::hsi::utils::define_config_file  $drv_handle "xaxidma_g.c" "XAxiDma" "DEVICE_ID" "C_BASEADDR" "C_SG_INCLUDE_STSCNTRL_STRM" "C_INCLUDE_MM2S" "C_INCLUDE_MM2S_DRE" "C_M_AXI_MM2S_DATA_WIDTH" "C_INCLUDE_S2MM" "C_INCLUDE_S2MM_DRE" "C_M_AXI_S2MM_DATA_WIDTH" "C_INCLUDE_SG" "C_NUM_MM2S_CHANNELS" "C_NUM_S2MM_CHANNELS" "C_MM2S_BURST_SIZE" "C_S2MM_BURST_SIZE" "C_MICRO_DMA" "c_addr_width" "c_sg_length_width"
+  ::hsi::utils::define_config_file  $drv_handle "xaxidma_g.c" "XAxiDma" "DEVICE_ID" "C_BASEADDR" "C_SG_INCLUDE_STSCNTRL_STRM" "C_INCLUDE_MM2S" "C_INCLUDE_MM2S_DRE" "C_M_AXI_MM2S_DATA_WIDTH" "C_INCLUDE_S2MM" "C_INCLUDE_S2MM_DRE" "C_M_AXI_S2MM_DATA_WIDTH" "C_INCLUDE_SG" "C_NUM_MM2S_CHANNELS" "C_NUM_S2MM_CHANNELS" "C_MM2S_BURST_SIZE" "C_S2MM_BURST_SIZE" "C_MICRO_DMA" "c_addr_width" "c_sg_length_width" "C_INTERRUPT" "C_INTR_PARENT"
+
+    foreach i [get_sw_cores standalone*] {
+        set intr_wrapper_tcl_file "[get_property "REPOSITORY" $i]/data/intr_wrapper.tcl"
+        if {[file exists $intr_wrapper_tcl_file]} {
+            source $intr_wrapper_tcl_file
+            break
+        }
+    }
+
+    gen_intr $drv_handle "xparameters.h"
+
+
 }
 
 #
