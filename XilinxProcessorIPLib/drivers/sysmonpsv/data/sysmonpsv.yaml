@@ -22,10 +22,16 @@ config:
 
 required:
     - reg
+    - interrupts
+    - interrupt-parent
     - child,required:
         - reg
 
 optional:
     - child,required:
         - xlnx,name
+
+examples:
+   xsysmonpsv_intr_example.c:
+    - interrupts
 ...

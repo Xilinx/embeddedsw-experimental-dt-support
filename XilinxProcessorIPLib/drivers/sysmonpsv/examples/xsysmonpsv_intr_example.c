@@ -34,21 +34,18 @@
 #include "xstatus.h"
 #include "xsysmonpsv.h"
 #include "xsysmonpsv_hw.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions ****************************/
 #define INTR_0 0U
 #define INTR_1 1U
-#define INTC_DEVICE_ID XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define SYSMONPSV_INTR_0_ID (144U + 32U)
-#define SYSMONPSV_INTR_1_ID (145U + 32U)
 #define LOCK_CODE 0xF9E8D7C6
 #define SYSMONPSV_TIMEOUT 100000
 
 /************************** Function Prototypes *****************************/
 
 int SysMonPsvIntrExample();
-static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
-                                XSysMonPsv *SysMonPsvInstPtr, u16 IntrId);
+static void SysMonPsv_InterruptHandler(void *CallBackRef);
 
 /************************** Variable Definitions ****************************/
 
@@ -141,7 +138,10 @@ int SysMonPsvIntrExample() {
   /* Clear any bits set in the Interrupt Status Register. */
   XSysMonPsv_IntrClear(SysMonInstPtr, 0xFFFFFFFF);
 
-  Status = SetupInterruptSystem(&IntcInst, SysMonInstPtr, SYSMONPSV_INTR_0_ID);
+  Status = XSetupInterruptSystem(SysMonInstPtr, &SysMonPsv_InterruptHandler,
+				 ConfigPtr->IntrId,
+				 ConfigPtr->IntrParent,
+				 XINTERRUPT_DEFAULT_PRIORITY);
   if (Status != XST_SUCCESS)
     return Status;
 
@@ -217,68 +217,3 @@ static void SysMonPsv_InterruptHandler(void *CallBackRef) {
   XSysMonPsv_IntrDisable(SysMonPtr, IntrStatus, INTR_0);
 }
 
-/*****************************************************************************/
-/**
- *
- * This function sets up the interrupt system so interrupts can occur for the
- * Sysmon. This function is application-specific. The user should modify this
- * function to fit the application.
- *
- * @param	IntcInstPtr is a pointer to the instance of the INTC.
- * @param	SysMonPsvInstPtr contains a pointer to the instance of the
- *		sysmon driver which is going to be connected to the interrupt
- *		controller.
- * @param	IntrId is the interrupt Id and is typically
- *		XPAR_<SYSMONPSV_instance>_INTR value from xparameters.h.
- *
- * @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
- *
- * @note		None.
- *
- ****************************************************************************/
-static int SetupInterruptSystem(XScuGic *IntcInstancePtr,
-                                XSysMonPsv *SysMonPsvInstPtr, u16 IntrId) {
-  int Status;
-  XScuGic_Config *IntcConfig;
-
-  /* Initialize the interrupt controller driver */
-  IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-  if (NULL == IntcConfig) {
-    return XST_FAILURE;
-  }
-
-  Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-                                 IntcConfig->CpuBaseAddress);
-  if (Status != XST_SUCCESS) {
-    return XST_FAILURE;
-  }
-
-  /*
-   * Connect the interrupt controller interrupt handler to the
-   * hardware interrupt handling logic in the processor.
-   */
-  Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-                               (Xil_ExceptionHandler)XScuGic_InterruptHandler,
-                               IntcInstancePtr);
-  /*
-   * Connect a device driver handler that will be called when an
-   * interrupt for the device occurs, the device driver handler
-   * performs the specific interrupt processing for the device
-   */
-  Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-                           (Xil_ExceptionHandler)SysMonPsv_InterruptHandler,
-                           (void *)SysMonPsvInstPtr);
-  if (Status != XST_SUCCESS) {
-    return XST_FAILURE;
-  }
-
-  /* Enable the interrupt for the device */
-  XScuGic_Enable(IntcInstancePtr, IntrId);
-
-  /*
-   * Enable interrupts in the Processor.
-   */
-  Xil_ExceptionEnable();
-
-  return XST_SUCCESS;
-}
