@@ -30,6 +30,7 @@
 #include "xaxidma.h"
 #include "xparameters.h"
 #include "xdebug.h"
+#include "xaxidma_example.h"
 
 /******************** Constant Definitions **********************************/
 
@@ -37,8 +38,10 @@
  * Device hardware build related constants.
  */
 
- #ifndef TESTAPP_GEN
-#define DMA_DEV_ID		XPAR_AXIDMA_0_DEVICE_ID
+#ifndef TESTAPP_GEN
+#ifndef SDT
+#define DMA_DEV_ID              XPAR_AXIDMA_0_DEVICE_ID
+#endif
 #endif
 
 /**************************** Type Definitions *******************************/
@@ -49,7 +52,11 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int AxiDMASelfTestExample(u16 DeviceId);
+#else
+int AxiDMASelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 /*
@@ -80,7 +87,11 @@ int main()
 	xil_printf("\r\n--- Entering main() --- \r\n");
 
 	/* Run the poll example for simple transfer */
+#ifndef SDT
 	Status = AxiDMASelfTestExample(DMA_DEV_ID);
+#else
+	Status = AxiDMASelfTestExample(XAXIDMA_BASEADDRESS);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("AxiDMASelfTest Example Failed\r\n");
@@ -109,12 +120,20 @@ int main()
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int AxiDMASelfTestExample(u16 DeviceId)
+#else
+int AxiDMASelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	XAxiDma_Config *CfgPtr;
 	int Status = XST_SUCCESS;
 
+#ifndef SDT
 	CfgPtr = XAxiDma_LookupConfig(DeviceId);
+#else
+	CfgPtr = XAxiDma_LookupConfig(BaseAddress);
+#endif
 	if (!CfgPtr) {
 		return XST_FAILURE;
 	}

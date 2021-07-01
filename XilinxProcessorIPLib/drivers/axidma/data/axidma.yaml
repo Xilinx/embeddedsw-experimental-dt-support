@@ -69,6 +69,8 @@ required:
     - xlnx,micro-dma
     - xlnx,addrwidth
     - xlnx,sg-length-width
+    - interrupts: 2
+    - interrupt-parent
 
 examples:
     xaxidma_example_simple_poll.c:
@@ -92,7 +94,4 @@ examples:
     xaxidma_example_poll_multi_pkts.c:
         - xlnx,include-sg: 1
 
-    xaxidma_example_multichan_sg_intr.c:
-        - xlnx,num-mm2s-channels: 2
-        - interrupts
 ...

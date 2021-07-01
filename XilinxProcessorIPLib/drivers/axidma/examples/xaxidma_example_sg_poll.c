@@ -60,6 +60,7 @@
 #include "xaxidma.h"
 #include "xparameters.h"
 #include "xdebug.h"
+#include "xaxidma_example.h"
 
 #ifdef __aarch64__
 #include "xil_mmu.h"
@@ -78,6 +79,7 @@ extern void xil_printf(const char *format, ...);
 /*
  * Device hardware build related constants.
  */
+#ifndef SDT
 
 #define DMA_DEV_ID		XPAR_AXIDMA_0_DEVICE_ID
 
@@ -89,6 +91,13 @@ extern void xil_printf(const char *format, ...);
 #define DDR_BASE_ADDR	XPAR_MIG_0_BASEADDR
 #elif defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR)
 #define DDR_BASE_ADDR	XPAR_PSU_DDR_0_S_AXI_BASEADDR
+#endif
+
+#else
+
+#ifdef XPAR_MEM0_BASEADDRESS
+#define DDR_BASE_ADDR		XPAR_MEM0_BASEADDRESS
+#endif
 #endif
 
 #ifndef DDR_BASE_ADDR
@@ -178,12 +187,21 @@ int main(void)
 	Xil_SetTlbAttributes(RX_BD_SPACE_BASE, MARK_UNCACHEABLE);
 #endif
 
+#ifndef SDT
 	Config = XAxiDma_LookupConfig(DMA_DEV_ID);
 	if (!Config) {
 		xil_printf("No config found for %d\r\n", DMA_DEV_ID);
 
 		return XST_FAILURE;
 	}
+#else
+	Config = XAxiDma_LookupConfig(XAXIDMA_BASEADDRESS);
+	if (!Config) {
+		xil_printf("No config found for %d\r\n", XAXIDMA_BASEADDRESS);
+
+		return XST_FAILURE;
+	}
+#endif
 
 	/* Initialize DMA engine */
 	Status = XAxiDma_CfgInitialize(&AxiDma, Config);
@@ -519,16 +537,15 @@ static int SendPacket(XAxiDma * AxiDmaInstPtr)
 		return XST_FAILURE;
 	}
 
-#if (XPAR_AXIDMA_0_SG_INCLUDE_STSCNTRL_STRM == 1)
-	Status = XAxiDma_BdSetAppWord(BdPtr,
-	    XAXIDMA_LAST_APPWORD, MAX_PKT_LEN);
-
-	/* If Set app length failed, it is not fatal
-	 */
-	if (Status != XST_SUCCESS) {
-		xil_printf("Set app word failed with %d\r\n", Status);
+	if (TxRingPtr->HasStsCntrlStrm) {
+		Status = XAxiDma_BdSetAppWord(BdPtr, XAXIDMA_LAST_APPWORD,
+					     MAX_PKT_LEN);
+		/* If Set app length failed, it is not fatal
+		 */
+		if (Status != XST_SUCCESS) {
+			xil_printf("Set app word failed with %d\r\n", Status);
+		}
 	}
-#endif
 
 	/* For single packet, both SOF and EOF are to be set
 	 */
