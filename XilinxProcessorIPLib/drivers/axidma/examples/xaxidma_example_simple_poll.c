@@ -61,6 +61,7 @@
 #include "xparameters.h"
 #include "xdebug.h"
 #include "sleep.h"
+#include "xaxidma_example.h"
 
 #if defined(XPAR_UARTNS550_0_BASEADDR)
 #include "xuartns550_l.h"       /* to use uartns550 */
@@ -72,6 +73,7 @@
  * Device hardware build related constants.
  */
 
+#ifndef SDT
 #define DMA_DEV_ID		XPAR_AXIDMA_0_DEVICE_ID
 
 #ifdef XPAR_AXI_7SDDR_0_S_AXI_BASEADDR
@@ -82,6 +84,13 @@
 #define DDR_BASE_ADDR	XPAR_MIG_0_C0_DDR4_MEMORY_MAP_BASEADDR
 #elif defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR)
 #define DDR_BASE_ADDR	XPAR_PSU_DDR_0_S_AXI_BASEADDR
+#endif
+
+#else
+
+#ifdef XPAR_MEM0_BASEADDRESS
+#define DDR_BASE_ADDR		XPAR_MEM0_BASEADDRESS
+#endif
 #endif
 
 #ifndef DDR_BASE_ADDR
@@ -115,7 +124,11 @@
 extern void xil_printf(const char *format, ...);
 #endif
 
+#ifndef SDT
 int XAxiDma_SimplePollExample(u16 DeviceId);
+#else
+int XAxiDma_SimplePollExample(UINTPTR BaseAddress);
+#endif
 static int CheckData(void);
 
 /************************** Variable Definitions *****************************/
@@ -146,7 +159,11 @@ int main()
 	xil_printf("\r\n--- Entering main() --- \r\n");
 
 	/* Run the poll example for simple transfer */
+#ifndef SDT
 	Status = XAxiDma_SimplePollExample(DMA_DEV_ID);
+#else
+	Status = XAxiDma_SimplePollExample(XAXIDMA_BASEADDRESS);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		xil_printf("XAxiDma_SimplePoll Example Failed\r\n");
@@ -203,7 +220,11 @@ static void Uart550_Setup(void)
 *
 *
 ******************************************************************************/
+#ifndef SDT
 int XAxiDma_SimplePollExample(u16 DeviceId)
+#else
+int XAxiDma_SimplePollExample(UINTPTR BaseAddress)
+#endif
 {
 	XAxiDma_Config *CfgPtr;
 	int Status;
@@ -219,11 +240,19 @@ int XAxiDma_SimplePollExample(u16 DeviceId)
 
 	/* Initialize the XAxiDma device.
 	 */
+#ifndef SDT
 	CfgPtr = XAxiDma_LookupConfig(DeviceId);
 	if (!CfgPtr) {
 		xil_printf("No config found for %d\r\n", DeviceId);
 		return XST_FAILURE;
 	}
+#else
+	CfgPtr = XAxiDma_LookupConfig(BaseAddress);
+	if (!CfgPtr) {
+		xil_printf("No config found for %d\r\n", BaseAddress);
+		return XST_FAILURE;
+	}
+#endif
 
 	Status = XAxiDma_CfgInitialize(&AxiDma, CfgPtr);
 	if (Status != XST_SUCCESS) {
