@@ -49,18 +49,24 @@
 #include "xusb_storage.h"
 #include "stdio.h"
 #include "xenv_standalone.h"
-#include "xil_exception.h"
 #include "xil_cache.h"
 
+#ifndef SDT
+#include "xil_exception.h"
 #ifdef XPAR_INTC_0_DEVICE_ID
  #include "xintc.h"
 #else
  #include "xscugic.h"
 #endif
-
+#else
+#include "xinterrupt_wrap.h"
+#include "xusb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
-#define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 #define READ_COMMAND		1
+
+#ifndef SDT
+#define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 
 #ifdef XPAR_INTC_0_DEVICE_ID
  #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
@@ -69,9 +75,10 @@
  #define INTC_HANDLER		XIntc_InterruptHandler
 #else
  #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
- #define USB_INTR		    XPAR_FABRIC_AXI_USB2_DEVICE_1_USB_IRPT_INTR
+ #define USB_INTR		XPAR_FABRIC_AXI_USB2_DEVICE_1_USB_IRPT_INTR
  #define INTC			 	XScuGic
  #define INTC_HANDLER		XScuGic_InterruptHandler
+#endif
 #endif
 
 #undef XUSB_MS_DEBUG
@@ -80,7 +87,9 @@
 
 XUsb UsbInstance;		/* The instance of the USB device */
 XUsb_Config *UsbConfigPtr;	/* Instance of the USB config structure */
+#ifndef SDT
 INTC InterruptController;	/* Instance of the Interrupt Controller */
+#endif
 
 volatile u8 CmdFlag = 0;
 volatile u8 FirstPkt = 0;
@@ -110,7 +119,11 @@ int main()
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(USB_DEVICE_ID);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(XUSB_BASEADDRESS);
+#endif
 	if (NULL == UsbConfigPtr) {
 		return XST_FAILURE;
 	}
@@ -176,7 +189,15 @@ int main()
 	/*
 	 * Setup the interrupt system.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(&UsbInstance);
+#else
+	Status = XSetupInterruptSystem(&UsbInstance,
+					&XUsb_IntrHandler,
+					UsbConfigPtr->IntrId,
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -217,7 +238,7 @@ int main()
 				if (UsbInstance.Config.DmaEnabled) {
 
 					Xil_DCacheInvalidateRange(
-						(u32) &CmdBlock, sizeof(CmdBlock));
+						(UINTPTR) &CmdBlock, sizeof(CmdBlock));
 
 					while ((XUsb_ReadReg(
 						UsbInstance.Config.BaseAddress,
@@ -492,7 +513,7 @@ void Ep1IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 
 				if (InstancePtr->Config.DmaEnabled) {
 
-					Xil_DCacheFlushRange((u32)RdRamDiskPtr,
+					Xil_DCacheFlushRange((UINTPTR)RdRamDiskPtr,
 								512);
 				}
 
@@ -507,7 +528,7 @@ void Ep1IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 				RdRamDiskPtr += (64 * RdIndex);
 
 				if (InstancePtr->Config.DmaEnabled) {
-					Xil_DCacheFlushRange((u32)RdRamDiskPtr,
+					Xil_DCacheFlushRange((UINTPTR)RdRamDiskPtr,
 						64);
 				}
 
@@ -529,7 +550,7 @@ void Ep1IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 			CmdStatusBlock.Residue.value = 0;
 
 			if (InstancePtr->Config.DmaEnabled) {
-				Xil_DCacheFlushRange((u32)&CmdStatusBlock,
+				Xil_DCacheFlushRange((UINTPTR)&CmdStatusBlock,
 					USBCSW_LENGTH);
 			}
 
@@ -759,7 +780,7 @@ void ProcessRxCmd(XUsb * InstancePtr)
 
 
 		if (InstancePtr->Config.DmaEnabled) {
-			Xil_DCacheFlushRange((u32)BufPtr, Length);
+			Xil_DCacheFlushRange((UINTPTR)BufPtr, Length);
 		}
 
 		while (XUsb_EpDataSend(InstancePtr, 1, BufPtr, Length) !=
@@ -795,7 +816,7 @@ void ProcessRxCmd(XUsb * InstancePtr)
 		if (InstancePtr->Config.DmaEnabled) {
 
 			Xil_DCacheFlushRange(
-				(u32)&CmdStatusBlock, USBCSW_LENGTH);
+				(UINTPTR)&CmdStatusBlock, USBCSW_LENGTH);
 		}
 
 		/*
@@ -880,7 +901,7 @@ void Read10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 		    XUSB_EP_HIGH_SPEED) {
 			if (InstancePtr->Config.DmaEnabled) {
 
-				Xil_DCacheFlushRange((u32)RamDiskPtr, 512);
+				Xil_DCacheFlushRange((UINTPTR)RamDiskPtr, 512);
 			}
 
 
@@ -914,7 +935,7 @@ void Read10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 			 */
 			if (InstancePtr->Config.DmaEnabled) {
 
-				Xil_DCacheFlushRange((u32)RamDiskPtr, 64);
+				Xil_DCacheFlushRange((UINTPTR)RamDiskPtr, 64);
 			}
 
 			if (XUsb_EpDataSend(InstancePtr, 1,
@@ -1005,7 +1026,7 @@ void Write10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 		    XUSB_EP_HIGH_SPEED) {
 			if (InstancePtr->Config.DmaEnabled) {
 				Xil_DCacheInvalidateRange(
-						(u32)WrRamDiskPtr, 512);
+						(UINTPTR)WrRamDiskPtr, 512);
 				}
 			while (XUsb_EpDataRecv(InstancePtr, 2, WrRamDiskPtr,
 					       512) != XST_SUCCESS) {
@@ -1038,7 +1059,7 @@ void Write10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 				if (InstancePtr->Config.DmaEnabled) {
 
 					Xil_DCacheInvalidateRange(
-						(u32)WrRamDiskPtr, 64);
+						(UINTPTR)WrRamDiskPtr, 64);
 				}
 				while (XUsb_EpDataRecv(InstancePtr, 2,
 						       WrRamDiskPtr,
@@ -1153,6 +1174,7 @@ void GetMaxLUN(XUsb * InstancePtr)
 			XUSB_BUFFREADY_OFFSET, 1);
 }
 
+#ifndef SDT
 /******************************************************************************/
 /**
 *
@@ -1173,8 +1195,6 @@ void GetMaxLUN(XUsb * InstancePtr)
 * @note		None
 *
 *******************************************************************************/
-
-
 static int SetupInterruptSystem(XUsb * InstancePtr)
 {
 	int Status;
@@ -1273,3 +1293,4 @@ static int SetupInterruptSystem(XUsb * InstancePtr)
 
 	return XST_SUCCESS;
 }
+#endif

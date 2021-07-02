@@ -60,16 +60,26 @@
 /***************************** Include Files *********************************/
 
 #include "xusb.h"
-#include "xintc.h"
 #include "xusb_mouse.h"
 #include "stdio.h"
 #include "xgpio.h"
-#include "xil_exception.h"
 
+#ifndef SDT
+#include "xintc.h"
+#include "xil_exception.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xusb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
+#ifndef SDT
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
+#else
+#define XGPIO_BASEADDRESS 0	/* Default gpio instance */
+#endif
+
 #define USB_INTR		XPAR_INTC_0_USB_0_VEC_ID
 
 /*
@@ -93,10 +103,15 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int UsbMouseExample (u16 UsbId,	u16 GpioId);
 
 static int SetupInterruptSystem(XUsb *UsbInstancePtr,
 				XGpio *Gpio);
+#else
+int UsbMouseExample(UINTPTR UsbBaseAddress, UINTPTR GpioBaseAddress);
+void GpioIsr(void *InstancePtr);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -106,7 +121,9 @@ static XGpio Gpio; 		/* The Instance of the GPIO Driver */
 XUsb_Config	*UsbConfigPtr;	/* Instance of the USB config structure */
 XGpio_Config *GpioConfigPtr;	/* Pointer to the GPIO config structure */
 
+#ifndef SDT
 XIntc Intc;			/* Instance of the Interrupt Controller */
+#endif
 volatile int StopTest = FALSE;
 
 /****************************************************************************/
@@ -127,7 +144,11 @@ int main(void)
 {
 	int Status;
 
+#ifndef SDT
 	Status = UsbMouseExample(USB_DEVICE_ID, GPIO_DEVICE_ID);
+#else
+	Status = UsbMouseExample(XUSB_BASEADDRESS, XGPIO_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -154,14 +175,22 @@ int main(void)
  * @note	None.
  *
  *****************************************************************************/
+#ifndef SDT
 int UsbMouseExample (u16 UsbId,	u16 GpioId)
+#else
+int UsbMouseExample(UINTPTR UsbBaseAddress, UINTPTR GpioBaseAddress)
+#endif
 {
 	int Status;
 
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(UsbId);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(UsbBaseAddress);
+#endif
 	if (NULL == UsbConfigPtr) {
 		return XST_FAILURE;
 	}
@@ -182,7 +211,11 @@ int UsbMouseExample (u16 UsbId,	u16 GpioId)
 	/*
 	 * Initialize the GPIO driver.
 	 */
+#ifndef SDT
 	GpioConfigPtr = XGpio_LookupConfig(GpioId);
+#else
+	GpioConfigPtr = XGpio_LookupConfig(GpioBaseAddress);
+#endif
 	if (GpioConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -234,7 +267,15 @@ int UsbMouseExample (u16 UsbId,	u16 GpioId)
 	/*
 	 * Setup the interrupt system.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(&UsbInstance, &Gpio);
+#else
+	Status = XSetupInterruptSystem(&UsbInstance,
+					&XUsb_IntrHandler,
+					UsbConfigPtr->IntrId,
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -251,6 +292,18 @@ int UsbMouseExample (u16 UsbId,	u16 GpioId)
 				XUSB_STATUS_EP0_BUFF1_COMP_MASK |
 				XUSB_STATUS_EP1_BUFF1_COMP_MASK |
 				XUSB_STATUS_EP1_BUFF2_COMP_MASK );
+#ifdef SDT
+	Status = XSetupInterruptSystem(&Gpio,
+					&GpioIsr,
+					GpioConfigPtr->IntrId,
+					GpioConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	XGpio_InterruptEnable(&Gpio, BUTTON_INTERRUPT);
+#endif
 
 	XUsb_Start(&UsbInstance);
 
@@ -582,6 +635,7 @@ void GpioIsr(void *InstancePtr)
 
 }
 
+#ifndef SDT
 /******************************************************************************/
 /**
 *
@@ -676,4 +730,4 @@ static int SetupInterruptSystem(XUsb *UsbInstancePtr, XGpio *Gpio)
 
 	return XST_SUCCESS;
 }
-
+#endif
