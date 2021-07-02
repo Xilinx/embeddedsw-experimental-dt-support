@@ -27,17 +27,22 @@
 #ifndef __XUSBTYPES_H__
 #define __XUSBTYPES_H__
 #ifdef __cplusplus
+#include "xusb.h"
 extern "C" {
 #endif
 
 /*
  * Application specific constant.
  */
+#ifndef SDT
 #undef HID_DEVICES
 #undef USB_KEYBOARD
 #undef USB_MOUSE
 #define MASS_STORAGE_DEVICE
 #undef MICROPHONE
+#else
+#include "xusb_example_config.h"
+#endif
 /*
  * Chapter 9 requests
  */

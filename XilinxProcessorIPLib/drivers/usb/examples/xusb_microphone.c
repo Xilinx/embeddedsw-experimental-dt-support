@@ -33,20 +33,27 @@
 /***************************** Include Files *********************************/
 
 #include "xusb.h"
-#include "xintc.h"
 #include "xusb_microphone.h"
 #include "stdio.h"
 #include "data.h"
-#include "xil_exception.h"
 #include "xil_cache.h"
 
+#ifndef SDT
+#include "xintc.h"
+#include "xil_exception.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xusb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
+#ifndef SDT
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
 #define USB_INTR		XPAR_INTC_0_USB_0_VEC_ID
 
 static int SetupInterruptSystem(XUsb * InstancePtr);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -54,7 +61,9 @@ static XUsb UsbInstance;		/* The instance of the USB device */
 
 XUsb_Config *UsbConfigPtr;	/* Pointer to the USB config structure */
 
+#ifndef SDT
 XIntc InterruptController;	/* Instance of the Interrupt Controller */
+#endif
 
 /*****************************************************************************/
 /**
@@ -77,7 +86,11 @@ int main()
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(USB_DEVICE_ID);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(XUSB_BASEADDRESS);
+#endif
 	if (UsbConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -131,7 +144,15 @@ int main()
 	/*
 	 * Setup the interrupt system.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(&UsbInstance);
+#else
+	Status = XSetupInterruptSystem(&UsbInstance,
+					&XUsb_IntrHandler,
+					UsbConfigPtr->IntrId,
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -405,6 +426,7 @@ void Ep1IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 	}
 }
 
+#ifndef SDT
 /******************************************************************************/
 /**
 *
@@ -483,4 +505,4 @@ static int SetupInterruptSystem(XUsb * InstancePtr)
 
 	return XST_SUCCESS;
 }
-
+#endif

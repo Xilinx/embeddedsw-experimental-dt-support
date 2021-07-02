@@ -34,8 +34,10 @@
 #include "xusb.h"
 #include "xusb_storage.h"
 #include "xenv_standalone.h"
-#include "xil_exception.h"
 #include "xil_cache.h"
+
+#ifndef SDT
+#include "xil_exception.h"
 
 #ifdef XPAR_INTC_0_DEVICE_ID
 #include "xintc.h"
@@ -44,10 +46,14 @@
 #include "xscugic.h"
 #include "xil_printf.h"
 #endif
-
+#else
+#include "xusb_example.h"
+#include "xinterrupt_wrap.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
+#ifndef SDT
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 
 
@@ -56,8 +62,9 @@
 #define USB_INTR		XPAR_INTC_0_USB_0_VEC_ID
 #else
 #define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define USB_INTR			XPAR_FABRIC_AXI_USB2_DEVICE_1_USB_IRPT_INTR
+#define USB_INTR		XPAR_FABRIC_AXI_USB2_DEVICE_1_USB_IRPT_INTR
 #endif /* XPAR_INTC_0_DEVICE_ID */
+#endif
 
 #define READ_COMMAND		1
 #define WRITE_COMMAND		2
@@ -65,6 +72,7 @@
 
 /************************** Variable Definitions *****************************/
 
+#ifndef SDT
 #ifdef XPAR_INTC_0_DEVICE_ID
 #define INTC		XIntc
 #define INTC_HANDLER	XIntc_InterruptHandler
@@ -72,13 +80,14 @@
 #define INTC		XScuGic
 #define INTC_HANDLER	XScuGic_InterruptHandler
 #endif /* XPAR_INTC_0_DEVICE_ID */
-
+#endif
 
 XUsb UsbInstance;		/* The instance of the USB device */
 XUsb_Config *UsbConfigPtr;	/* Instance of the USB config structure */
 
+#ifndef SDT
 INTC InterruptController;	/* Instance of the Interrupt Controller */
-
+#endif
 
 volatile u8 CmdFlag = 0;
 
@@ -122,7 +131,11 @@ int main()
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(USB_DEVICE_ID);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(XUSB_BASEADDRESS);
+#endif
 	if (NULL == UsbConfigPtr) {
 		return XST_FAILURE;
 	}
@@ -191,7 +204,15 @@ int main()
 	/*
 	 * Setup the interrupt system.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(&UsbInstance);
+#else
+	Status = XSetupInterruptSystem(&UsbInstance,
+					&XUsb_IntrHandler,
+					UsbConfigPtr->IntrId,
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -519,7 +540,7 @@ void Ep2IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 
 	}
 	if (CmdFlag != WRITE_COMMAND) {
-		Xil_DCacheInvalidateRange(							(u32) &CmdBlock, sizeof(CmdBlock));
+		Xil_DCacheInvalidateRange((UINTPTR) &CmdBlock, sizeof(CmdBlock));
 
 		RxDmaTransfer = TRUE;
 		XUsb_EpDataRecv(InstancePtr, 2,
@@ -568,7 +589,7 @@ void DmaIntrHandler(void *CallBackRef, u32 IntrStatus)
 				if (CmdFlag != WRITE_COMMAND){
 					if (ResponseSent == FALSE) {
 					Xil_DCacheFlushRange(
-						(u32)&CmdStatusBlock,
+						(UINTPTR)&CmdStatusBlock,
 						USBCSW_LENGTH);
 					/*
 					 * Send a Success Status.
@@ -816,7 +837,7 @@ void ProcessRxCmd(XUsb * InstancePtr)
 
 	if (SendResp == TRUE) {
 
-		Xil_DCacheFlushRange((u32)BufPtr, Length);
+		Xil_DCacheFlushRange((UINTPTR)BufPtr, Length);
 		if (XUsb_EpDataSend(InstancePtr, 1, BufPtr, Length) !=
 		       XST_SUCCESS) {
 			xil_printf("SendResp failure\r\n");
@@ -838,7 +859,7 @@ void ProcessRxCmd(XUsb * InstancePtr)
 
 
 	if (SendStatus == TRUE) {
-		Xil_DCacheFlushRange((u32)&CmdStatusBlock,
+		Xil_DCacheFlushRange((UINTPTR)&CmdStatusBlock,
 				USBCSW_LENGTH);
 		if (XUsb_EpDataSend(&UsbInstance, 1,
 			(unsigned char *) &CmdStatusBlock,
@@ -911,7 +932,7 @@ void Read10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 
 		if (InstancePtr->DeviceConfig.CurrentSpeed ==
 		    XUSB_EP_HIGH_SPEED) {
-			Xil_DCacheFlushRange((u32)RamDiskPtr, 512);
+			Xil_DCacheFlushRange((UINTPTR)RamDiskPtr, 512);
 
 			if (XUsb_EpDataSend(InstancePtr, 1, RamDiskPtr,
 					       512) != XST_SUCCESS) {
@@ -944,7 +965,7 @@ void Read10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 			 * Full speed is 64 bytes a packet, so 8 make up 512
 			 * bytes.
 			 */
-			Xil_DCacheFlushRange((u32)RamDiskPtr, 64);
+			Xil_DCacheFlushRange((UINTPTR)RamDiskPtr, 64);
 
 			if (XUsb_EpDataSend(InstancePtr, 1,
 					       RamDiskPtr,
@@ -1047,7 +1068,7 @@ void ReadTransfer(XUsb *InstancePtr)
 	}
 	if (BlockCount.IntBlockCount > 0) {
 			RdRamDiskPtr = (u8 *) &(RamDisk[Lba.IntLba][0]);
-			Xil_DCacheFlushRange((u32)RdRamDiskPtr, 512);
+			Xil_DCacheFlushRange((UINTPTR)RdRamDiskPtr, 512);
 			if (InstancePtr->DeviceConfig.CurrentSpeed ==
 				XUSB_EP_HIGH_SPEED) {
 				if (XUsb_EpDataSend(&UsbInstance, 1,
@@ -1059,7 +1080,7 @@ void ReadTransfer(XUsb *InstancePtr)
 			} else {
 
 				RdRamDiskPtr += (64 * RdIndex);
-				Xil_DCacheFlushRange((u32)RdRamDiskPtr,
+				Xil_DCacheFlushRange((UINTPTR)RdRamDiskPtr,
 				64);
 				XUsb_EpDataSend(&UsbInstance, 1, RdRamDiskPtr,
 					64);
@@ -1072,7 +1093,7 @@ void ReadTransfer(XUsb *InstancePtr)
 			}
 	} else {
 			if (RdResponseSent == FALSE) {
-				Xil_DCacheFlushRange((u32)&CmdStatusBlock,
+				Xil_DCacheFlushRange((UINTPTR)&CmdStatusBlock,
 					USBCSW_LENGTH);
 					CmdStatusBlock.bCSWStatus = CMD_PASSED;
 					CmdStatusBlock.Residue.value = 0;
@@ -1106,7 +1127,7 @@ void WriteTransfer(XUsb *InstancePtr)
 
 		RxDmaTransfer = TRUE;
 		WrRamDiskPtr = (u8 *) &(RamDisk[Lba.IntLba][0]);
-		Xil_DCacheInvalidateRange((u32)WrRamDiskPtr, 512);
+		Xil_DCacheInvalidateRange((UINTPTR)WrRamDiskPtr, 512);
 		if (InstancePtr->DeviceConfig.CurrentSpeed ==
 				XUSB_EP_HIGH_SPEED) {
 			if (XUsb_EpDataRecv(&UsbInstance, 2, WrRamDiskPtr,
@@ -1121,7 +1142,7 @@ void WriteTransfer(XUsb *InstancePtr)
 			}
 		} else {
 			WrRamDiskPtr += (64 * WrIndex);
-			Xil_DCacheInvalidateRange((u32)WrRamDiskPtr,
+			Xil_DCacheInvalidateRange((UINTPTR)WrRamDiskPtr,
 						64);
 			XUsb_EpDataRecv(&UsbInstance, 2, WrRamDiskPtr,
 						64);
@@ -1137,7 +1158,7 @@ void WriteTransfer(XUsb *InstancePtr)
 				WrDataPhase = FALSE;
 				CmdStatusBlock.bCSWStatus = CMD_PASSED;
 				CmdStatusBlock.Residue.value = 0;
-				Xil_DCacheFlushRange((u32)&CmdStatusBlock,
+				Xil_DCacheFlushRange((UINTPTR)&CmdStatusBlock,
 					USBCSW_LENGTH);
 				if (XUsb_EpDataSend(&UsbInstance, 1,
 				(unsigned char *) &CmdStatusBlock,
@@ -1214,6 +1235,7 @@ void GetMaxLUN(XUsb * InstancePtr)
 			XUSB_BUFFREADY_OFFSET, 1);
 }
 
+#ifndef SDT
 /******************************************************************************/
 /**
 *
@@ -1338,5 +1360,4 @@ static int SetupInterruptSystem(XUsb * InstancePtr)
 
 	return XST_SUCCESS;
 }
-
-
+#endif

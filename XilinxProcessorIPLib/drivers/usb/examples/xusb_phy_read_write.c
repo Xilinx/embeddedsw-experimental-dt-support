@@ -25,17 +25,24 @@
 /***************************** Include Files *********************************/
 
 #include "xusb.h"
-#include "xintc.h"
 #include "stdio.h"
 #include "xenv_standalone.h"
-#include "xil_exception.h"
 #include "xil_cache.h"
 
+#ifndef SDT
+#include "xintc.h"
+#include "xil_exception.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xusb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
+#ifndef SDT
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
 #define USB_INTR		XPAR_INTC_0_USB_0_VEC_ID
+#endif
 
 #define ULPI_SCRATCH_REGISTER	0x16
 #define WRITE_REG_DATA		0xAA
@@ -45,12 +52,16 @@
 XUsb UsbInstance;		/* The instance of the USB device */
 XUsb_Config *UsbConfigPtr;	/* Instance of the USB config structure */
 
-XIntc InterruptController;	/* Instance of the Interrupt Controller */
-
 volatile u8 PhyAccessDone = 0;
 
+#ifndef SDT
+XIntc InterruptController;	/* Instance of the Interrupt Controller */
+#endif
+
 void UsbIfPhyIntrHandler(void *CallBackRef, u32 IntrStatus);
+
 static int SetupInterruptSystem(XUsb * InstancePtr);
+
 
 /*****************************************************************************/
 /**
@@ -72,7 +83,11 @@ int main()
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(USB_DEVICE_ID);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(XUSB_BASEADDRESS);
+#endif
 	if (NULL == UsbConfigPtr) {
 		return XST_FAILURE;
 	}
@@ -107,7 +122,15 @@ int main()
 	/*
 	 * Setup the interrupt system.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(&UsbInstance);
+#else
+	Status = XSetupInterruptSystem(&UsbInstance,
+					&XUsb_IntrHandler,
+					UsbConfigPtr->IntrId,
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -179,6 +202,7 @@ void UsbIfPhyIntrHandler(void *CallBackRef, u32 IntrStatus)
 
 }
 
+#ifndef SDT
 /******************************************************************************/
 /**
 *
@@ -257,5 +281,4 @@ static int SetupInterruptSystem(XUsb * InstancePtr)
 
 	return XST_SUCCESS;
 }
-
-
+#endif
