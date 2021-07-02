@@ -36,9 +36,8 @@
 
 #include "xparameters.h"	/* EDK generated parameters */
 #include "xspips.h"		/* SPI device driver */
-#include "xscugic.h"		/* Interrupt controller device driver */
-#include "xil_exception.h"
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -47,9 +46,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define SPI_INTR_ID		XPAR_XSPIPS_0_INTR
+#endif
 
 /*
  * The following constants define the commands which may be sent to the EEPROM
@@ -121,11 +120,6 @@ typedef u8 EepromBuffer[BUFFER_SIZE];
 
 /************************** Function Prototypes ******************************/
 
-static int SpiSetupIntrSystem(XScuGic *IntcInstancePtr,
-			      XSpiPs *SpiInstancePtr, u16 SpiIntrId);
-
-static void SpiDisableIntrSystem(XScuGic *IntcInstancePtr, u16 SpiIntrId);
-
 void SpiHandler(void *CallBackRef, u32 StatusEvent, unsigned int ByteCount);
 
 void EepromRead(XSpiPs *SpiPtr, u16 Address, int ByteCount,
@@ -133,9 +127,11 @@ void EepromRead(XSpiPs *SpiPtr, u16 Address, int ByteCount,
 
 void EepromWrite(XSpiPs *SpiPtr, u16 Address, u8 ByteCount,
 		 EepromBuffer Buffer);
-
-int SpiPsEepromIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
-			 u16 SpiDeviceId, u16 SpiIntrId);
+#ifndef SDT
+int SpiPsEepromIntrExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId);
+#else
+int SpiPsEepromIntrExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -144,7 +140,6 @@ int SpiPsEepromIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
  * are initialized to zero each time the program runs.  They could be local
  * but should at least be static so they are zeroed.
  */
-static XScuGic IntcInstance;
 static XSpiPs SpiInstance;
 
 /*
@@ -193,8 +188,11 @@ int main(void)
 	/*
 	 * Run the Spi Interrupt example.
 	 */
-	Status = SpiPsEepromIntrExample(&IntcInstance, &SpiInstance,
-				      SPI_DEVICE_ID, SPI_INTR_ID);
+#ifndef	SDT
+	Status = SpiPsEepromIntrExample(&SpiInstance, SPI_DEVICE_ID);
+#else
+	Status = SpiPsEepromIntrExample(&SpiInstance, XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI EEPROM Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -227,8 +225,11 @@ int main(void)
 * read a status of 0xFF for the status register as the bus is pulled up.
 *
 *****************************************************************************/
-int SpiPsEepromIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
-			 u16 SpiDeviceId, u16 SpiIntrId)
+#ifndef SDT
+int SpiPsEepromIntrExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
+#else
+int SpiPsEepromIntrExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 *BufferPtr;
@@ -240,7 +241,11 @@ int SpiPsEepromIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
 	/*
 	 * Initialize the SPI driver so that it's ready to use
 	 */
+#ifndef SDT
 	SpiConfig = XSpiPs_LookupConfig(SpiDeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}
@@ -263,7 +268,10 @@ int SpiPsEepromIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
 	 * Connect the Spi device to the interrupt subsystem such that
 	 * interrupts can occur. This function is application specific
 	 */
-	Status = SpiSetupIntrSystem(IntcInstancePtr, SpiInstancePtr, SpiIntrId);
+	Status = XSetupInterruptSystem(SpiInstancePtr, &XSpiPs_InterruptHandler,
+				       SpiConfig->IntrId,
+				       SpiConfig->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -332,7 +340,7 @@ int SpiPsEepromIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
 		}
 	}
 
-	SpiDisableIntrSystem(IntcInstancePtr, SpiIntrId);
+	XDisconnectInterruptCntrl(SpiConfig->IntrId, SpiConfig->IntrParent);
 	return XST_SUCCESS;
 }
 
@@ -516,109 +524,4 @@ void EepromWrite(XSpiPs *SpiPtr, u16 Address, u8 ByteCount,
 			break;
 		}
 	}
-}
-
-/*****************************************************************************/
-/**
-*
-* This function setups the interrupt system for an Spi device.
-* This function is application specific since the actual system may or may not
-* have an interrupt controller. The Spi device could be directly connected to
-* a processor without an interrupt controller.  The user should modify this
-* function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the Intc device.
-* @param	SpiInstancePtr is a pointer to the instance of the Spi device.
-* @param	SpiIntrId is the interrupt Id for an SPI device.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-******************************************************************************/
-static int SpiSetupIntrSystem(XScuGic *IntcInstancePtr,
-			      XSpiPs *SpiInstancePtr, u16 SpiIntrId)
-{
-	int Status;
-
-#ifndef TESTAPP_GEN
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, SpiIntrId,
-				(Xil_ExceptionHandler)XSpiPs_InterruptHandler,
-				(void *)SpiInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the Spi device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, SpiIntrId);
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-#endif
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
-*
-* This function disables the interrupts that occur for the Spi device.
-*
-* @param	IntcInstancePtr is the pointer to a ScuGic driver instance.
-* @param	SpiIntrId is the interrupt Id for an SPI device.
-*
-* @return	None.
-*
-* @note		None.
-*
-******************************************************************************/
-static void SpiDisableIntrSystem(XScuGic *IntcInstancePtr, u16 SpiIntrId)
-{
-	/*
-	 * Disable the interrupt for the SPI device.
-	 */
-	XScuGic_Disable(IntcInstancePtr, SpiIntrId);
-
-	/*
-	 * Disconnect and disable the interrupt for the Spi device.
-	 */
-	XScuGic_Disconnect(IntcInstancePtr, SpiIntrId);
 }

@@ -40,7 +40,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
+#endif
 #define TPM_SPI_SELECT		0x00
 
 #define	XSPIPS_TPM_ACCESS 	0x0000
@@ -89,7 +91,11 @@ int SpiPsTpmFifoRead(XSpiPs *SpiPtr, u8* DataPtr, u8 ByteCount);
 int SpiPsTpmFifoWrite(XSpiPs *SpiPtr, u8* DataPtr, u8 ByteCount);
 int SpiPsTpmTransfer(XSpiPs *SpiPtr, u32 Address, u8* TxBuf, u8* RxBuf, u16 Length);
 int SpiPsTpmDataTransfer(XSpiPs *SpiPtr, u8* TxBuf, u8* RxBuf, u16 TxLen);
+#ifndef SDT
 int SpiPsTpmPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId);
+#else
+int SpiPsTpmPolledExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 /*
@@ -186,7 +192,11 @@ int main(void)
 	/*
 	 * Run the Spi TPM polled example.
 	 */
+#ifndef SDT
 	Status = SpiPsTpmPolledExample(&SpiInstance, SPI_DEVICE_ID);
+#else
+	Status = SpiPsTpmPolledExample(&SpiInstance, XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI TPM Polled Mode Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -208,7 +218,11 @@ int main(void)
 *
 *
 *****************************************************************************/
+#ifndef SDT
 int SpiPsTpmPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
+#else
+int SpiPsTpmPolledExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	XSpiPs_Config *SpiConfig;
 	int Index;
@@ -222,7 +236,11 @@ int SpiPsTpmPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
 	/*
 	 * Initialize the SPI driver so that it's ready to use
 	 */
+#ifndef SDT
 	SpiConfig = XSpiPs_LookupConfig(SpiDeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}

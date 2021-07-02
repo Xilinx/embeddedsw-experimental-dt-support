@@ -48,7 +48,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
+#endif
 
 /*
  * The following constants define the commands which may be sent to the flash
@@ -126,9 +128,11 @@ static void FlashErase(XSpiPs *SpiPtr);
 static void FlashWrite(XSpiPs *SpiPtr, u32 Address, u32 ByteCount, u8 Command);
 
 static void FlashRead(XSpiPs *SpiPtr, u32 Address, u32 ByteCount, u8 Command);
-
+#ifndef SDT
 int SpiPsFlashPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId);
-
+#else
+int SpiPsFlashPolledExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress);
+#endif
 static int FlashReadID(XSpiPs *SpiInstance);
 
 static int SST_GlobalBlkProtectUnlk(XSpiPs *SpiInstancePtr);
@@ -140,9 +144,8 @@ static int SST_GlobalBlkProtectUnlk(XSpiPs *SpiInstancePtr);
  * are initialized to zero each time the program runs. They could be local
  * but should at least be static so they are zeroed.
  */
-#ifndef TESTAPP_GEN
+
 static XSpiPs SpiInstance;
-#endif
 
 /*
  * Write Address Location in Serial Flash.
@@ -169,7 +172,6 @@ u8 WriteBuffer[MAX_DATA + DATA_OFFSET];
 * @note		None
 *
 ******************************************************************************/
-#ifndef TESTAPP_GEN
 int main(void)
 {
 	int Status;
@@ -179,7 +181,11 @@ int main(void)
 	/*
 	 * Run the Spi Polled example.
 	 */
-	Status = SpiPsFlashPolledExample(&SpiInstance,SPI_DEVICE_ID);
+#ifndef	SDT
+	Status = SpiPsFlashPolledExample(&SpiInstance, SPI_DEVICE_ID);
+#else
+	Status = SpiPsFlashPolledExample(&SpiInstance, XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI SerialFlash Polled Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -188,7 +194,6 @@ int main(void)
 	xil_printf("Successfully ran SPI SerialFlash Polled Example Test\r\n");
 	return XST_SUCCESS;
 }
-#endif
 
 /*****************************************************************************/
 /**
@@ -212,8 +217,11 @@ int main(void)
 * is pulled up.
 *
 *****************************************************************************/
-int SpiPsFlashPolledExample(XSpiPs *SpiInstancePtr,
-			 u16 SpiDeviceId)
+#ifndef SDT
+int SpiPsFlashPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
+#else
+int SpiPsFlashPolledExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 *BufferPtr;
@@ -233,7 +241,11 @@ int SpiPsFlashPolledExample(XSpiPs *SpiInstancePtr,
 	/*
 	 * Initialize the SPI driver so that it's ready to use
 	 */
+#ifndef	SDT
 	SpiConfig = XSpiPs_LookupConfig(SpiDeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}
