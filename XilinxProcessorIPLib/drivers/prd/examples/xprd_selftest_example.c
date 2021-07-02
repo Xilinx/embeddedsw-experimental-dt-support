@@ -38,16 +38,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define PRD_DEVICE_ID	XPAR_PR_DECOUPLER_0_DEVICE_ID
-
+#endif
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 u32 XPrd_SelfTestExample(u16 DeviceId);
-
+#else
+u32 XPrd_SelfTestExample(UINTPTR BaseAddress);
+#endif
 /************************** Variable Definitions *****************************/
 
 XPrd Prd;		/* Instance of the PR Decoupler */
@@ -74,7 +78,11 @@ int main(void)
 	 * Run the PR Decoupler self test example, specify the Device ID
 	 * that is generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = XPrd_SelfTestExample((u16)PRD_DEVICE_ID);
+#else
+	Status = XPrd_SelfTestExample(XPAR_XPRD_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("PR Decoupler Selftest example is failed\r\n");
 		return XST_FAILURE;
@@ -101,7 +109,12 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+
+#ifndef SDT
 u32 XPrd_SelfTestExample(u16 DeviceId)
+#else
+u32 XPrd_SelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	u32 Status;
 	XPrd_Config *CfgPtr;
@@ -110,7 +123,11 @@ u32 XPrd_SelfTestExample(u16 DeviceId)
 	 * Initialize the PR Decoupler driver so that it's ready to use.
 	 * Look up the configuration in the config table, then initialize it.
 	 */
-	 CfgPtr = XPrd_LookupConfig(DeviceId);
+#ifndef SDT
+	CfgPtr = XPrd_LookupConfig(DeviceId);
+#else
+	CfgPtr = XPrd_LookupConfig(BaseAddress);
+#endif
 	 if (NULL == CfgPtr) {
 		return XST_FAILURE;
 	 }
