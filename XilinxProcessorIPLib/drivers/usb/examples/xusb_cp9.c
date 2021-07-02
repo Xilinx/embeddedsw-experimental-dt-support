@@ -32,7 +32,10 @@
 /***************************** Include Files *********************************/
 
 #include "xusb_cp9.h"
+
+#ifndef SDT
 #include <xparameters.h>
+#endif
 
 #undef XUSB_CH9_DEBUG
 

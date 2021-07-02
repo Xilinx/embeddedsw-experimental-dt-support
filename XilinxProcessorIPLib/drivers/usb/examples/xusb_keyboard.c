@@ -63,14 +63,21 @@
 /***************************** Include Files *********************************/
 
 #include "xusb.h"
-#include "xintc.h"
 #include "xusb_keyboard.h"
 #include "stdio.h"
 #include "xgpio.h"
+
+#ifndef SDT
+#include "xintc.h"
 #include "xil_exception.h"
+#else
+#include "xinterrupt_wrap.h"
+#include "xusb_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
+#ifndef SDT
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
 #define USB_INTR		XPAR_INTC_0_USB_0_VEC_ID
@@ -85,6 +92,7 @@
  */
 #define GPIO_DEVICE_ID		XPAR_PUSH_BUTTONS_4BITS_DEVICE_ID
 #define INTC_GPIO_INTERRUPT_ID  XPAR_INTC_0_GPIO_0_VEC_ID
+#endif
 
 #define GPIO_ALL_BUTTONS  0x1F	/* The GPIO bits 0 to 4. */
 #define EXIT_BUTTON	0x0010  /* The GPIO_SW_C on the ML403 board */
@@ -94,8 +102,13 @@
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int UsbKbdExample(u16 UsbId, u16 GpioId);
 static int SetupInterruptSystem(XUsb *UsbPtr, XGpio *GpioPtr);
+#else
+int UsbKbdExample(UINTPTR UsbBaseAddress, UINTPTR GpioBaseAddress);
+void GpioIsr(void *InstancePtr);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -105,7 +118,9 @@ static XGpio Gpio; /* The Instance of the GPIO Driver */
 XUsb_Config *UsbConfigPtr;	/* Pointer to the USB config structure */
 XGpio_Config *GpioConfigPtr;	/* Pointer to the GPIO config structure */
 
+#ifndef SDT
 XIntc InterruptController;	/* Instance of the Interrupt Controller */
+#endif
 volatile int StopTest = FALSE;
 
 int MaxMsgLength;
@@ -128,7 +143,11 @@ int main(void)
 {
 	int Status;
 
+#ifndef SDT
 	Status = UsbKbdExample(USB_DEVICE_ID, GPIO_DEVICE_ID);
+#else
+	Status = UsbKbdExample(XUSB_BASEADDRESS, XGPIO_BASEADDRESS);
+#endif
 
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
@@ -153,7 +172,11 @@ int main(void)
  * @note	None.
  *
  *****************************************************************************/
+#ifndef SDT
 int UsbKbdExample(u16 UsbId, u16 GpioId)
+#else
+int UsbKbdExample(UINTPTR UsbBaseAddress, UINTPTR GpioBaseAddress)
+#endif
 {
 	int Status;
 
@@ -162,7 +185,11 @@ int UsbKbdExample(u16 UsbId, u16 GpioId)
 	/*
 	 * Initialize the GPIO driver.
 	 */
+#ifndef SDT
 	GpioConfigPtr = XGpio_LookupConfig(GpioId);
+#else
+	GpioConfigPtr = XGpio_LookupConfig(GpioBaseAddress);
+#endif
 	if (GpioConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -185,7 +212,11 @@ int UsbKbdExample(u16 UsbId, u16 GpioId)
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(UsbId);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(UsbBaseAddress);
+#endif
 	if (UsbConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -229,7 +260,15 @@ int UsbKbdExample(u16 UsbId, u16 GpioId)
 	/*
 	 * Setup the interrupt system.
 	 */
+#ifndef SDT
 	Status = SetupInterruptSystem(&UsbInstance, &Gpio);
+#else
+	Status = XSetupInterruptSystem(&UsbInstance,
+					&XUsb_IntrHandler,
+					UsbConfigPtr->IntrId,
+					UsbConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+#endif
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -246,6 +285,19 @@ int UsbKbdExample(u16 UsbId, u16 GpioId)
 			XUSB_STATUS_EP0_BUFF1_COMP_MASK |
 			XUSB_STATUS_EP1_BUFF1_COMP_MASK |
 			XUSB_STATUS_EP1_BUFF2_COMP_MASK );
+
+#ifdef SDT
+	Status = XSetupInterruptSystem(&Gpio,
+					&GpioIsr,
+					GpioConfigPtr->IntrId,
+					GpioConfigPtr->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	XGpio_InterruptEnable(&Gpio, BUTTON_INTERRUPT);
+#endif
 
 	XUsb_Start(&UsbInstance);
 
@@ -574,6 +626,7 @@ void GpioIsr(void *InstancePtr)
 
 }
 
+#ifndef SDT
 /******************************************************************************/
 /**
 *
@@ -672,5 +725,4 @@ static int SetupInterruptSystem(XUsb *UsbPtr, XGpio *GpioPtr)
 
 	return XST_SUCCESS;
 }
-
-
+#endif

@@ -34,9 +34,13 @@
 #include "xusb.h"
 #include "xusb_storage.h"
 #include "stdio.h"
-#include "xparameters.h"
 #include "xil_cache.h"
 
+#ifndef SDT
+#include "xparameters.h"
+#else
+#include "xusb_example.h"
+#endif
 /************************** Constant Definitions *****************************/
 
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
@@ -94,7 +98,11 @@ int main()
 	/*
 	 * Initialize the USB driver.
 	 */
+#ifndef SDT
 	UsbConfigPtr = XUsb_LookupConfig(USB_DEVICE_ID);
+#else
+	UsbConfigPtr = XUsb_LookupConfig(XUSB_BASEADDRESS);
+#endif
 	if (NULL == UsbConfigPtr) {
 		return XST_FAILURE;
 	}
@@ -179,7 +187,7 @@ int main()
 							== XUSB_DMA_DMASR_BUSY);
 
 					Xil_DCacheInvalidateRange(
-						(u32) &CmdBlock, sizeof(CmdBlock));
+						(UINTPTR) &CmdBlock, sizeof(CmdBlock));
 				}
 
 				ProcessRxCmd(&UsbInstance);
@@ -444,7 +452,7 @@ void Ep1IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 
 			if (InstancePtr->Config.DmaEnabled) {
 
-				Xil_DCacheFlushRange((u32)RdRamDiskPtr, 512);
+				Xil_DCacheFlushRange((UINTPTR)RdRamDiskPtr, 512);
 			}
 
 			XUsb_EpDataSend(&UsbInstance, 1, RdRamDiskPtr, 512);
@@ -467,7 +475,7 @@ void Ep1IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 			CmdStatusBlock.Residue.value = 0;
 
 			if (InstancePtr->Config.DmaEnabled) {
-				Xil_DCacheFlushRange((u32)&CmdStatusBlock,
+				Xil_DCacheFlushRange((UINTPTR)&CmdStatusBlock,
 					USBCSW_LENGTH);
 			}
 
@@ -535,7 +543,7 @@ void Ep2IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 						XUSB_DMA_DMASR_BUSY)
 						== XUSB_DMA_DMASR_BUSY);
 				Xil_DCacheInvalidateRange(
-						(u32)WrRamDiskPtr, 512);
+						(UINTPTR)WrRamDiskPtr, 512);
 			}
 
 
@@ -561,7 +569,7 @@ void Ep2IntrHandler(void *CallBackRef, u8 EpNum, u32 IntrStatus)
 				CmdStatusBlock.Residue.value = 0;
 
 				if (UsbInstance.Config.DmaEnabled) {
-					Xil_DCacheFlushRange((u32)&CmdStatusBlock,
+					Xil_DCacheFlushRange((UINTPTR)&CmdStatusBlock,
 						USBCSW_LENGTH);
 				}
 
@@ -763,7 +771,7 @@ void ProcessRxCmd(XUsb * InstancePtr)
 
 
 		if (InstancePtr->Config.DmaEnabled) {
-			Xil_DCacheFlushRange((u32)BufPtr, Length);
+			Xil_DCacheFlushRange((UINTPTR)BufPtr, Length);
 		}
 
 		while (XUsb_EpDataSend(InstancePtr, 1, BufPtr, Length) !=
@@ -797,7 +805,7 @@ void ProcessRxCmd(XUsb * InstancePtr)
 		if (InstancePtr->Config.DmaEnabled) {
 
 			Xil_DCacheFlushRange(
-				(u32)&CmdStatusBlock, USBCSW_LENGTH);
+				(UINTPTR)&CmdStatusBlock, USBCSW_LENGTH);
 		}
 
 		/*
@@ -881,7 +889,7 @@ void Read10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 
 			if (InstancePtr->Config.DmaEnabled) {
 
-				Xil_DCacheFlushRange((u32)RamDiskPtr, 512);
+				Xil_DCacheFlushRange((UINTPTR)RamDiskPtr, 512);
 			}
 
 
@@ -1001,7 +1009,7 @@ void Write10(XUsb * InstancePtr, PUSBCBW pCmdBlock, PUSBCSW pStatusBlock)
 				== XUSB_DMA_DMASR_BUSY);
 
 				Xil_DCacheInvalidateRange(
-					(u32)WrRamDiskPtr, 512);
+					(UINTPTR)WrRamDiskPtr, 512);
 			}
 
 				BlockCount.IntBlockCount--;
