@@ -11,7 +11,11 @@ maintainers:
 properties:
   compatible:
     items:
-      - const: xlnx,pr_decoupler
+    OneOf:
+     - items:
+       - enum:
+         - xlnx,pr_decoupler-
+         - xlnx,dfx-decoupler-1.0
   reg:
     description: Physical base address and size of the controller register map
 
