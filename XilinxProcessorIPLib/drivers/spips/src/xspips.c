@@ -168,8 +168,9 @@ s32 XSpiPs_CfgInitialize(XSpiPs *InstancePtr, const XSpiPs_Config *ConfigPtr,
 		InstancePtr->Config.BaseAddress = EffectiveAddr;
 		InstancePtr->Config.InputClockHz = ConfigPtr->InputClockHz;
 		InstancePtr->StatusHandler = StubStatusHandler;
+#ifndef SDT
 		InstancePtr->Config.DeviceId = ConfigPtr->DeviceId;
-
+#endif
 		InstancePtr->SendBufferPtr = NULL;
 		InstancePtr->RecvBufferPtr = NULL;
 		InstancePtr->RequestedBytes = 0U;
