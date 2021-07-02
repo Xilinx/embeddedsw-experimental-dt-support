@@ -53,7 +53,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
+#endif
 
 /*
  * The following constant specify the max amount of data the slave is
@@ -77,7 +79,11 @@ void SpiSlaveRead(int ByteCount);
 
 void SpiSlaveWrite(u8 *Sendbuffer, int ByteCount);
 
+#ifndef SDT
 int SpiPsSlavePolledExample(u16 SpiDeviceId);
+#else
+int SpiPsSlavePolledExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -116,7 +122,11 @@ int main(void)
 	/*
 	 * Run the SpiPs Slave Polled example.
 	 */
+#ifndef SDT
 	Status = SpiPsSlavePolledExample(SPI_DEVICE_ID);
+#else
+	Status = SpiPsSlavePolledExample(XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SpiPs Slave Polled Example Failed \r\n");
 		return XST_FAILURE;
@@ -143,7 +153,11 @@ int main(void)
 *
 *
 *****************************************************************************/
+#ifndef SDT
 int SpiPsSlavePolledExample(u16 SpiDeviceId)
+#else
+int SpiPsSlavePolledExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 *BufferPtr;
@@ -152,7 +166,11 @@ int SpiPsSlavePolledExample(u16 SpiDeviceId)
 	/*
 	 * Initialize the SPI driver so that it's ready to use
 	 */
+#ifndef SDT
 	SpiConfig = XSpiPs_LookupConfig(SpiDeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}
