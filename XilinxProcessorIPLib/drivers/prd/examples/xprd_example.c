@@ -39,16 +39,22 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define XPRD_DEVICE_ID	XPAR_PR_DECOUPLER_0_DEVICE_ID
 #define XGPIO_DEVICE_ID	XPAR_GPIO_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 u32 XPrd_Example(u16 DeviceId);
+#else
+u32 XPrd_Example(UINTPTR BaseAddress);
+#endif
+
 u32 XPrd_TestDecouplerState(XGpio DecouplerGpio);
 
 /************************** Variable Definitions *****************************/
@@ -74,7 +80,11 @@ int main(void)
 	u32 Status;
 
 	/* Run the selftest example */
+#ifndef SDT
 	Status = XPrd_Example((u16)XPRD_DEVICE_ID);
+#else
+	Status = XPrd_Example(XPAR_XPRD_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("PR Decoupler Example is failed\r\n");
 		return XST_FAILURE;
@@ -100,7 +110,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 u32 XPrd_Example(u16 DeviceId)
+#else
+u32 XPrd_Example(UINTPTR BaseAddress)
+#endif
 {
 	u32 Status;
 	XPrd_Config *XPrdCfgPtr;
@@ -113,7 +127,11 @@ u32 XPrd_Example(u16 DeviceId)
 	 * Look up the configuration in the config table, then initialize it.
 	 */
 
+#ifndef SDT
 	XPrdCfgPtr = XPrd_LookupConfig(DeviceId);
+#else
+	XPrdCfgPtr = XPrd_LookupConfig(BaseAddress);
+#endif
 	if (NULL == XPrdCfgPtr) {
 		return XST_FAILURE;
 	}
@@ -124,7 +142,11 @@ u32 XPrd_Example(u16 DeviceId)
 	}
 
 	/* Set up the Decoupler GPIO */
+#ifndef SDT
 	XDecouplerGpioCfgPtr = XGpio_LookupConfig((u16)XGPIO_DEVICE_ID);
+#else
+	XDecouplerGpioCfgPtr = XGpio_LookupConfig(XPAR_XGPIO_0_BASEADDR);
+#endif
 	if (NULL == XDecouplerGpioCfgPtr) {
 		return XST_FAILURE;
 	}
