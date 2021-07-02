@@ -38,9 +38,8 @@
 #include "xparameters.h"	/* SDK generated parameters */
 #include "xplatform_info.h"
 #include "xspips.h"		/* SPI device driver */
-#include "xscugic.h"		/* Interrupt controller device driver */
-#include "xil_exception.h"
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
 
 /************************** Constant Definitions *****************************/
 
@@ -49,9 +48,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define SPI_INTR_ID		XPAR_XSPIPS_1_INTR
+#endif
 
 /*
  * The following constants define the commands which may be sent to the flash
@@ -125,11 +124,6 @@ static int is_sst;
 
 /************************** Function Prototypes ******************************/
 
-static int SpiPsSetupIntrSystem(XScuGic *IntcInstancePtr,
-			       XSpiPs *SpiInstancePtr, u16 SpiIntrId);
-
-static void SpiPsDisableIntrSystem(XScuGic *IntcInstancePtr, u16 SpiIntrId);
-
 void SpiPsHandler(void *CallBackRef, u32 StatusEvent, unsigned int ByteCount);
 
 static void FlashErase(XSpiPs *SpiPtr);
@@ -139,10 +133,11 @@ static void FlashWrite(XSpiPs *SpiPtr, u32 Address, u32 ByteCount, u8 Command);
 static void FlashRead(XSpiPs *SpiPtr, u32 Address, u32 ByteCount, u8 Command);
 
 static int FlashReadID(XSpiPs *SpiInstance);
-
-int SpiPsFlashIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
-			 u16 SpiDeviceId, u16 SpiIntrId);
-
+#ifndef SDT
+int SpiPsFlashIntrExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId);
+#else
+int SpiPsFlashIntrExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress);
+#endif
 static int SST_GlobalBlkProtectUnlk(XSpiPs *SpiInstancePtr);
 
 /************************** Variable Definitions *****************************/
@@ -152,10 +147,7 @@ static int SST_GlobalBlkProtectUnlk(XSpiPs *SpiInstancePtr);
  * are initialized to zero each time the program runs. They could be local
  * but should at least be static so they are zeroed.
  */
- #ifndef TESTAPP_GEN
-static XScuGic IntcInstance;
 static XSpiPs SpiInstance;
-#endif
 
 /*
  * The following variables are shared between non-interrupt processing and
@@ -194,7 +186,6 @@ u8 WriteBuffer[MAX_DATA + DATA_OFFSET];
 * @note		None
 *
 ******************************************************************************/
-#ifndef TESTAPP_GEN
 int main(void)
 {
 	int Status;
@@ -204,8 +195,11 @@ int main(void)
 	/*
 	 * Run the Spi Interrupt example.
 	 */
-	Status = SpiPsFlashIntrExample(&IntcInstance, &SpiInstance,
-				      SPI_DEVICE_ID, SPI_INTR_ID);
+#ifndef SDT
+	Status = SpiPsFlashIntrExample(&SpiInstance, SPI_DEVICE_ID);
+#else
+	Status = SpiPsFlashIntrExample(&SpiInstance, XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI FLASH Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -214,7 +208,7 @@ int main(void)
 	xil_printf("Successfully ran SPI FLASH Interrupt Example Test\r\n");
 	return XST_SUCCESS;
 }
-#endif
+
 /*****************************************************************************/
 /**
 *
@@ -227,8 +221,6 @@ int main(void)
 * @param	SpiInstancePtr is a pointer to the SPI driver instance to use.
 *
 * @param	SpiDeviceId is the Instance Id of SPI in the system.
-*
-* @param	SpiIntrId is the Interrupt Id for SPI in the system.
 *
 *
 * @return
@@ -243,8 +235,11 @@ int main(void)
 * read a status of 0xFF for the status register as the bus is pulled up.
 *
 *****************************************************************************/
-int SpiPsFlashIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
-			 u16 SpiDeviceId, u16 SpiIntrId)
+#ifndef SDT
+int SpiPsFlashIntrExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
+#else
+int SpiPsFlashIntrExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 *BufferPtr;
@@ -259,13 +254,16 @@ int SpiPsFlashIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
 	if ((Platform == XPLAT_ZYNQ_ULTRA_MP) || (Platform == XPLAT_VERSAL)) {
 		MaxSize = 1024 * 10;
 		ChipSelect = FLASH_SPI_SELECT_0;	/* Device is on CS 0 */
-		SpiIntrId = XPAR_XSPIPS_0_INTR;
 	}
 
 	/*
 	 * Initialize the SPI driver so that it's ready to use
 	 */
+#ifndef SDT
 	SpiConfig = XSpiPs_LookupConfig(SpiDeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}
@@ -288,8 +286,10 @@ int SpiPsFlashIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
 	 * Connect the Spi device to the interrupt subsystem such that
 	 * interrupts can occur. This function is application specific
 	 */
-	Status = SpiPsSetupIntrSystem(IntcInstancePtr, SpiInstancePtr,
-				     SpiIntrId);
+	Status = XSetupInterruptSystem(SpiInstancePtr, &XSpiPs_InterruptHandler,
+				       SpiConfig->IntrId,
+				       SpiConfig->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -429,7 +429,7 @@ int SpiPsFlashIntrExample(XScuGic *IntcInstancePtr, XSpiPs *SpiInstancePtr,
 		}
 	}
 
-	SpiPsDisableIntrSystem(IntcInstancePtr, SpiIntrId);
+	XDisconnectInterruptCntrl(SpiConfig->IntrId, SpiConfig->IntrParent);
 	return XST_SUCCESS;
 }
 
@@ -937,103 +937,4 @@ static void FlashErase(XSpiPs *SpiPtr)
 		}
 	}
 
-}
-
-/*****************************************************************************/
-/**
-*
-* This function setups the interrupt system for an Spi device.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the Intc device.
-* @param	SpiInstancePtr is a pointer to the instance of the Spi device.
-* @param	SpiIntrId is the interrupt Id for an SPI device.
-*
-* @return
-*		- XST_SUCCESS if successful
-*		- XST_FAILURE if not successful
-*
-* @note		None.
-*
-******************************************************************************/
-static int SpiPsSetupIntrSystem(XScuGic *IntcInstancePtr,
-			       XSpiPs *SpiInstancePtr, u16 SpiIntrId)
-{
-	int Status;
-
-	XScuGic_Config *IntcConfig; /* Instance of the interrupt controller */
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				IntcInstancePtr);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, SpiIntrId,
-				(Xil_ExceptionHandler)XSpiPs_InterruptHandler,
-				(void *)SpiInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the Spi device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, SpiIntrId);
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
-*
-* This function disables the interrupts that occur for the Spi device.
-*
-* @param	IntcInstancePtr is the pointer to an INTC instance.
-* @param	SpiIntrId is the interrupt Id for an SPI device.
-*
-* @return	None.
-*
-* @note		None.
-*
-******************************************************************************/
-static void SpiPsDisableIntrSystem(XScuGic *IntcInstancePtr, u16 SpiIntrId)
-{
-	/*
-	 * Disable the interrupt for the SPI device.
-	 */
-	XScuGic_Disable(IntcInstancePtr, SpiIntrId);
-
-	/*
-	 * Disconnect and disable the interrupt for the Spi device.
-	 */
-	XScuGic_Disconnect(IntcInstancePtr, SpiIntrId);
 }

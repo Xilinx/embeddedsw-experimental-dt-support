@@ -37,15 +37,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions ********************************/
 
 /***************** Macros (Inline Functions) Definitions **********************/
 
 /************************** Function Prototypes *******************************/
-
+#ifndef SDT
 int SpiPsSelfTestExample(u16 DeviceId);
+#else
+int SpiPsSelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions ******************************/
 
@@ -61,7 +66,6 @@ XSpiPs Spi;			/* The instance of the SPI device */
 * @note		None
 *
 *******************************************************************************/
-#ifndef TESTAPP_GEN
 int main(void)
 {
 	int Status;
@@ -72,7 +76,11 @@ int main(void)
 	 * Call the example , specify the device ID that is generated in
 	 * xparameters.h
 	 */
+#ifndef SDT
 	Status = SpiPsSelfTestExample(SPI_DEVICE_ID);
+#else
+	Status = SpiPsSelfTestExample(XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI Selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -81,7 +89,6 @@ int main(void)
 	xil_printf("Successfully ran SPI Selftest Example\r\n");
 	return XST_SUCCESS;
 }
-#endif
 
 /*****************************************************************************/
 /**
@@ -99,7 +106,11 @@ int main(void)
 * @note		None
 *
 ****************************************************************************/
+#ifndef SDT
 int SpiPsSelfTestExample(u16 DeviceId)
+#else
+int SpiPsSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XSpiPs_Config *SpiConfig;
@@ -107,7 +118,11 @@ int SpiPsSelfTestExample(u16 DeviceId)
 	/*
 	 * Initialize the SPI device.
 	 */
+#ifndef SDT
 	SpiConfig = XSpiPs_LookupConfig(DeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}

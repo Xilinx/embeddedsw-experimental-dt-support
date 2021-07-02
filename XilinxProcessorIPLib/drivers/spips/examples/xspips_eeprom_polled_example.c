@@ -45,7 +45,9 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define SPI_DEVICE_ID		XPAR_XSPIPS_0_DEVICE_ID
+#endif
 
 /*
  * The following constants define the commands which may be sent to the EEPROM
@@ -122,8 +124,11 @@ void EepromRead(XSpiPs *SpiPtr, u16 Address, int ByteCount,
 
 void EepromWrite(XSpiPs *SpiPtr, u16 Address, u8 ByteCount,
 		 EepromBuffer Buffer);
-
+#ifndef SDT
 int SpiPsEepromPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId);
+#else
+int SpiPsEepromPolledExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -168,7 +173,11 @@ int main(void)
 	/*
 	 * Run the Spi Interrupt example.
 	 */
+#ifndef SDT
 	Status = SpiPsEepromPolledExample(&SpiInstance, SPI_DEVICE_ID);
+#else
+	Status = SpiPsEepromPolledExample(&SpiInstance, XPAR_XSPIPS_0_BASEADDR);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("SPI EEPROM Polled Mode Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -199,7 +208,11 @@ int main(void)
 * read a status of 0xFF for the status register as the bus is pulled up.
 *
 *****************************************************************************/
+#ifndef	SDT
 int SpiPsEepromPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
+#else
+int SpiPsEepromPolledExample(XSpiPs *SpiInstancePtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	u8 *BufferPtr;
@@ -211,7 +224,11 @@ int SpiPsEepromPolledExample(XSpiPs *SpiInstancePtr, u16 SpiDeviceId)
 	/*
 	 * Initialize the SPI driver so that it's ready to use
 	 */
+#ifndef SDT
 	SpiConfig = XSpiPs_LookupConfig(SpiDeviceId);
+#else
+	SpiConfig = XSpiPs_LookupConfig(BaseAddress);
+#endif
 	if (NULL == SpiConfig) {
 		return XST_FAILURE;
 	}
