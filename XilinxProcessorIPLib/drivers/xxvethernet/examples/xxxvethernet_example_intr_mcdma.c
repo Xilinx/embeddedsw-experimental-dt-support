@@ -32,6 +32,8 @@
 /***************************** Include Files *********************************/
 
 #include "xxxvethernet_example.h"
+#include "xxvethernet_example.h"
+#include "xinterrupt_wrap.h"
 #include "xmcdma.h"
 #include "xil_cache.h"
 #include "xil_exception.h"
@@ -55,22 +57,10 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #ifndef TESTAPP_GEN
 #define XXVETHERNET_DEVICE_ID	XPAR_XXVETHERNET_0_DEVICE_ID
 #define AXIMCDMA_DEVICE_ID	XPAR_MCDMA_0_DEVICE_ID
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define RX_INTR_ID		XPAR_INTC_0_MCDMA_0_VEC_ID
-#define TX_INTR_ID		XPAR_INTC_0_MCDMA_0_VEC_ID
-#else
-#define TX_INTR_ID(ChanId) XPAR_FABRIC_MCDMA_0_MM2S_CH##ChanId##_INTROUT_VEC_ID
-#define RX_INTR_ID(ChanId) XPAR_FABRIC_MCDMA_0_S2MM_CH##ChanId##_INTROUT_VEC_ID
-#endif
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#else
-#define INTC_DEVICE_ID          XPAR_SCUGIC_SINGLE_DEVICE_ID
 #endif
 #endif
 
@@ -136,28 +126,23 @@ volatile int FramesRx;	/* Num of frames that have been received */
 volatile int FramesTx;	/* Num of frames that have been sent */
 volatile int DeviceErrors;/* Num of errors detected in the device */
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC		XIntc
-#define INTC_HANDLER	XIntc_InterruptHandler
-#else
-#define INTC		XScuGic
-#define INTC_HANDLER	XScuGic_InterruptHandler
-#endif
-
-#ifndef TESTAPP_GEN
-static INTC IntcInstance;
-#endif
-
 /*************************** Function Prototypes *****************************/
 
 /*
  * Examples
  */
+#ifndef SDT
 int XxvEthernetSgDmaIntrExample(INTC *IntcInstancePtr,
 				XXxvEthernet *XxvEthernetInstancePtr,
 				XMcdma *DmaInstancePtr,
 				u16 XxvEthernetDeviceId,
 				u16 AxiMcDmaDeviceId);
+#else
+int XxvEthernetSgDmaIntrExample(XXxvEthernet *XxvEthernetInstancePtr,
+				XMcdma *DmaInstancePtr,
+				UINTPTR XxvEthernetBaseAddr);
+#endif
+
 int XxvEthernetSgDmaIntrSingleFrameExample(XXxvEthernet *XxvEthernetInstancePtr,
 					   XMcdma *DmaInstancePtr, u8 ChanId);
 static int RxBdSetup(XMcdma *McDmaInstPtr, XXxvEthernet *XxvEthernetInstancePtr,
@@ -169,16 +154,6 @@ static void ErrorHandler(void *CallBackRef, u32 Chan_id, u32 Mask);
 static void TxDoneHandler(void *CallBackRef, u32 Chan_id);
 static void TxErrorHandler(void *CallBackRef, u32 Chan_id, u32 Mask);
 static int inline AxiEnetMapper(u8 ChanId);
-static int ChanIntr_Id(XMcdma_ChanCtrl *Chan, int ChanId);
-
-/*
- * Interrupt setup and Callbacks for examples
- */
-static int XxvEthernetSetupIntrSystem(INTC *IntcInstancePtr,
-				      XMcdma *DmaInstancePtr,
-				      u8 McdmaIntrId,
-				      u8 Direction);
-
 /*****************************************************************************/
 /**
 *
@@ -203,11 +178,17 @@ int main(void)
 	 * Call the Xxv Ethernet MCDMA interrupt example , specify the
 	 * parameters generated in xparameters.h.
 	 */
+#ifndef SDT
 	Status = XxvEthernetSgDmaIntrExample(&IntcInstance,
 					     &XxvEthernetInstance,
 					     &DmaInstance,
 					     XXVETHERNET_DEVICE_ID,
 					     AXIMCDMA_DEVICE_ID);
+#else
+	Status = XxvEthernetSgDmaIntrExample(&XxvEthernetInstance,
+					     &DmaInstance,
+					     XXXVETHERNET_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		XxvEthernetUtilErrorTrap("Failed test intr mcdma");
 		XxvEthernetUtilErrorTrap("--- Exiting main() ---");
@@ -250,15 +231,22 @@ int main(void)
 *		initialization would reset XxvEthernet.
 *
 ******************************************************************************/
+#ifndef SDT
 int XxvEthernetSgDmaIntrExample(INTC *IntcInstancePtr,
 				XXxvEthernet *XxvEthernetInstancePtr,
 				XMcdma *DmaInstancePtr,
 				u16 XxvEthernetDeviceId,
 				u16 AxiMcDmaDeviceId)
+#else
+int XxvEthernetSgDmaIntrExample(XXxvEthernet *XxvEthernetInstancePtr,
+				XMcdma *DmaInstancePtr,
+				UINTPTR XxvEthernetBaseAddr)
+#endif
 {
 	int Status;
 	XXxvEthernet_Config *MacCfgPtr;
 	XMcdma_Config* DmaConfig;
+	UINTPTR XxvDevBaseAddress;
 	u8 ChanId;
 
 	/*************************************/
@@ -268,20 +256,30 @@ int XxvEthernetSgDmaIntrExample(INTC *IntcInstancePtr,
 	/*
 	 *  Get the configuration of XxvEthernet hardware.
 	 */
+#ifndef SDT
 	MacCfgPtr = XXxvEthernet_LookupConfig(XxvEthernetDeviceId);
+#else
+	MacCfgPtr = XXxvEthernet_LookupConfig(XxvEthernetBaseAddr);
+#endif
+
+	XxvDevBaseAddress = MacCfgPtr->XxvDevBaseAddress & XXV_AXIBASEADDR_MASK;
 
 	/*
 	 * This example assumes a target MCDMA is connected to XXV Ethernet
 	 */
 
+#ifndef SDT
 	DmaConfig = XMcdma_LookupConfig(AxiMcDmaDeviceId);
-
+#else
+	DmaConfig = XMcdma_LookupConfig(XxvDevBaseAddress);
+#endif
 	/*
 	 * Initialize AXIMCDMA engine. AXIMCDMA engine must be initialized before
 	 * XxvEthernet. During AXIMCDMA engine initialization, AXIMCDMA hardware is
 	 * reset, and since AXIMCDMA reset line is connected to XxvEthernet, this
 	 * would ensure a reset of XxvEthernet.
 	 */
+
 	Status = XMcDma_CfgInitialize(DmaInstancePtr, DmaConfig);
 	if(Status != XST_SUCCESS) {
 		XxvEthernetUtilErrorTrap("Error initializing DMA\r\n");
@@ -322,7 +320,7 @@ int XxvEthernetSgDmaIntrExample(INTC *IntcInstancePtr,
 	/* Run through the examples */
 	/****************************/
 
-	for (ChanId = 1 ; ChanId <= XPAR_MCDMA_0_NUM_MM2S_CHANNELS; ChanId++) {
+	for (ChanId = 1 ; ChanId <= DmaConfig->TxNumChannels; ChanId++) {
 
 		/*
 		 * Run the XxvEthernet DMA Single Frame Interrupt example
@@ -351,11 +349,13 @@ static int RxBdSetup(XMcdma *McDmaInstPtr, XXxvEthernet *XxvEthernetInstancePtr,
 	int BdCount = RXBD_CNT;
 	int Status;
 	UINTPTR RxBdSpacePtr;
+	int Num_channels;
 
 
 	RxBdSpacePtr = (UINTPTR)&RxBdSpace;
+	Num_channels = McDmaInstPtr->Config.RxNumChannels;
 
-	for (ChanId = 1; ChanId <= XPAR_MCDMA_0_NUM_MM2S_CHANNELS; ChanId++) {
+	for (ChanId = 1; ChanId <= McDmaInstPtr->Config.RxNumChannels; ChanId++) {
 		Rx_Chan = XMcdma_GetMcdmaRxChan(McDmaInstPtr, ChanId);
 
 		/* Disable all interrupts */
@@ -373,11 +373,10 @@ static int RxBdSetup(XMcdma *McDmaInstPtr, XXxvEthernet *XxvEthernetInstancePtr,
 		                          (void *)DoneHandler, McDmaInstPtr);
 		XMcdma_SetCallBack(McDmaInstPtr, XMCDMA_HANDLER_ERROR,
 		                          (void *)ErrorHandler, McDmaInstPtr);
-
-		Status = XxvEthernetSetupIntrSystem(&IntcInstance,
-						    McDmaInstPtr,
-							ChanIntr_Id(Rx_Chan, ChanId),
-						    XMCDMA_MEM_TO_DEV);
+		Status = XSetupInterruptSystem(McDmaInstPtr, &XMcdma_IntrHandler,
+					       McDmaInstPtr->Config.IntrId[Num_channels+(ChanId-1)],
+					       McDmaInstPtr->Config.IntrParent,
+					       XINTERRUPT_DEFAULT_PRIORITY);
 		if (Status != XST_SUCCESS) {
 		      xil_printf("Failed RX interrupt setup %d\r\n", ChanId);
 		      return XST_FAILURE;
@@ -398,7 +397,7 @@ static int TxBdSetup(XMcdma *McDmaInstPtr, XXxvEthernet *XxvEthernetInstancePtr,
 
 	TxBdSpacePtr = (UINTPTR)&TxBdSpace;
 
-	for (ChanId = 1; ChanId <= XPAR_MCDMA_0_NUM_MM2S_CHANNELS; ChanId++) {
+	for (ChanId = 1; ChanId <= McDmaInstPtr->Config.TxNumChannels; ChanId++) {
 		Tx_Chan = XMcdma_GetMcdmaTxChan(McDmaInstPtr, ChanId);
 
 		XMcdma_IntrDisable(Tx_Chan, XMCDMA_IRQ_ALL_MASK);
@@ -416,10 +415,10 @@ static int TxBdSetup(XMcdma *McDmaInstPtr, XXxvEthernet *XxvEthernetInstancePtr,
 		XMcdma_SetCallBack(McDmaInstPtr, XMCDMA_TX_HANDLER_ERROR,
 				   (void *)TxErrorHandler, McDmaInstPtr);
 
-		Status = XxvEthernetSetupIntrSystem(&IntcInstance,
-						    McDmaInstPtr,
-							ChanIntr_Id(Tx_Chan, ChanId),
-						    XMCDMA_DEV_TO_MEM);
+		Status = XSetupInterruptSystem(McDmaInstPtr, &XMcdma_TxIntrHandler,
+					       McDmaInstPtr->Config.IntrId[ChanId - 1],
+					       McDmaInstPtr->Config.IntrParent,
+					       XINTERRUPT_DEFAULT_PRIORITY);
 		if (Status != XST_SUCCESS) {
 		      xil_printf("Failed TX interrupt setup %d\r\n", ChanId);
 		      return XST_FAILURE;
@@ -739,320 +738,4 @@ int XxvEthernetSgDmaIntrSingleFrameExample(XXxvEthernet *XxvEthernetInstancePtr,
 
 	xil_printf("ChanId %d Single frame interrupt example passed \n\r", ChanId);
 	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
-*
-* This function setups the interrupt system so interrupts can occur for the
-* Xxv Ethernet.  This function is application-specific since the actual system
-* may or may not have an interrupt controller.  The Xxv Ethernet could be
-* directly connected to a processor without an interrupt controller.  The user
-* should modify this function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the Intc
-*		component.
-* @param	DmaInstancePtr is a pointer to the instance of the AXIMCDMA
-*		component.
-* @param	DmaRxIntrId is the interrupt id for DMA Rx and is typically
-*		taken from XPAR_<XXVETHERNET_instance>_CONNECTED_DMARX_INTR
-* @param	DmaTxIntrId is the interrupt id for DMA Tx and is typically
-*		taken from XPAR_<XXVETHERNET_instance>_CONNECTED_DMATX_INTR
-*
-* @return	-XST_SUCCESS to indicate success
-*		-XST_FAILURE to indicate failure
-*
-* @note		None.
-*
-******************************************************************************/
-static int XxvEthernetSetupIntrSystem(INTC *IntcInstancePtr,
-				      XMcdma *DmaInstancePtr,
-				      u8 McdmaIntrId,
-				      u8 Direction)
-{
-	int Status;
-#ifdef XPAR_INTC_0_DEVICE_ID
-#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the interrupt controller and connect the ISR
-	 */
-	Status = XIntc_Initialize(IntcInstancePtr, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-		XxvEthernetUtilErrorTrap("Unable to initialize the interrupt controller");
-		return XST_FAILURE;
-	}
-#endif
-
-	if (Direction == XMCDMA_DEV_TO_MEM)
-		Status = XIntc_Connect(IntcInstancePtr, McdmaIntrId,
-				       (XInterruptHandler) XMcdma_TxIntrHandler, DmaInstancePtr);
-	else
-		Status = XIntc_Connect(IntcInstancePtr, McdmaIntrId,
-				       (XInterruptHandler) XMcdma_IntrHandler, DmaInstancePtr);
-
-	if (Status != XST_SUCCESS) {
-		XxvEthernetUtilErrorTrap("Unable to connect ISR to interrupt controller");
-		return XST_FAILURE;
-	}
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Start the interrupt controller
-	 */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		XxvEthernetUtilErrorTrap("Error starting intc");
-		return XST_FAILURE;
-	}
-#endif
-
-	/*
-	 * Enable interrupts from the hardware
-	 */
-	XIntc_Enable(IntcInstancePtr, McdmaIntrId);
-#else
-	XScuGic_Config *IntcConfig;
-
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-
-	XScuGic_SetPriorityTriggerType(IntcInstancePtr, McdmaIntrId, 0xA0, 0x3);
-
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	if (Direction == XMCDMA_DEV_TO_MEM)
-		Status = XScuGic_Connect(IntcInstancePtr, McdmaIntrId,
-					(Xil_InterruptHandler)XMcdma_TxIntrHandler,
-					DmaInstancePtr);
-	else
-		Status = XScuGic_Connect(IntcInstancePtr, McdmaIntrId,
-					(Xil_InterruptHandler)XMcdma_IntrHandler,
-					DmaInstancePtr);
-
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-
-	XScuGic_Enable(IntcInstancePtr, McdmaIntrId);
-#endif
-#ifndef TESTAPP_GEN
-	Xil_ExceptionInit();
-
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler)INTC_HANDLER,
-			(void *)(IntcInstancePtr));
-
-	Xil_ExceptionEnable();
-
-#endif
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/*
- * This function maps the mcdma channel with the Corresponding interrupt id
- * Generated in the xparameters.h file.
- *
- * @param	Chan is the MCDMA Channel instance to be worked on.
- * @param:	ChanId is the MCDMA channel id to be worked on
- *
- * @return:
- *		- Corresponding interrupt ID on success.
- *		- XST_FAILURE if unable to find a valid interrupt id
- * 		  For a given MCDMA channel.
- *
- * @note:	Make sure the XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH1_INTROUT_INTR
- *		Checks in the API below are properly mapped for your design.
- */
-/*****************************************************************************/
-static int ChanIntr_Id(XMcdma_ChanCtrl *Chan, int ChanId)
-{
-
-
-	switch(ChanId) {
-	case 1:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH1_INTROUT_VEC_ID
-			return TX_INTR_ID(1);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH1_INTROUT_VEC_ID
-			return RX_INTR_ID(1);
-#endif
-		}
-	case 2:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH2_INTROUT_VEC_ID
-			return TX_INTR_ID(2);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH2_INTROUT_VEC_ID
-			return RX_INTR_ID(2);
-#endif
-		}
-	case 3:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH3_INTROUT_VEC_ID
-			return TX_INTR_ID(3);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH3_INTROUT_VEC_ID
-			return RX_INTR_ID(3);
-#endif
-		}
-	case 4:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH4_INTROUT_VEC_ID
-			return TX_INTR_ID(4);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH4_INTROUT_VEC_ID
-			return RX_INTR_ID(4);
-#endif
-		}
-	case 5:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH5_INTROUT_VEC_ID
-			return TX_INTR_ID(5);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH5_INTROUT_VEC_ID
-			return RX_INTR_ID(5);
-#endif
-		}
-	case 6:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH6_INTROUT_VEC_ID
-			return TX_INTR_ID(6);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH6_INTROUT_VEC_ID
-			return RX_INTR_ID(6);
-#endif
-		}
-	case 7:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH7_INTROUT_VEC_ID
-			return TX_INTR_ID(7);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH7_INTROUT_VEC_ID
-			return RX_INTR_ID(7);
-#endif
-		}
-	case 8:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH8_INTROUT_VEC_ID
-			return TX_INTR_ID(8);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH8_INTROUT_VEC_ID
-			return RX_INTR_ID(8);
-#endif
-		}
-	case 9:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH9_INTROUT_VEC_ID
-			return TX_INTR_ID(9);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH9_INTROUT_VEC_ID
-			return RX_INTR_ID(9);
-#endif
-		}
-	case 10:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH10_INTROUT_VEC_ID
-			return TX_INTR_ID(10);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH10_INTROUT_VEC_ID
-			return RX_INTR_ID(10);
-#endif
-		}
-	case 11:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH11_INTROUT_VEC_ID
-			return TX_INTR_ID(11);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH11_INTROUT_VEC_ID
-			return RX_INTR_ID(11);
-#endif
-		}
-	case 12:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH12_INTROUT_VEC_ID
-			return TX_INTR_ID(12);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH12_INTROUT_VEC_ID
-			return RX_INTR_ID(12);
-#endif
-		}
-	case 13:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH13_INTROUT_VEC_ID
-			return TX_INTR_ID(13);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH13_INTROUT_VEC_ID
-			return RX_INTR_ID(13);
-#endif
-		}
-	case 14:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH14_INTROUT_VEC_ID
-			return TX_INTR_ID(14);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH14_INTROUT_VEC_ID
-			return RX_INTR_ID(14);
-#endif
-		}
-	case 15:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH15_INTROUT_VEC_ID
-			return TX_INTR_ID(15);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH15_INTROUT_VEC_ID
-			return RX_INTR_ID(15);
-#endif
-		}
-	case 16:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_MCDMA_0_MM2S_CH16_INTROUT_VEC_ID
-			return TX_INTR_ID(16);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_MCDMA_0_S2MM_CH16_INTROUT_VEC_ID
-			return RX_INTR_ID(16);
-#endif
-		}
-	default:
-		break;
-	}
-
-	return XST_FAILURE;
 }
