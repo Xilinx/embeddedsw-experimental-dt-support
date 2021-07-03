@@ -76,7 +76,7 @@ XXxvEthernet_Config *XXxvEthernet_LookupConfig(u16 DeviceId)
 #else
 XXxvEthernet_Config *XXxvEthernet_LookupConfig(UINTPTR BaseAddress)
 {
-	extern XXxvEthernet_Config XXxvethernet_ConfigTable[];
+	extern XXxvEthernet_Config XXxvEthernet_ConfigTable[];
 	XXxvEthernet_Config *CfgPtr = NULL;
 	int Index;
 

@@ -12,6 +12,7 @@ properties:
     OneOf:
       - items:
         - enum:
+          - xlnx,xxv-ethernet-4.0
           - xlnx,xxv-ethernet-3.1
           - xlnx,xxv-ethernet-1.0
   reg:
@@ -28,7 +29,7 @@ required:
     - compatible
     - reg
     - xlnx,include-statistics-counters
-    - axistream-connected
+    - axistream-connected: phandle
 
 examples:
     xxxvethernet_example_intr_mcdma.c:
