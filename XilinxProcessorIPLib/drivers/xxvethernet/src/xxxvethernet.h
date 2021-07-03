@@ -211,6 +211,9 @@ extern "C" {
 #define RATE_10G	10000
 
 /**************************** Type Definitions *******************************/
+/* XXV Ethernet Dev Type Masks */
+#define XXV_AXIDEVTYPE_MASK     0xF
+#define XXV_AXIBASEADDR_MASK    0xFFFFFFFFFFFFFFF0
 
 
 /**
@@ -227,12 +230,10 @@ typedef struct XXxvEthernet_Config {
 			  */
 	u8 Stats;	/**< Statistics gathering option */
 
-	int XxvDevType;  /**< XxvDevType is the type of device attached to the
-			  *   Xxv Ethernet's AXI4-Stream interface -
-			  *   MCDMA in this case
-			  */
-	UINTPTR XxvDevBaseAddress; /**< XxvDevBaseAddress is the base address of
-				 *  the device attached to the Xxv Ethernet's
+	UINTPTR XxvDevBaseAddress; /**< Bit[0] AxiDevType is the type of device attached to the
+				 *  Axi Ethernet's AXI4-Stream interface
+				 *  Bit[64/32:1] AxiDevBaseAddress is the base address of
+				 *  the device attached to the XXV Ethernet's
 				 *  AXI4-Stream interface.
 				 */
 	u8 AxiMcDmaChan_Cnt;
