@@ -4,11 +4,19 @@ list(APPEND TOTAL_TIMER_INSTANCES ${TMRCTR_NUM_DRIVER_INSTANCES})
 list(APPEND TOTAL_TIMER_INSTANCES ${TTCPS_NUM_DRIVER_INSTANCES})
 list(APPEND TOTAL_TIMER_INSTANCES ${SCUTIMER_NUM_DRIVER_INSTANCES})
 
-set(XILTIMER_sleep_timer "Default;${TOTAL_TIMER_INSTANCES}" CACHE STRING "This parameter is used to select specific timer for sleep functionality")
-SET_PROPERTY(CACHE XILTIMER_sleep_timer PROPERTY STRINGS "Default;${TOTAL_TIMER_INSTANCES}")
+if (NOT "${TOTAL_TIMER_INSTANCES}" STREQUAL "")
+   set(XILTIMER_sleep_timer "Default;${TOTAL_TIMER_INSTANCES}" CACHE STRING "This parameter is used to select specific timer for sleep functionality")
+   SET_PROPERTY(CACHE XILTIMER_sleep_timer PROPERTY STRINGS "Default;${TOTAL_TIMER_INSTANCES}")
 
-set(XILTIMER_tick_timer "None;${TOTAL_TIMER_INSTANCES}" CACHE STRING "This parameter is used to select specific timer for tick functionality")
-SET_PROPERTY(CACHE XILTIMER_tick_timer PROPERTY STRINGS "None;${TOTAL_TIMER_INSTANCES}")
+   set(XILTIMER_tick_timer "None;${TOTAL_TIMER_INSTANCES}" CACHE STRING "This parameter is used to select specific timer for tick functionality")
+   SET_PROPERTY(CACHE XILTIMER_tick_timer PROPERTY STRINGS "None;${TOTAL_TIMER_INSTANCES}")
+else()
+   set(XILTIMER_sleep_timer "Default" CACHE STRING "This parameter is used to select specific timer for sleep functionality")
+   SET_PROPERTY(CACHE XILTIMER_sleep_timer PROPERTY STRINGS "Default")
+
+    set(XILTIMER_tick_timer "None" CACHE STRING "This parameter is used to select specific timer for tick functionality")
+    SET_PROPERTY(CACHE XILTIMER_tick_timer PROPERTY STRINGS "None")
+endif()
 
 list(LENGTH TMRCTR_NUM_DRIVER_INSTANCES CONFIG_AXI_TIMER)
 list(LENGTH TTCPS_NUM_DRIVER_INSTANCES CONFIG_TTCPS)
