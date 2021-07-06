@@ -251,6 +251,8 @@ typedef struct {
 	int HasRxLength;
 	u8 IsTxCacheCoherent; /**< Describes whether Cache Coherent or not */
 	u8 IsRxCacheCoherent; /**< Describes whether Cache Coherent or not */
+	u16 IntrId[32]; /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XMcdma_Config;
 
 typedef struct {
