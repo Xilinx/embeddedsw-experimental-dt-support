@@ -136,6 +136,7 @@ s32 XMcDma_Initialize(XMcdma *InstancePtr, XMcdma_Config *CfgPtr)
 	InstancePtr->Config.HasRxLength = CfgPtr->HasRxLength;
 	InstancePtr->Config.IsTxCacheCoherent = CfgPtr->IsTxCacheCoherent;
 	InstancePtr->Config.IsRxCacheCoherent = CfgPtr->IsRxCacheCoherent;
+	InstancePtr->Config.IntrParent = CfgPtr->IntrParent;
 
 	InstancePtr->IsReady = (u32)(XIL_COMPONENT_IS_READY);
 
@@ -154,6 +155,7 @@ s32 XMcDma_Initialize(XMcdma *InstancePtr, XMcdma_Config *CfgPtr)
 			InstancePtr->Tx_Chan[i].IsRxChan = 0;
 			if (InstancePtr->Config.AddrWidth > 32)
 				InstancePtr->Tx_Chan[i].ext_addr = 1;
+			InstancePtr->Config.IntrId[i-1]= CfgPtr->IntrId[i-1];
 		}
 	}
 
@@ -176,6 +178,8 @@ s32 XMcDma_Initialize(XMcdma *InstancePtr, XMcdma_Config *CfgPtr)
 			InstancePtr->Rx_Chan[i].IsRxChan = 1;
 			if (InstancePtr->Config.AddrWidth > 32)
 				InstancePtr->Rx_Chan[i].ext_addr = 1;
+			InstancePtr->Config.IntrId[InstancePtr->Config.RxNumChannels+(i-1)] =
+						CfgPtr->IntrId[InstancePtr->Config.RxNumChannels+(i-1)];
 		}
 	}
 
