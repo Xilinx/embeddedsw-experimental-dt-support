@@ -49,6 +49,7 @@ required:
     - compatible
     - reg
     - xlnx,addrwidth
+    - xlnx,enable-single-intr
     - xlnx,include-mm2s
     - xlnx,include-mm2s-dre
     - xlnx,num-mm2s-channels
@@ -61,6 +62,9 @@ required:
     - xlnx,sg-include-stscntrl-strm
     - xlnx,sg-use-stsapp-length
     - dma-coherent
+    - dma-coherent
+    - interrupts: 32
+    - interrupt-parent
 
 examples:
     xmcdma_interrupt_example.c:
