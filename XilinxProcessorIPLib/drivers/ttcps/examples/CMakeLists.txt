@@ -46,6 +46,7 @@ else()
 endif()
 
 foreach(EXAMPLE ${COMMON_EXAMPLES})
+    string(REGEX REPLACE "\\.[^.]*$" "" EXAMPLE ${EXAMPLE})
     add_executable(${EXAMPLE}.elf ${EXAMPLE})
     target_link_libraries(${EXAMPLE}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 endforeach()
