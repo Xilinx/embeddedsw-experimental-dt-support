@@ -92,6 +92,8 @@
  */
 #define GPIO_DEVICE_ID		XPAR_PUSH_BUTTONS_4BITS_DEVICE_ID
 #define INTC_GPIO_INTERRUPT_ID  XPAR_INTC_0_GPIO_0_VEC_ID
+#else
+#define XGPIO_BASEADDRESS	0	/* Default gpio instance */
 #endif
 
 #define GPIO_ALL_BUTTONS  0x1F	/* The GPIO bits 0 to 4. */
@@ -107,8 +109,9 @@ int UsbKbdExample(u16 UsbId, u16 GpioId);
 static int SetupInterruptSystem(XUsb *UsbPtr, XGpio *GpioPtr);
 #else
 int UsbKbdExample(UINTPTR UsbBaseAddress, UINTPTR GpioBaseAddress);
-void GpioIsr(void *InstancePtr);
 #endif
+
+void GpioIsr(void *InstancePtr);
 
 /************************** Variable Definitions *****************************/
 

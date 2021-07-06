@@ -76,9 +76,6 @@
 #ifndef SDT
 #define USB_DEVICE_ID		XPAR_USB_0_DEVICE_ID
 #define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#else
-#define XGPIO_BASEADDRESS 0	/* Default gpio instance */
-#endif
 
 #define USB_INTR		XPAR_INTC_0_USB_0_VEC_ID
 
@@ -91,6 +88,9 @@
  */
 #define GPIO_DEVICE_ID		XPAR_PUSH_BUTTONS_4BITS_DEVICE_ID
 #define INTC_GPIO_INTERRUPT_ID  XPAR_INTC_0_GPIO_0_VEC_ID
+#else
+#define XGPIO_BASEADDRESS 0	/* Default gpio instance */
+#endif
 
 #define GPIO_ALL_BUTTONS  0x1F	/* The GPIO bits 0 to 4. */
 #define EXIT_BUTTON	0x0010  /* The GPIO_SW_C on the ML403 board */
@@ -105,13 +105,13 @@
 
 #ifndef SDT
 int UsbMouseExample (u16 UsbId,	u16 GpioId);
-
 static int SetupInterruptSystem(XUsb *UsbInstancePtr,
 				XGpio *Gpio);
 #else
 int UsbMouseExample(UINTPTR UsbBaseAddress, UINTPTR GpioBaseAddress);
-void GpioIsr(void *InstancePtr);
 #endif
+
+void GpioIsr(void *InstancePtr);
 
 /************************** Variable Definitions *****************************/
 
