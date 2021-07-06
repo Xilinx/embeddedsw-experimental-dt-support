@@ -45,16 +45,13 @@
 #include "xparameters.h"
 #include "xdebug.h"
 #include "xmcdma_hw.h"
+#include "xinterrupt_wrap.h"
+#include "xmcdma_example.h"
 
 #ifdef __aarch64__
 #include "xil_mmu.h"
 #endif
 
-#ifdef XPAR_INTC_0_DEVICE_ID
- #include "xintc.h"
-#else
- #include "xscugic.h"
-#endif
 
 /******************** Constant Definitions **********************************/
 
@@ -62,21 +59,9 @@
  * Device hardware build related constants.
  */
 
+#ifndef SDT
 #define MCDMA_DEV_ID	XPAR_AXI_MCDMA_0_DEVICE_ID
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define RX_INTR_ID		XPAR_INTC_0_MCDMA_0_VEC_ID
-#define TX_INTR_ID		XPAR_INTC_0_MCDMA_0_VEC_ID
-#else
-#define TX_INTR_ID(ChanId) XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH##ChanId##_INTROUT_INTR
-#define RX_INTR_ID(ChanId) XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH##ChanId##_INTROUT_INTR
-#endif
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC_DEVICE_ID          XPAR_INTC_0_DEVICE_ID
-#else
-#define INTC_DEVICE_ID          XPAR_SCUGIC_SINGLE_DEVICE_ID
-#endif
 
 #ifdef XPAR_AXI_7SDDR_0_S_AXI_BASEADDR
 #define DDR_BASE_ADDR		XPAR_AXI_7SDDR_0_S_AXI_BASEADDR
@@ -94,6 +79,13 @@
 
 #ifdef XPAR_PSU_R5_DDR_0_S_AXI_BASEADDR
 #define DDR_BASE_ADDR	XPAR_PSU_R5_DDR_0_S_AXI_BASEADDR
+#endif
+
+#else
+
+#ifdef XPAR_MEM0_BASEADDRESS
+#define DDR_BASE_ADDR		XPAR_MEM0_BASEADDRESS
+#endif
 #endif
 
 #ifndef DDR_BASE_ADDR
@@ -120,19 +112,11 @@
 
 #define TEST_START_VALUE	0xC
 
-#ifdef XPAR_INTC_0_DEVICE_ID
- #define INTC		XIntc
- #define INTC_HANDLER	XIntc_InterruptHandler
-#else
- #define INTC		XScuGic
- #define INTC_HANDLER	XScuGic_InterruptHandler
-#endif
 
 /**************************** Type Definitions *******************************/
 
 
 /***************** Macros (Inline Functions) Definitions *********************/
-static INTC Intc;	/* Instance of the Interrupt Controller */
 
 
 /************************** Function Prototypes ******************************/
@@ -140,12 +124,10 @@ static int RxSetup(XMcdma *McDmaInstPtr);
 static int TxSetup(XMcdma *McDmaInstPtr);
 static int SendPacket(XMcdma *McDmaInstPtr);
 static int CheckData(u8 *RxPacket, int ByteCount);
-static int SetupIntrSystem(INTC * IntcInstancePtr, XMcdma *McDmaInstPtr, u16 IntrId, u8 Direction);
 static void TxDoneHandler(void *CallBackRef, u32 Chan_id);
 static void TxErrorHandler(void *CallBackRef, u32 Chan_id, u32 Mask);
 static void DoneHandler(void *CallBackRef, u32 Chan_id);
 static void ErrorHandler(void *CallBackRef, u32 Chan_id, u32 Mask);
-static int ChanIntr_Id(XMcdma_ChanCtrl *Chan, int ChanId);
 
 /************************** Variable Definitions *****************************/
 /*
@@ -204,13 +186,21 @@ int main(void)
 #endif
 
 
+#ifndef SDT
 	Mcdma_Config = XMcdma_LookupConfig(MCDMA_DEV_ID);
 	if (!Mcdma_Config) {
 			xil_printf("No config found for %d\r\n", MCDMA_DEV_ID);
 
 			return XST_FAILURE;
 	}
+#else
+	Mcdma_Config = XMcdma_LookupConfig(XMCDMA_BASEADDRESS);
+	if (!Mcdma_Config) {
+			xil_printf("No config found for %llx\r\n", XMCDMA_BASEADDRESS);
 
+			return XST_FAILURE;
+	}
+#endif
 
 	Status = XMcDma_CfgInitialize(&AxiMcdma, Mcdma_Config);
 	if (Status != XST_SUCCESS) {
@@ -358,8 +348,10 @@ static int RxSetup(XMcdma *McDmaInstPtr)
 		XMcdma_SetCallBack(McDmaInstPtr, XMCDMA_HANDLER_ERROR,
 		                          (void *)ErrorHandler, McDmaInstPtr);
 
-		Status = SetupIntrSystem(&Intc, McDmaInstPtr, ChanIntr_Id(Rx_Chan, ChanId),
-					 XMCDMA_MEM_TO_DEV);
+		Status = XSetupInterruptSystem(McDmaInstPtr, &XMcdma_IntrHandler,
+					       McDmaInstPtr->Config.IntrId[num_channels+(ChanId-1)],
+					       McDmaInstPtr->Config.IntrParent,
+					       XINTERRUPT_DEFAULT_PRIORITY);
 		if (Status != XST_SUCCESS) {
 		      xil_printf("Failed RX interrupt setup %d\r\n", ChanId);
 		      return XST_FAILURE;
@@ -450,8 +442,10 @@ static int TxSetup(XMcdma *McDmaInstPtr)
 		XMcdma_SetCallBack(McDmaInstPtr, XMCDMA_TX_HANDLER_ERROR,
                              (void *)TxErrorHandler, McDmaInstPtr);
 
-		Status = SetupIntrSystem(&Intc, McDmaInstPtr, ChanIntr_Id(Tx_Chan, ChanId),
-					XMCDMA_DEV_TO_MEM);
+		Status = XSetupInterruptSystem(McDmaInstPtr, &XMcdma_TxIntrHandler,
+					       McDmaInstPtr->Config.IntrId[ChanId-1],
+					       McDmaInstPtr->Config.IntrParent,
+					       XINTERRUPT_DEFAULT_PRIORITY);
 		if (Status != XST_SUCCESS) {
 		      xil_printf("Failed Tx interrupt setup %d\r\n", ChanId);
 		      return XST_FAILURE;
@@ -615,292 +609,5 @@ static void TxErrorHandler(void *CallBackRef, u32 Chan_id, u32 Mask)
 	Error = 1;
 }
 
-/*****************************************************************************/
-/*
-*
-* This function setups the interrupt system so interrupts can occur for the
-* DMA, it assumes INTC component exists in the hardware system.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the INTC.
-* @param	McDmaInstPtr is a pointer to the instance of the MCDMA.
-* @param	InrId is the MCDMA Channel Interrupt Id.
-* @param	Direction is the MCDMA Channel S2MM or MM2S path.
-*
-* @return
-*		- XST_SUCCESS if successful,
-*		- XST_FAILURE.if not successful
-*
-* @note		None.
-*
-******************************************************************************/
-
-static int SetupIntrSystem(INTC * IntcInstancePtr, XMcdma *McDmaInstPtr, u16 IntrId, u8 Direction)
-{
-	int Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-	/* Initialize the interrupt controller and connect the ISRs */
-	Status = XIntc_Initialize(IntcInstancePtr, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-		xil_printf("Failed init intc\r\n");
-		return XST_FAILURE;
-	}
-
-	if (Direction == XMCDMA_DEV_TO_MEM)
-		Status = XIntc_Connect(IntcInstancePtr, IntrId,
-				       (XInterruptHandler) XMcdma_TxIntrHandler, McDmaInstPtr);
-	else
-		Status = XIntc_Connect(IntcInstancePtr, IntrId,
-				       (XInterruptHandler) XMcdma_IntrHandler, McDmaInstPtr);
-	if (Status != XST_SUCCESS) {
-		xil_printf("Failed tx connect intc\r\n");
-		return XST_FAILURE;
-	}
-
-	/* Start the interrupt controller */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		xil_printf("Failed to start intc\r\n");
-		return XST_FAILURE;
-	}
-
-	XIntc_Enable(IntcInstancePtr, IntrId);
-#else
-
-	XScuGic_Config *IntcConfig;
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	XScuGic_SetPriorityTriggerType(IntcInstancePtr, IntrId, 0xA0, 0x3);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	if (Direction == XMCDMA_DEV_TO_MEM)
-		Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-					 (Xil_InterruptHandler)XMcdma_TxIntrHandler, McDmaInstPtr);
-	else
-		Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-					 (Xil_InterruptHandler)XMcdma_IntrHandler, McDmaInstPtr);
 
 
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	XScuGic_Enable(IntcInstancePtr, IntrId);
-
-#endif
-	/* Enable interrupts from the hardware */
-	Xil_ExceptionInit();
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler)INTC_HANDLER,
-				(void *)IntcInstancePtr);
-
-	Xil_ExceptionEnable();
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/*
- * This function maps the mcdma channel with the Corresponding interrupt id
- * Generated in the xparameters.h file.
- *
- * @param	Chan is the MCDMA Channel instance to be worked on.
- * @param:	ChanId is the MCDMA channel id to be worked on
- *
- * @return:
- *		- Corresponding interrupt ID on success.
- *		- XST_FAILURE if unable to find a valid interrupt id
- * 		  For a given MCDMA channel.
- *
- * @note:	Make sure the XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH1_INTROUT_INTR
- *		Checks in the API below are properly mapped for your design.
- */
-/*****************************************************************************/
-static int ChanIntr_Id(XMcdma_ChanCtrl *Chan, int ChanId)
-{
-
-
-	switch(ChanId) {
-	case 1:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH1_INTROUT_INTR
-			return TX_INTR_ID(1);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH1_INTROUT_INTR
-			return RX_INTR_ID(1);
-#endif
-		}
-	case 2:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH2_INTROUT_INTR
-			return TX_INTR_ID(2);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH2_INTROUT_INTR
-			return RX_INTR_ID(2);
-#endif
-		}
-	case 3:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH3_INTROUT_INTR
-			return TX_INTR_ID(3);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH3_INTROUT_INTR
-			return RX_INTR_ID(3);
-#endif
-		}
-	case 4:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH4_INTROUT_INTR
-			return TX_INTR_ID(4);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH4_INTROUT_INTR
-			return RX_INTR_ID(4);
-#endif
-		}
-	case 5:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH5_INTROUT_INTR
-			return TX_INTR_ID(5);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH5_INTROUT_INTR
-			return RX_INTR_ID(5);
-#endif
-		}
-	case 6:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH6_INTROUT_INTR
-			return TX_INTR_ID(6);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH6_INTROUT_INTR
-			return RX_INTR_ID(6);
-#endif
-		}
-	case 7:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH7_INTROUT_INTR
-			return TX_INTR_ID(7);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH7_INTROUT_INTR
-			return RX_INTR_ID(7);
-#endif
-		}
-	case 8:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH8_INTROUT_INTR
-			return TX_INTR_ID(8);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH8_INTROUT_INTR
-			return RX_INTR_ID(8);
-#endif
-		}
-	case 9:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH9_INTROUT_INTR
-			return TX_INTR_ID(9);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH9_INTROUT_INTR
-			return RX_INTR_ID(9);
-#endif
-		}
-	case 10:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH10_INTROUT_INTR
-			return TX_INTR_ID(10);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH10_INTROUT_INTR
-			return RX_INTR_ID(10);
-#endif
-		}
-	case 11:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH11_INTROUT_INTR
-			return TX_INTR_ID(11);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH11_INTROUT_INTR
-			return RX_INTR_ID(11);
-#endif
-		}
-	case 12:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH12_INTROUT_INTR
-			return TX_INTR_ID(12);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH12_INTROUT_INTR
-			return RX_INTR_ID(12);
-#endif
-		}
-	case 13:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH13_INTROUT_INTR
-			return TX_INTR_ID(13);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH13_INTROUT_INTR
-			return RX_INTR_ID(13);
-#endif
-		}
-	case 14:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH14_INTROUT_INTR
-			return TX_INTR_ID(14);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH14_INTROUT_INTR
-			return RX_INTR_ID(14);
-#endif
-		}
-	case 15:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH15_INTROUT_INTR
-			return TX_INTR_ID(15);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH15_INTROUT_INTR
-			return RX_INTR_ID(15);
-#endif
-		}
-	case 16:
-		if(!(Chan->IsRxChan)) {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_MM2S_CH16_INTROUT_INTR
-			return TX_INTR_ID(16);
-#endif
-		} else {
-#ifdef XPAR_FABRIC_AXI_MCDMA_0_S2MM_CH16_INTROUT_INTR
-			return RX_INTR_ID(16);
-#endif
-		}
-	default:
-		break;
-	}
-
-	return XST_FAILURE;
-}
