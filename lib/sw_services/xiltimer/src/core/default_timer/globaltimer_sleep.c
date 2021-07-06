@@ -81,6 +81,11 @@ u32 XilSleepTimer_Init(XTimer *InstancePtr)
 	InstancePtr->XTimer_ModifyInterval = XGlobalTimer_ModifyInterval;
 	InstancePtr->XSleepTimer_Stop = NULL;
 
+#ifdef SDT
+	u32 TimerStampFreq = XGet_TimeStampFreq();
+	mtcp(CNTFRQ_EL0, TimerStampFreq);
+#endif
+
 	return XST_SUCCESS;
 }
 
@@ -118,7 +123,7 @@ static void XGlobalTimer_ModifyInterval(XTimer *InstancePtr, u32 delay,
 #else
         u32 TimerStampFreq = XGet_TimeStampFreq();
 #endif
-        u32 iterpersec = TimerStampFreq / 4;
+        u32 iterpersec = TimerStampFreq;
 	static u8 IsSleepTimerStarted = FALSE;
 
 	if (FALSE == IsSleepTimerStarted) {
