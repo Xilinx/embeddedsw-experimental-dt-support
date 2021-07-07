@@ -451,6 +451,9 @@ typedef struct {
 	UINTPTR BaseAddress;	/**< Core register base address */
 	u8 IsCacheCoherent;	/**< Describes whether Cache Coherent or not */
 	u8 EnableSuperSpeed;	/**< Set to enable super speed support */
+	u16 IntrId[3];	/** Bits[11:0] Interrupt-id Bits[15:12] trigger type */
+			/** level flags */
+	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] */
 #if defined (XCLOCKING)
 	u32 RefClk;		/**< Input clocks */
 #endif
