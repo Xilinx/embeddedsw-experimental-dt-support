@@ -31,6 +31,9 @@
 #include "xplatform_info.h"
 #include "xuartpsv.h"
 #include "xil_printf.h"
+#ifdef SDT
+#include "xuartpsv_example.h"
+#endif
 
 /************************** Constant Definitions **************************/
 
@@ -39,7 +42,10 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UARTPSV_DEVICE_ID		XPAR_XUARTPSV_0_DEVICE_ID
+#endif
+
 /*
  * The following constant controls the length of the buffers to be sent
  * and received with the UART,
@@ -50,8 +56,11 @@
 /**************************** Type Definitions ******************************/
 
 /************************** Function Prototypes *****************************/
-
+#ifndef SDT
 int UartPsvPolledExample(u16 DeviceId);
+#else
+int UartPsvPolledExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions ***************************/
 
@@ -82,7 +91,12 @@ int main(void)
 	int Status;
 
 	/* Run the UartPsv Polled example, specify the the Device ID */
+#ifndef SDT
 	Status = UartPsvPolledExample(UARTPSV_DEVICE_ID);
+#else
+	Status = UartPsvPolledExample(XUARTPSV_BASEADDRESS);
+#endif
+
 	if (Status != XST_SUCCESS) {
 		xil_printf("UartPsv Polled Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -115,7 +129,11 @@ int main(void)
 * working correctly.
 *
 **************************************************************************/
+#ifndef SDT
 int UartPsvPolledExample(u16 DeviceId)
+#else
+int UartPsvPolledExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XUartPsv_Config *Config;
@@ -127,7 +145,11 @@ int UartPsvPolledExample(u16 DeviceId)
 	 * Initialize the UART driver so that it's ready to use.
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XUartPsv_LookupConfig(DeviceId);
+#else
+	Config = XUartPsv_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}

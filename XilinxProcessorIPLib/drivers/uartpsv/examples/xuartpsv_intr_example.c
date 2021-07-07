@@ -34,12 +34,11 @@
 #include "xuartpsv.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
+#include "xinterrupt_wrap.h"
+#ifdef SDT
+#include "xuartpsv_example.h"
 #endif
+
 /************************** Constant Definitions **************************/
 
 /*
@@ -47,17 +46,10 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC		XIntc
-#define UARTPSV_DEVICE_ID		XPAR_XUARTPSV_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#define UARTPSV_INT_IRQ_ID		XPAR_INTC_0_UARTPSV_0_VEC_ID
-#else
-#define INTC		XScuGic
-#define UARTPSV_DEVICE_ID		XPAR_XUARTPSV_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define UARTPSV_INT_IRQ_ID		XPAR_XUARTPS_0_INTR
+#ifndef SDT
+#define UARTPSV_DEVICE_ID               XPAR_XUARTPSV_0_DEVICE_ID
 #endif
+
 /*
  * The following constant controls the length of the buffers to be sent
  * and received with the UART,
@@ -69,14 +61,11 @@
 
 
 /************************** Function Prototypes *****************************/
-
-int UartPsvIntrExample(INTC *IntcInstPtr, XUartPsv *UartInstPtr,
-			u16 DeviceId, u16 UartIntrId);
-
-
-static int SetupInterruptSystem(INTC *IntcInstancePtr,
-				XUartPsv *UartInstancePtr,
-				u16 UartIntrId);
+#ifndef SDT
+int UartPsvIntrExample(XUartPsv *UartInstPtr, u16 DeviceId);
+#else
+int UartPsvIntrExample(XUartPsv *UartInstPtr, UINTPTR BaseAddress);
+#endif
 
 void Handler(void *CallBackRef, u32 Event, unsigned int EventData);
 
@@ -84,7 +73,6 @@ void Handler(void *CallBackRef, u32 Event, unsigned int EventData);
 /************************** Variable Definitions ***************************/
 
 XUartPsv UartPsv	;		/* Instance of the UART Device */
-INTC InterruptController;	/* Instance of the Interrupt Controller */
 
 /*
  * The following buffers are used in this example to send and receive data
@@ -119,8 +107,11 @@ int main(void)
 	int Status;
 
 	/* Run the UartPsv Interrupt example, specify the the Device ID */
-	Status = UartPsvIntrExample(&InterruptController, &UartPsv,
-				UARTPSV_DEVICE_ID, UARTPSV_INT_IRQ_ID);
+#ifndef SDT
+	Status = UartPsvIntrExample(&UartPsv, UARTPSV_DEVICE_ID);
+#else
+	Status = UartPsvIntrExample(&UartPsv, XUARTPSV_BASEADDRESS);
+#endif
 	if (Status != XST_SUCCESS) {
 		xil_printf("UartPsv Interrupt Example Test Failed\r\n");
 		return XST_FAILURE;
@@ -159,8 +150,11 @@ int main(void)
 * working it may never return.
 *
 **************************************************************************/
-int UartPsvIntrExample(INTC *IntcInstPtr, XUartPsv *UartInstPtr,
-			u16 DeviceId, u16 UartIntrId)
+#ifndef SDT
+int UartPsvIntrExample(XUartPsv *UartInstPtr, u16 DeviceId)
+#else
+int UartPsvIntrExample(XUartPsv *UartInstPtr, UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XUartPsv_Config *Config;
@@ -172,7 +166,11 @@ int UartPsvIntrExample(INTC *IntcInstPtr, XUartPsv *UartInstPtr,
 	 * Initialize the UART driver so that it's ready to use
 	 * Look up the configuration in the config table, then initialize it.
 	 */
+#ifndef SDT
 	Config = XUartPsv_LookupConfig(DeviceId);
+#else
+	Config = XUartPsv_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
@@ -192,7 +190,9 @@ int UartPsvIntrExample(INTC *IntcInstPtr, XUartPsv *UartInstPtr,
 	 * Connect the UART to the interrupt subsystem such that interrupts
 	 * can occur. This function is application specific.
 	 */
-	Status = SetupInterruptSystem(IntcInstPtr, UartInstPtr, UartIntrId);
+	Status = XSetupInterruptSystem(UartInstPtr, &XUartPsv_InterruptHandler,
+					Config->IntrId, Config->IntrParent,
+					XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -349,127 +349,3 @@ void Handler(void *CallBackRef, u32 Event, unsigned int EventData)
 	}
 }
 
-
-/*****************************************************************************/
-/**
-*
-* This function sets up the interrupt system so interrupts can occur for the
-* Uart. This function is application-specific. The user should modify this
-* function to fit the application.
-*
-* @param	IntcInstancePtr is a pointer to the instance of the INTC.
-* @param	UartInstancePtr contains a pointer to the instance of the UART
-*		driver which is going to be connected to the interrupt
-*		controller.
-* @param	UartIntrId is the interrupt Id and is typically
-*		XPAR_<UARTPSV_instance>_INTR value from xparameters.h.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-****************************************************************************/
-static int SetupInterruptSystem(INTC *IntcInstancePtr,
-				XUartPsv *UartInstancePtr,
-				u16 UartIntrId)
-{
-	int Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the interrupt controller driver so that it's ready to
-	 * use.
-	 */
-	Status = XIntc_Initialize(IntcInstancePtr, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-#endif
-	/*
-	 * Connect the handler that will be called when an interrupt
-	 * for the device occurs, the handler defined above performs the
-	 * specific interrupt processing for the device.
-	 */
-	Status = XIntc_Connect(IntcInstancePtr, UartIntrId,
-		(XInterruptHandler) XUartPsv_InterruptHandler, UartInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Start the interrupt controller so interrupts are enabled for all
-	 * devices that cause interrupts.
-	 */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-#endif
-	/*
-	 * Enable the interrupt for uart
-	 */
-	XIntc_Enable(IntcInstancePtr, UartIntrId);
-
-	#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the exception table.
-	 */
-	Xil_ExceptionInit();
-
-	/*
-	 * Register the interrupt controller handler with the exception table.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler) XIntc_InterruptHandler,
-				IntcInstancePtr);
-	#endif
-#else
-#ifndef TESTAPP_GEN
-	XScuGic_Config *IntcConfig; /* Config for interrupt controller */
-
-	/* Initialize the interrupt controller driver */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the
-	 * hardware interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-				(Xil_ExceptionHandler) XScuGic_InterruptHandler,
-				IntcInstancePtr);
-#endif
-
-	/*
-	 * Connect a device driver handler that will be called when an
-	 * interrupt for the device occurs, the device driver handler
-	 * performs the specific interrupt processing for the device
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, UartIntrId,
-				  (Xil_ExceptionHandler) XUartPsv_InterruptHandler,
-				  (void *) UartInstancePtr);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	/* Enable the interrupt for the device */
-	XScuGic_Enable(IntcInstancePtr, UartIntrId);
-
-#endif
-#ifndef TESTAPP_GEN
-	/* Enable interrupts */
-	 Xil_ExceptionEnable();
-#endif
-
-	return XST_SUCCESS;
-}
