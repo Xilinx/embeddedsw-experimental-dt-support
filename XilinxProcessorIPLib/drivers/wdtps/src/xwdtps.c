@@ -97,6 +97,7 @@ s32 XWdtPs_CfgInitialize(XWdtPs *InstancePtr,
 		 * can be accessed and indicate it has not been started yet.
 		 */
 		InstancePtr->Config.BaseAddress = EffectiveAddress;
+		InstancePtr->Config.InputClockHz = ConfigPtr->InputClockHz;
 		InstancePtr->IsStarted = 0U;
 
 		/*
