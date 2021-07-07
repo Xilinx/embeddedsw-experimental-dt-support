@@ -28,6 +28,9 @@
 #include "xparameters.h"
 #include "xuartpsv.h"
 #include "xil_printf.h"
+#ifdef SDT
+#include "xuartpsv_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -36,15 +39,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UARTPSV_DEVICE_ID		XPAR_XUARTPSV_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int UartPsvSelfTestExample(u16 DeviceId);
+#else
+int UartPsvSelfTestExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -66,7 +74,12 @@ int main(void)
 	int Status;
 
 	/* Run the selftest example */
+#ifndef SDT
 	Status = UartPsvSelfTestExample(UARTPSV_DEVICE_ID);
+#else
+	Status = UartPsvSelfTestExample(XUARTPSV_BASEADDRESS);
+#endif
+
 	if (Status != XST_SUCCESS) {
 		xil_printf("UartPsv Selftest Example Failed\r\n");
 		return XST_FAILURE;
@@ -91,7 +104,11 @@ int main(void)
 * @note 	None
 *
 ****************************************************************************/
+#ifndef SDT
 int UartPsvSelfTestExample(u16 DeviceId)
+#else
+int UartPsvSelfTestExample(UINTPTR BaseAddress)
+#endif
 {
 	int Status;
 	XUartPsv_Config *Config;
@@ -101,7 +118,12 @@ int UartPsvSelfTestExample(u16 DeviceId)
 	 * Look up the configuration in the config table,
 	 * then initialize it.
 	 */
+#ifndef SDT
 	Config = XUartPsv_LookupConfig(DeviceId);
+#else
+	Config = XUartPsv_LookupConfig(BaseAddress);
+#endif
+
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}

@@ -33,6 +33,9 @@
 
 #include "xparameters.h"
 #include "xuartpsv.h"
+#ifdef SDT
+#include "xuartpsv_example.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -41,15 +44,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define UARTPSV_DEVICE_ID		XPAR_XUARTPSV_0_DEVICE_ID
+#endif
 
 /**************************** Type Definitions *******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
 /************************** Function Prototypes ******************************/
-
+#ifndef SDT
 int UartPsvHelloWorldExample(u16 DeviceId);
+#else
+int UartPsvHelloWorldExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -77,8 +85,11 @@ int main(void)
 	 * Run the Hello World example , specify the the Device ID that is
 	 * generated in xparameters.h
 	 */
+#ifndef SDT
 	Status = UartPsvHelloWorldExample(UARTPSV_DEVICE_ID);
-
+#else
+	Status = UartPsvHelloWorldExample(XUARTPSV_BASEADDRESS);
+#endif
 	if (Status == XST_FAILURE) {
 		xil_printf("UartPsv Hello World Example Failed\r\n");
 		return XST_FAILURE;
@@ -108,7 +119,11 @@ int main(void)
 * @note 	None.
 *
 ******************************************************************************/
+#ifndef SDT
 int UartPsvHelloWorldExample(u16 DeviceId)
+#else
+int UartPsvHelloWorldExample(UINTPTR BaseAddress)
+#endif
 {
 	u8 HelloWorld[] = "Hello World";
 	int SentCount = 0;
@@ -120,7 +135,11 @@ int UartPsvHelloWorldExample(u16 DeviceId)
 	 * Look up the configuration in the config table and then
 	 * initialize it.
 	 */
+#ifndef SDT
 	Config = XUartPsv_LookupConfig(DeviceId);
+#else
+	Config = XUartPsv_LookupConfig(BaseAddress);
+#endif
 	if (NULL == Config) {
 		return XST_FAILURE;
 	}
