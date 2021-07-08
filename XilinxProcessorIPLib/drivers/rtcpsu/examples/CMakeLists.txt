@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT 
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 cmake_minimum_required(VERSION 2.8.9)
