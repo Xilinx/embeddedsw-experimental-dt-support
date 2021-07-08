@@ -43,7 +43,11 @@
 /************************** Function Prototypes ******************************/
 
 /************************** Variable Definitions *****************************/
+#ifndef SDT
 extern XIicPs_Config XIicPs_ConfigTable[XPAR_XIICPS_NUM_INSTANCES];
+#else
+extern XIicPs_Config XIicPs_ConfigTable[];
+#endif
 
 /*****************************************************************************/
 /**
