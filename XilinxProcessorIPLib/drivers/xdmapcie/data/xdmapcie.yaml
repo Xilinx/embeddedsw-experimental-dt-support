@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
 title: Bindings for XDMAPCIE controller
