@@ -72,11 +72,8 @@
 #include "xparameters.h"
 #include "xil_util.h"
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
-#endif
+#include "xinterrupt_wrap.h"
+#include "xaxicdma_example.h"
 
 #ifndef __MICROBLAZE__
 #include "xpseudo_asm.h"
@@ -92,19 +89,12 @@ extern void xil_printf(const char *format, ...);
 
 /******************** Constant Definitions **********************************/
 
+#ifndef SDT
 #ifndef TESTAPP_GEN
 /*
  * Device hardware build related constants.
  */
-#ifdef XPAR_INTC_0_DEVICE_ID
 #define DMA_CTRL_DEVICE_ID	XPAR_AXICDMA_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#define DMA_CTRL_IRPT_INTR	XPAR_INTC_0_AXICDMA_0_VEC_ID
-#else
-#define DMA_CTRL_DEVICE_ID 	XPAR_AXICDMA_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define DMA_CTRL_IRPT_INTR	XPAR_FABRIC_AXICDMA_0_VEC_ID
-#endif
 #endif
 
 #ifdef XPAR_AXI_7SDDR_0_S_AXI_BASEADDR
@@ -115,7 +105,16 @@ extern void xil_printf(const char *format, ...);
 #define MEMORY_BASE	XPAR_MIG_0_C0_DDR4_MEMORY_MAP_BASEADDR
 #elif XPAR_PSU_DDR_0_S_AXI_BASEADDR
 #define MEMORY_BASE	XPAR_PSU_DDR_0_S_AXI_BASEADDR
+#endif
+
 #else
+
+#ifdef XPAR_MEM0_BASEADDRESS
+#define MEMORY_BASE		XPAR_MEM0_BASEADDRESS
+#endif
+#endif
+
+#ifndef MEMORY_BASE
 #warning CHECK FOR THE VALID DDR ADDRESS IN XPARAMETERS.H, \
 			DEFAULT SET TO 0x01000000
 #define MEMORY_BASE		0x01000000
@@ -169,23 +168,12 @@ static int SubmitSgTransfer(XAxiCdma * InstancePtr);
 static int DoSgTransfer(XAxiCdma * InstancePtr);
 
 
-#ifdef XPAR_INTC_0_DEVICE_ID
 
-static int SetupIntrSystem(XIntc *IntcInstancePtr, XAxiCdma *InstancePtr,
-							u32 IntrId);
-static void DisableIntrSystem(XIntc *IntcInstancePtr, u32 IntrId);
-
-int XAxiCdma_HybridIntrExample(XIntc *IntcInstancePtr, XAxiCdma *InstancePtr,
-						u16 DeviceId,u32 IntrId);
-
+#ifndef SDT
+int XAxiCdma_HybridIntrExample(XAxiCdma *InstancePtr, u16 DeviceId);
 #else
 
-static int SetupIntrSystem(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
-							u32 IntrId);
-static void DisableIntrSystem(XScuGic *IntcInstancePtr, u32 IntrId);
-
-int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
-						u16 DeviceId,u32 IntrId);
+int XAxiCdma_HybridIntrExample(XAxiCdma *InstancePtr, UINTPTR BaseAddress);
 #endif
 
 
@@ -193,11 +181,6 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 
 #ifndef TESTAPP_GEN
 static XAxiCdma Engine;       /* Instance of the XAxiCdma */
-#ifdef XPAR_INTC_0_DEVICE_ID
-static XIntc IntcController;	/* Instance of the Interrupt Controller */
-#else
-static XScuGic IntcController;	/* Instance of the Interrupt Controller */
-#endif
 
 #endif
 
@@ -246,8 +229,11 @@ int main(void)
 
 	/* Run the interrupt example for simple transfer
 	 */
-	Status = XAxiCdma_HybridIntrExample(&IntcController, &Engine,
-				DMA_CTRL_DEVICE_ID, DMA_CTRL_IRPT_INTR);
+#ifndef SDT
+	Status = XAxiCdma_HybridIntrExample(&Engine, DMA_CTRL_DEVICE_ID);
+#else
+	Status = XAxiCdma_HybridIntrExample(&Engine, XAXICDMA_BASEADDRESS);
+#endif
 
 	if (Status != (XST_SUCCESS)) {
 		xil_printf("Axicdma Hybrid interrupt Example Failed\r\n");
@@ -504,199 +490,6 @@ static int CheckData(u8 *SrcPtr, u8 *DestPtr, int Length)
 	return XST_SUCCESS;
 }
 
-/******************************************************************************/
-/*
-* Setup the interrupt system, including:
-*	- Initialize the interrupt controller,
-*	- Register the XAxiCdma interrupt handler to the interrupt controller
-*	- Enable interrupt
-*
-* @param	IntcInstancePtr is a pointer to the instance of the INTC
-* @param	InstancePtr is a pointer to the instance of the XAxiCdma
-* @param	IntrId is the interrupt Id for XAxiCdma
-*
-* @return
-* 		- XST_SUCCESS if interrupt system setup successfully
-* 		- XST_FAILURE if error occurs
-*
-* @note		None.
-*
-*******************************************************************************/
-#ifdef XPAR_INTC_0_DEVICE_ID
-static int SetupIntrSystem(XIntc *IntcInstancePtr, XAxiCdma *InstancePtr,
-								u32 IntrId)
-{
-	int Status;
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	Status = XIntc_Initialize(IntcInstancePtr, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-		xdbg_printf(XDBG_DEBUG_ERROR,
-		    "Interrupt controller initialization failed %d\r\n",
-		    Status);
-
-		return XST_FAILURE;
-	}
-#endif
-
-	/*
-	 * Connect the driver interrupt handler
-	 * It will call the example callback upon transfer completion
-	 */
-	Status = XIntc_Connect(IntcInstancePtr, IntrId,
-			  (XInterruptHandler)XAxiCdma_IntrHandler,
-			  			(void *)InstancePtr);
-	if (Status != XST_SUCCESS) {
-		xdbg_printf(XDBG_DEBUG_ERROR,
-		    "Interrupt handler registration failed %d\r\n",
-		    Status);
-
-		return XST_FAILURE;
-	}
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Start the interrupt controller such that interrupts are enabled for
-	 * all devices that cause interrupts. Specify real mode so that the DMA
-	 * engine can generate interrupts through the interrupt controller
-	 */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-#endif
-
-	/*
-	 * Enable the interrupt for the DMA engine
-	 */
-	XIntc_Enable(IntcInstancePtr, IntrId);
-
-#ifndef TESTAPP_GEN
-
-	Xil_ExceptionInit();
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler)XIntc_InterruptHandler,
-			(void *)IntcInstancePtr);
-
-	Xil_ExceptionEnable();
-
-#endif /* TESTAPP_GEN */
-
-	return XST_SUCCESS;
-}
-#else
-
-static int SetupIntrSystem(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
-							u32 IntrId)
-{
-	int Status;
-
-#ifndef TESTAPP_GEN
-	/*
-	 * Initialize the interrupt controller driver
-	 */
-	XScuGic_Config *IntcConfig;
-
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-#endif
-
-	XScuGic_SetPriorityTriggerType(IntcInstancePtr, IntrId, 0xA0, 0x3);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, IntrId,
-				(Xil_InterruptHandler)XAxiCdma_IntrHandler,
-				InstancePtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the DMA device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, IntrId);
-
-
-
-#ifndef TESTAPP_GEN
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				IntcInstancePtr);
-
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-#endif /* TESTAPP_GEN */
-
-	return XST_SUCCESS;
-}
-
-#endif
-
-/*****************************************************************************/
-/*
-*
-* This function disables the interrupt for the XAxiCdma device
-*
-* @param	IntcInstancePtr is the pointer to the instance of the INTC
-* @param	IntrId is the interrupt Id for the XAxiCdma instance
-*
-* @return	None.
-*
-* @note		None.
-*
-******************************************************************************/
-#ifdef XPAR_INTC_0_DEVICE_ID
-static void DisableIntrSystem(XIntc *IntcInstancePtr, u32 IntrId)
-{
-
-	/* Disconnect the interrupt
-	 */
-	XIntc_Disconnect(IntcInstancePtr, IntrId);
-
-}
-#else
-static void DisableIntrSystem(XScuGic *IntcInstancePtr, u32 IntrId)
-{
-
-	/* Disconnect the interrupt
-	 */
-	XScuGic_Disable(IntcInstancePtr, IntrId);
-	XScuGic_Disconnect(IntcInstancePtr, IntrId);
-
-
-}
-#endif
 /*****************************************************************************/
 /*
 *
@@ -965,10 +758,9 @@ static int DoSgTransfer(XAxiCdma * InstancePtr)
 *	a multiple BD scatter gather transfer
 *	another simple transfer
 *
-* @param	IntcInstancePtr is a pointer to the INTC instance
 * @param	InstancePtr is a pointer to the XAxiCdma instance
-* @param	DeviceId is the Device Id of the XAxiCdma instance
-* @param	IntrId is the interrupt Id for the XAxiCdma instance in build
+* @param	DeviceId/BaseAddress is the Device Id/base address of the
+* 		XAxiCdma instance
 *
 * @return
 * 		- XST_SUCCESS if example finishes successfully
@@ -978,12 +770,10 @@ static int DoSgTransfer(XAxiCdma * InstancePtr)
 *		function hangs
 *
 ******************************************************************************/
-#ifdef XPAR_INTC_0_DEVICE_ID
-int XAxiCdma_HybridIntrExample(XIntc *IntcInstancePtr, XAxiCdma *InstancePtr,
-						u16 DeviceId,u32 IntrId)
+#ifndef SDT
+int XAxiCdma_HybridIntrExample(XAxiCdma *InstancePtr, u16 DeviceId)
 #else
-int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
-						u16 DeviceId,u32 IntrId)
+int XAxiCdma_HybridIntrExample(XAxiCdma *InstancePtr, UINTPTR BaseAddress)
 #endif
 {
 	XAxiCdma_Config *CfgPtr;
@@ -992,6 +782,7 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 
 	/* Initialize the XAxiCdma device.
 	 */
+#ifndef SDT
 	CfgPtr = XAxiCdma_LookupConfig(DeviceId);
 	if (!CfgPtr) {
 		xdbg_printf(XDBG_DEBUG_ERROR,
@@ -1000,7 +791,16 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 
 		return XST_FAILURE;
 	}
+#else
+	CfgPtr = XAxiCdma_LookupConfig(BaseAddress);
+	if (!CfgPtr) {
+		xdbg_printf(XDBG_DEBUG_ERROR,
+		    "Cannot find config structure for device %llx\r\n",
+			BaseAddress);
 
+		return XST_FAILURE;
+	}
+#endif
 	Status = XAxiCdma_CfgInitialize(InstancePtr, CfgPtr,
 						CfgPtr->BaseAddress);
 	if (Status != XST_SUCCESS) {
@@ -1012,7 +812,9 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 
 	/* Setup the interrupt system
 	 */
-	Status = SetupIntrSystem(IntcInstancePtr, InstancePtr, IntrId);
+	Status = XSetupInterruptSystem(InstancePtr, &XAxiCdma_IntrHandler,
+				       CfgPtr->IntrId, CfgPtr->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
 		xdbg_printf(XDBG_DEBUG_ERROR,
 		    "Setup Intr system failed with %d\r\n", Status);
@@ -1033,7 +835,7 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 		   BUFFER_BYTESIZE, SubmitTries);
 
 	if(Status != XST_SUCCESS) {
-		DisableIntrSystem(IntcInstancePtr, IntrId);
+		XDisconnectInterruptCntrl(CfgPtr->IntrId, CfgPtr->IntrParent);
 
 		return XST_FAILURE;
 	}
@@ -1047,7 +849,7 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 
 	Status = DoSgTransfer(InstancePtr);
 	if(Status != XST_SUCCESS) {
-		DisableIntrSystem(IntcInstancePtr, IntrId);
+		XDisconnectInterruptCntrl(CfgPtr->IntrId, CfgPtr->IntrParent);
 
 		return XST_FAILURE;
 	}
@@ -1063,7 +865,7 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 		   BUFFER_BYTESIZE, SubmitTries);
 
 	if(Status != XST_SUCCESS) {
-		DisableIntrSystem(IntcInstancePtr, IntrId);
+		XDisconnectInterruptCntrl(CfgPtr->IntrId, CfgPtr->IntrParent);
 
 		return XST_FAILURE;
 	}
@@ -1072,7 +874,7 @@ int XAxiCdma_HybridIntrExample(XScuGic *IntcInstancePtr, XAxiCdma *InstancePtr,
 
 	/* Test finishes successfully, clean up and return
 	 */
-	DisableIntrSystem(IntcInstancePtr, IntrId);
+	XDisconnectInterruptCntrl(CfgPtr->IntrId, CfgPtr->IntrParent);
 
 	return XST_SUCCESS;
 }
