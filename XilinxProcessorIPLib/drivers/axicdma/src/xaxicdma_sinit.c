@@ -65,7 +65,7 @@ XAxiCdma_Config *XAxiCdma_LookupConfig(u32 DeviceId)
 #else
 XAxiCdma_Config *XAxiCdma_LookupConfig(UINTPTR BaseAddress)
 {
-	extern XAxiCdma_Config XAxicdma_ConfigTable[];
+	extern XAxiCdma_Config XAxiCdma_ConfigTable[];
 	XAxiCdma_Config *CfgPtr = NULL;
 	u32 Index;
 

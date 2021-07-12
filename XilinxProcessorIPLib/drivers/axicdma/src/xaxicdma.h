@@ -412,6 +412,8 @@ typedef struct {
 	int DataWidth;            /**< Length of a word in bits */
 	int BurstLen;             /**< Burst length */
 	int AddrWidth;		  /**< Address Width */
+	u16 IntrId; /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 }XAxiCdma_Config;
 
 /**
@@ -451,6 +453,7 @@ typedef struct {
 	int HwBdCnt;               /**< Number of BDs in work group */
 	int PostBdCnt;             /**< Number of BDs in post-work group */
 	int AllBdCnt;              /**< Total Number of BDs */
+	int BurstLen;		   /**< Burst length */
 
 	/* Callback function for simple transfer*/
 	XAxiCdma_CallBackFn SimpleCallBackFn; /**< Callback function for simple
@@ -508,7 +511,7 @@ typedef struct {
 #ifndef SDT
 XAxiCdma_Config *XAxiCdma_LookupConfig(u32 DeviceId);
 #else
-XAxiCdma_Config *XAxiCdma_LookupConfig(u32 BaseAddress);
+XAxiCdma_Config *XAxiCdma_LookupConfig(UINTPTR BaseAddress);
 #endif
 
 u32 XAxiCdma_CfgInitialize(XAxiCdma *InstancePtr, XAxiCdma_Config *CfgPtr,
