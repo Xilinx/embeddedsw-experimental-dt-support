@@ -35,7 +35,9 @@ extern "C" {
 
 #include "xil_types.h"
 #include "xil_io.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -46,6 +48,14 @@ extern "C" {
                                                requirement for descriptors to
                                                satisfy both hardware/software
                                                needs */
+/*@}*/
+
+/** @name Maximum transfer length
+ *    This is determined by hardware
+ * @{
+ */
+#define XAXICDMA_MAX_TRANSFER_LEN	0x7FFFFF  /**< Max length hw supports */
+#define XAXICDMA_4_1_MAX_TRANSFER_LEN	0x3FFFFFF  /**< Max length hw supports */
 /*@}*/
 
 /** @name Register offset definitions
