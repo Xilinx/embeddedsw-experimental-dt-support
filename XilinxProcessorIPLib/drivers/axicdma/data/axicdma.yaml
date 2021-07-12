@@ -40,12 +40,19 @@ required:
     - xlnx,addrwidth
     - interrupts
     - interrupt-parent
+    - xlnx,include-sg
 
 examples:
     xaxicdma_example_simple_intr.c:
         - interrupts
     xaxicdma_example_sg_intr.c:
         - interrupts
+        - xlnx,include-sg: 1
+    xaxicdma_example_sg_poll.c:
+        - xlnx,include-sg: 1
     xaxicdma_example_hybrid_intr.c:
         - interrupts
+        - xlnx,include-sg: 1
+    xaxicdma_example_hybrid_poll.c:
+        - xlnx,include-sg: 1
 ...
