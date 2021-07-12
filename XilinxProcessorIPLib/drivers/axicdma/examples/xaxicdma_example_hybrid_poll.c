@@ -63,6 +63,7 @@
 #include "xil_cache.h"
 #include "xenv.h"	/* memset */
 #include "xparameters.h"
+#include "xaxicdma_example.h"
 
 #if defined(XPAR_UARTNS550_0_BASEADDR)
 #include "xuartns550_l.h"       /* to use uartns550 */
@@ -77,6 +78,7 @@ extern void xil_printf(const char *format, ...);
 /*
  * Device hardware build related constants.
  */
+#ifndef SDT
 #ifndef TESTAPP_GEN
 #define DMA_CTRL_DEVICE_ID  XPAR_AXICDMA_0_DEVICE_ID
 #endif
@@ -89,7 +91,16 @@ extern void xil_printf(const char *format, ...);
 #define MEMORY_BASE	XPAR_MIG_0_BASEADDR
 #elif XPAR_PSU_DDR_0_S_AXI_BASEADDR
 #define MEMORY_BASE	XPAR_PSU_DDR_0_S_AXI_BASEADDR
+#endif
+
 #else
+
+#ifdef XPAR_MEM0_BASEADDRESS
+#define MEMORY_BASE		XPAR_MEM0_BASEADDRESS
+#endif
+#endif
+
+#ifndef MEMORY_BASE
 #warning CHECK FOR THE VALID DDR ADDRESS IN XPARAMETERS.H, \
 		DEFAULT SET TO 0x01000000
 #define MEMORY_BASE		0x01000000
@@ -131,7 +142,11 @@ static int CheckSgCompletion(XAxiCdma *InstancePtr);
 static int CheckData(u8 *SrcPtr, u8 *DestPtr, int Length);
 static int DoSimplePollTransfer(XAxiCdma *InstancePtr, int Length, int Retries);
 static int DoSgPollTransfer(XAxiCdma *InstancePtr, int Length);
+#ifndef SDT
 int XAxiCdma_HybridPollExample(u16 DeviceId);
+#else
+int XAxiCdma_HybridPollExample(UINTPTR BaseAddress);
+#endif
 
 /************************** Variable Definitions *****************************/
 
@@ -183,7 +198,11 @@ int main()
 
 	/* Run the poll example for simple transfer
 	 */
+#ifndef SDT
 	Status = XAxiCdma_HybridPollExample(DMA_CTRL_DEVICE_ID);
+#else
+	Status = XAxiCdma_HybridPollExample(XAXICDMA_BASEADDRESS);
+#endif
 
 	if (Status != (XST_SUCCESS)) {
 		xil_printf("Axicdma Hybrid polled Example Failed\r\n");
@@ -663,7 +682,8 @@ static int DoSgPollTransfer(XAxiCdma *InstancePtr, int Length)
 *	a scatter gather polled transfer with multiple BDs
 * 	a simple polled transfer
 *
-* @param	DeviceId is the Device Id of the XAxiCdma instance
+* @param	DeviceId/BaseAddress is the Device Id/base address of the
+* 		XAxiCdma instance
 *
 * @return
 * 		- XST_SUCCESS if example finishes successfully
@@ -673,7 +693,11 @@ static int DoSgPollTransfer(XAxiCdma *InstancePtr, int Length)
 *		function hangs
 *
 ******************************************************************************/
+#ifndef SDT
 int XAxiCdma_HybridPollExample(u16 DeviceId)
+#else
+int XAxiCdma_HybridPollExample(UINTPTR BaseAddress)
+#endif
 {
 	XAxiCdma_Config *CfgPtr;
 	int Status;
@@ -681,6 +705,7 @@ int XAxiCdma_HybridPollExample(u16 DeviceId)
 
 	/* Initialize the XAxiCdma device.
 	 */
+#ifndef SDT
 	CfgPtr = XAxiCdma_LookupConfig(DeviceId);
 	if (!CfgPtr) {
 		xdbg_printf(XDBG_DEBUG_ERROR,
@@ -689,6 +714,16 @@ int XAxiCdma_HybridPollExample(u16 DeviceId)
 
 		return XST_FAILURE;
 	}
+#else
+	CfgPtr = XAxiCdma_LookupConfig(BaseAddress);
+	if (!CfgPtr) {
+		xdbg_printf(XDBG_DEBUG_ERROR,
+		    "Cannot find config structure for device %llx\r\n",
+			BaseAddress);
+
+		return XST_FAILURE;
+	}
+#endif
 
 	Status = XAxiCdma_CfgInitialize(&Engine, CfgPtr,
 						CfgPtr->BaseAddress);
