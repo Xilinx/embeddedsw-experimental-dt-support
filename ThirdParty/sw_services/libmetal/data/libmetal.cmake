@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.5)
 message("current PROJECT_MACHINE is ${PROJECT_MACHINE} ")
 message("current PROJECT_PROCESSOR is ${PROJECT_PROCESSOR} ")

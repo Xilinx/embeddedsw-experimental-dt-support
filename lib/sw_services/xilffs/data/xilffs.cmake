@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.5)
 
 SET(XILFFS_fs_interface 1 CACHE STRING "Enables file system with selected interface. Enter 1 for SD. Enter 2 for RAM")
