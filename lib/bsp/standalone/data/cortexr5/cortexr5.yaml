@@ -18,6 +18,7 @@ properties:
           - arm,cortex-r5
 
 required:
+    - access-val
     - cpu-frequency
     - reg
 ...

@@ -11,6 +11,7 @@
 
 /**************************** Type Definitions ******************************/
 typedef struct {
+		u32 AccessVal;
 		u32 CpuFreq;
 		u8 CpuId;	/* CPU Number */
 } XCortexr5_Config;
