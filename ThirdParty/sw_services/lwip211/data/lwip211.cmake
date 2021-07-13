@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.5)
 
 set(lwip_api_mode RAW_API CACHE STRING "Mode of operation for lwIP (RAW API/Sockets API)")

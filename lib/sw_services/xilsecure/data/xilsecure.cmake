@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 
 option(XILSECURE_secure_environment "Enables trusted execution environment" OFF)
 if(XILSECURE_secure_environment)

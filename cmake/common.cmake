@@ -1,4 +1,5 @@
-
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 set (CMAKE_INSTALL_LIBDIR "lib")
 function (collector_create name base)
   set_property (GLOBAL PROPERTY "COLLECT_${name}_LIST")
