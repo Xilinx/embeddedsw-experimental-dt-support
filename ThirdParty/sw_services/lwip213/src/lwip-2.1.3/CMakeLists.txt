@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.7)
 
 project(lwIP)
