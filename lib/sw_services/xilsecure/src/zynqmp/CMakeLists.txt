@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_SOURCES xsecure_rsa_core.c)
 collect (PROJECT_LIB_HEADERS xsecure_sha.h)
 collect (PROJECT_LIB_HEADERS xsecure_rsa_hw.h)
