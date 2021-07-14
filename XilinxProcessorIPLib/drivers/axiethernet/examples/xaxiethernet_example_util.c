@@ -562,7 +562,7 @@ int AxiEthernetUtilEnterLoopback(XAxiEthernet *AxiEthernetInstancePtr,
 	if (PhyType != XAE_PHY_TYPE_1000BASE_X) {
 		PhyAddr = AxiEthernetDetectPHY(AxiEthernetInstancePtr);
 	} else {
-		PhyAddr = XPAR_AXIETHERNET_0_PHYADDR;
+		PhyAddr = AxiEthernetInstancePtr->Config.PhyAddr;
 	}
 
 	XAxiEthernet_PhyRead(AxiEthernetInstancePtr, PhyAddr,
@@ -727,31 +727,7 @@ void AxiEthernetUtilErrorTrap(char *Message)
 ******************************************************************************/
 void AxiEthernetUtilPhyDelay(unsigned int Seconds)
 {
-#if defined (__MICROBLAZE__) || defined(__PPC__)
-	static int WarningFlag = 0;
-
-	/* If MB caches are disabled or do not exist, this delay loop could
-	 * take minutes instead of seconds (e.g., 30x longer).  Print a warning
-	 * message for the user (once).  If only MB had a built-in timer!
-	 */
-	if (((mfmsr() & 0x20) == 0) && (!WarningFlag)) {
-		WarningFlag = 1;
-	}
-
-#define ITERS_PER_SEC   (XPAR_CPU_CORE_CLOCK_FREQ_HZ / 6)
-    asm volatile ("\n"
-			"1:               \n\t"
-			"addik r7, r0, %0 \n\t"
-			"2:               \n\t"
-			"addik r7, r7, -1 \n\t"
-			"bneid  r7, 2b    \n\t"
-			"or  r0, r0, r0   \n\t"
-			"bneid %1, 1b     \n\t"
-			"addik %1, %1, -1 \n\t"
-			:: "i"(ITERS_PER_SEC), "d" (Seconds));
-#else
     sleep(Seconds);
-#endif
 }
 
 /******************************************************************************/
@@ -776,7 +752,7 @@ int AxiEthernetUtilConfigureInternalPhy(XAxiEthernet *AxiEthernetInstancePtr,
 	u16 PhyReg0;
 	signed int PhyAddr;
 
-	PhyAddr = XPAR_AXIETHERNET_0_PHYADDR;
+	PhyAddr = AxiEthernetInstancePtr->Config.PhyAddr;
 
 	/* Clear the PHY of any existing bits by zeroing this out */
 	PhyReg0 = 0;
