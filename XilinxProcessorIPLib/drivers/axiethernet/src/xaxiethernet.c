@@ -101,6 +101,12 @@ int XAxiEthernet_CfgInitialize(XAxiEthernet *InstancePtr,
 
 	/* Reset the hardware and set default options */
 	InstancePtr->IsReady = XIL_COMPONENT_IS_READY;
+	InstancePtr->Config.IntrId = CfgPtr->IntrId;
+	InstancePtr->Config.IntrParent = CfgPtr->IntrParent;
+	InstancePtr->AxiDevType = CfgPtr->AxiDevBaseAddress &
+					XAE_AXIDEVTYPE_MASK;
+	InstancePtr->AxiDevBaseAddress = CfgPtr->AxiDevBaseAddress &
+					XAE_AXIBASEADDR_MASK;
 
 	XAxiEthernet_Reset(InstancePtr);
 
@@ -153,6 +159,12 @@ int XAxiEthernet_Initialize(XAxiEthernet *InstancePtr,
 
 	/* Set device base address */
 	InstancePtr->Config.BaseAddress = EffectiveAddress;
+	InstancePtr->Config.IntrId = CfgPtr->IntrId;
+	InstancePtr->Config.IntrParent = CfgPtr->IntrParent;
+	InstancePtr->AxiDevType = CfgPtr->AxiDevBaseAddress &
+					XAE_AXIDEVTYPE_MASK;
+	InstancePtr->AxiDevBaseAddress = CfgPtr->AxiDevBaseAddress &
+					XAE_AXIBASEADDR_MASK;
 
 	/* Set default options */
 	InstancePtr->IsReady = XIL_COMPONENT_IS_READY;
@@ -1393,7 +1405,6 @@ u16 XAxiEthernet_GetOperatingSpeed(XAxiEthernet *InstancePtr)
 int XAxiEthernet_SetOperatingSpeed(XAxiEthernet *InstancePtr, u16 Speed)
 {
 	u32 EmmcReg;
-	u8  TemacType;
 	u8  PhyType;
 	u8  SetSpeed = TRUE;
 
@@ -1405,9 +1416,7 @@ int XAxiEthernet_SetOperatingSpeed(XAxiEthernet *InstancePtr, u16 Speed)
 	"XAxiEthernet_SetOperatingSpeed: setting speed to:%d (0x%0x)\n",
 								Speed, Speed);
 
-	TemacType = XAxiEthernet_GetTemacType(InstancePtr);
 	PhyType = XAxiEthernet_GetPhysicalInterface(InstancePtr);
-	(void) (TemacType);
 
 	/*
 	 * The following code checks for all allowable speed conditions before
