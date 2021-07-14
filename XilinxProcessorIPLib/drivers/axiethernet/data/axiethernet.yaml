@@ -81,7 +81,7 @@ required:
     - xlnx,phyaddr
     - interrupts
     - interrupt-parent
-    - axistream-connected
+    - axistream-connected: phandle
 
 examples:
     xaxiethernet_example_polled.c:
@@ -92,6 +92,14 @@ examples:
         - interrupts
 
     xaxiethernet_example_intr_sgdma.c:
+        - axistream-connected: 2
+        - interrupts
+
+    xaxiethernet_example_extmulticast.c:
+        - axistream-connected: 2
+        - interrupts
+
+    xaxiethernet_example_extvlan.c:
         - axistream-connected: 2
         - interrupts
 
