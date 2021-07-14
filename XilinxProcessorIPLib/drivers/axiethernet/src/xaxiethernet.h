@@ -719,6 +719,15 @@ extern "C" {
 #define XAE_SOFT_TEMAC_10_100_1000_MBPS	1
 #define XAE_HARD_TEMC			2
 
+/* AxiEthernet TYPE Enumerations */
+#define XPAR_AXI_FIFO    1U
+#define XPAR_AXI_DMA     2U
+#define XPAR_AXI_MCDMA   3U
+
+/* Axi Ethernet Dev Type Masks */
+#define XAE_AXIDEVTYPE_MASK 	0xF
+#define XAE_AXIBASEADDR_MASK	0xFFFFFFFFFFFFFFF0
+
 /**************************** Type Definitions *******************************/
 
 
@@ -733,10 +742,6 @@ typedef struct XAxiEthernet_Config {
 #endif
 	UINTPTR BaseAddress;/**< BaseAddress is the physical base address of the
 			  *  device's registers
-			  */
-	u8 TemacType;   /**< Temac Type can have 3 possible values. They are
-			  *  0 for SoftTemac at 10/100 Mbps, 1 for SoftTemac
-			  *  at 10/100/1000 Mbps and 2 for Vitex6 Hard Temac
 			  */
 	u8 TxCsum;	/**< TxCsum indicates that the device has checksum
 			  *  offload on the Tx channel or not.
@@ -760,22 +765,16 @@ typedef struct XAxiEthernet_Config {
 	u8 Enable_1588;	/**< Enable 1588 option */
 	u32 Speed;	/**< Tells whether MAC is 1G or 2p5G */
 	u8 NumTableEntries;	/**< Number of table entries */
+	u32 PhyAddr;
+	u16 IntrId; /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
+	UINTPTR AxiDevBaseAddress; /**< Bit[0] AxiDevType is the type of device attached to the
+				 * Axi Ethernet's AXI4-Stream interface
+				 * Bit[64/32:1] AxiDevBaseAddress is the base address of
+                                 *  the device attached to the Axi Ethernet's
+                                 *  AXI4-Stream interface.
+                                 */
 
-	u8 TemacIntr;	/**< Axi Ethernet interrupt ID */
-
-	int AxiDevType;  /**< AxiDevType is the type of device attached to the
-			  *   Axi Ethernet's AXI4-Stream interface.
-			  */
-	UINTPTR AxiDevBaseAddress; /**< AxiDevBaseAddress is the base address of
-				 *  the device attached to the Axi Ethernet's
-				 *  AXI4-Stream interface.
-				 */
-	u8 AxiFifoIntr;	/**< AxiFifoIntr interrupt ID (unused if DMA) */
-	u8 AxiDmaRxIntr;/**< Axi DMA RX interrupt ID (unused if FIFO) */
-	u8 AxiDmaTxIntr;/**< Axi DMA TX interrupt ID (unused if FIFO) */
-	u8 AxiMcDmaChan_Cnt;  /**< Axi MCDMA Channel Count */
-	u8 AxiMcDmaRxIntr[16]; /**< Axi MCDMA Rx interrupt ID (unused if AXI DMA or FIFO) */
-	u8 AxiMcDmaTxIntr[16]; /**< AXI MCDMA TX interrupt ID (unused if AXIX DMA or FIFO) */
 } XAxiEthernet_Config;
 
 
@@ -791,6 +790,10 @@ typedef struct XAxiEthernet {
 	u32 IsReady;		 /**< Device is initialized and ready */
 	u32 Options;		 /**< Current options word */
 	u32 Flags;		 /**< Internal driver flags */
+	int AxiDevType;	/**< AxiDevType is the type of device attached to the
+			         *   Axi Ethernet's AXI4-Stream interface.
+			         */
+	UINTPTR AxiDevBaseAddress;
 } XAxiEthernet;
 
 
@@ -835,7 +838,7 @@ typedef struct XAxiEthernet {
 *
 ******************************************************************************/
 #define XAxiEthernet_IsDma(InstancePtr) \
-	(((InstancePtr)->Config.AxiDevType == XPAR_AXI_DMA) ? TRUE: FALSE)
+	(((InstancePtr)->AxiDevType == XPAR_AXI_DMA) ? TRUE: FALSE)
 
 /*****************************************************************************/
 /**
@@ -855,7 +858,7 @@ typedef struct XAxiEthernet {
 *
 ******************************************************************************/
 #define XAxiEthernet_IsFifo(InstancePtr) \
-	(((InstancePtr)->Config.AxiDevType == XPAR_AXI_FIFO) ? TRUE: FALSE)
+	(((InstancePtr)->AxiDevType == XPAR_AXI_FIFO) ? TRUE: FALSE)
 
 /*****************************************************************************/
 /**
@@ -873,7 +876,7 @@ typedef struct XAxiEthernet {
 *
 ******************************************************************************/
 #define XAxiEthernet_IsMcDma(InstancePtr) \
-	(((InstancePtr)->Config.AxiDevType == XPAR_AXI_MCDMA) ? TRUE: FALSE)
+	(((InstancePtr)->AxiDevType == XPAR_AXI_MCDMA) ? TRUE: FALSE)
 
 /*****************************************************************************/
 /**
@@ -1347,29 +1350,6 @@ typedef struct XAxiEthernet {
  *****************************************************************************/
 #define XAxiEthernet_IsRxVlanTag(InstancePtr)	\
 	(((InstancePtr)->Config.RxVlanTag) ? TRUE : FALSE)
-
-/*****************************************************************************/
-/**
-*
-* XAxiEthernet_GetTemacType returns the Axi Ethernet type of the core.
-*
-* @param	InstancePtr is a pointer to the Axi Ethernet instance to be
-*		worked on.
-*
-* @return
-*	 	- Returns the values of TemacType, which can be
-*		  XAE_SOFT_TEMAC_10_100_MBPS (0) for Soft Temac Core with
-*							speed 10/100 Mbps.
-*		  XAE_SOFT_TEMAC_10_100_1000_MBPS (1) for Soft Temac core with
-*							speed 10/100/1000 Mbps
-*		  XAE_HARD_TEMC (2) for Hard Temac Core for Virtex-6
-*
-* @note 	C-style signature:
-* 		u32 XAxiEthernet_GetTemacType(XAxiEthernet *InstancePtr)
-*
- *****************************************************************************/
-#define XAxiEthernet_GetTemacType(InstancePtr)	\
-	((InstancePtr)->Config.TemacType)
 
 /*****************************************************************************/
 /**
