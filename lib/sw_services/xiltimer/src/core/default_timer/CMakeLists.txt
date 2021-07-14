@@ -1,4 +1,5 @@
-
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexr5")
 collect (PROJECT_LIB_SOURCES cortexr5_sleep.c)

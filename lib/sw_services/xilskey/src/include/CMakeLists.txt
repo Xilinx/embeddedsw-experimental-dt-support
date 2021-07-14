@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_HEADERS xilskey_eps_zynqmp.h)
 collect (PROJECT_LIB_HEADERS xilskey_eps_zynqmp_puf.h)
 collect (PROJECT_LIB_HEADERS xilskey_utils.h)

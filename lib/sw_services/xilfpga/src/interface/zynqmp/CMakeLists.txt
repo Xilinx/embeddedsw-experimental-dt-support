@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 if (${zynqmp_secure_env})
     collect (PROJECT_LIB_SOURCES xilfpga_ipi_pcap.c)
 else()

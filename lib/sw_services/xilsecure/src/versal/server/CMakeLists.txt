@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_HEADERS Ecdsa.h)
 collect (PROJECT_LIB_SOURCES xsecure_aes.c)
 collect (PROJECT_LIB_HEADERS xsecure_aes.h)

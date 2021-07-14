@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_SOURCES xpm_aie.c)
 collect (PROJECT_LIB_HEADERS xpm_aie.h)
 collect (PROJECT_LIB_SOURCES xpm_api.c)
