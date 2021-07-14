@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_SOURCES xsecure_aesclient.c)
 collect (PROJECT_LIB_HEADERS xsecure_aesclient.h)
 collect (PROJECT_LIB_SOURCES xsecure_ellipticclient.c)
