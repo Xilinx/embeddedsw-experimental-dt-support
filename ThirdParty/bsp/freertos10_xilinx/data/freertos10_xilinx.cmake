@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.5)
 include(${CMAKE_SOURCE_DIR}/Freertos10_xilinxExample.cmake * NO_POLICY_SCOPE)
 

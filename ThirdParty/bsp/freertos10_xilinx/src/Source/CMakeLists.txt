@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_SOURCES event_groups.c)
 collect (PROJECT_LIB_SOURCES list.c)
 collect (PROJECT_LIB_SOURCES queue.c)
