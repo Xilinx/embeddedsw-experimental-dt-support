@@ -1,3 +1,7 @@
+/******************************************************************************
+* Copyright (C) 2021 Xilinx, Inc.  All rights reserved.
+* SPDX-License-Identifier: MIT
+******************************************************************************/
 #ifndef XTTCPS_EXAMPLE_H
 #define XTTCPS_EXAMPLE_H
 
