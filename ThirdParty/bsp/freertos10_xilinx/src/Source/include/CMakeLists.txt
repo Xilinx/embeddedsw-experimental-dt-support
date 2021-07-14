@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 collect (PROJECT_LIB_HEADERS croutine.h)
 collect (PROJECT_LIB_HEADERS message_buffer.h)
 collect (PROJECT_LIB_HEADERS queue.h)
