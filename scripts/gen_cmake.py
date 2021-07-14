@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 import os
 import sys
 import glob
