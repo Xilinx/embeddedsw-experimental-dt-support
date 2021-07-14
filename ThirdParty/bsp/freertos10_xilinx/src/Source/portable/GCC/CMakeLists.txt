@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 if( ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53") OR
     ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
   )
