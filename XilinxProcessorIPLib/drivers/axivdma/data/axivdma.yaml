@@ -118,5 +118,6 @@ required:
 
 examples:
     xaxivdma_example_intr.c:
+        - xlnx,include-sg: 0
         - interrupts
 ...
