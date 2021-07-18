@@ -59,13 +59,10 @@
 #include "xparameters.h"
 #include "xil_exception.h"
 #include "xil_printf.h"
+#include "xinterrupt_wrap.h"
+#include "xaxivdma_example.h"
 
 #include "xil_cache.h"
-#ifdef XPAR_INTC_0_DEVICE_ID
-#include "xintc.h"
-#else
-#include "xscugic.h"
-#endif
 
 #ifndef __MICROBLAZE__
 #include "xpseudo_asm_gcc.h"
@@ -80,17 +77,9 @@
 /*
  * Device related constants. These need to defined as per the HW system.
  */
+#ifndef SDT
 #define DMA_DEVICE_ID		XPAR_AXIVDMA_0_DEVICE_ID
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-#define INTC_DEVICE_ID		XPAR_INTC_0_DEVICE_ID
-#define WRITE_INTR_ID		XPAR_INTC_0_AXIVDMA_0_S2MM_INTROUT_VEC_ID
-#define READ_INTR_ID		XPAR_INTC_0_AXIVDMA_0_MM2S_INTROUT_VEC_ID
-#else
-#define INTC_DEVICE_ID		XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define WRITE_INTR_ID		XPAR_FABRIC_AXIVDMA_0_S2MM_INTROUT_VEC_ID
-#define READ_INTR_ID		XPAR_FABRIC_AXIVDMA_0_MM2S_INTROUT_VEC_ID
-#endif
 
 #ifdef XPAR_AXI_7SDDR_0_S_AXI_BASEADDR
 #define DDR_BASE_ADDR		XPAR_AXI_7SDDR_0_S_AXI_BASEADDR
@@ -101,7 +90,22 @@
 #elif XPAR_MIG_0_BASEADDR
 #define DDR_BASE_ADDR		XPAR_MIG_0_BASEADDR
 #define DDR_HIGH_ADDR	 	XPAR_MIG_0_HIGHADDR
+#endif
+
 #else
+
+#ifdef XPAR_MEM0_BASEADDRESS
+#define DDR_BASE_ADDR		XPAR_MEM0_BASEADDRESS
+#define DDR_HIGH_ADDR		XPAR_MEM0_HIGHADDRESS
+#endif
+
+#ifdef XPAR_PSU_DDR_1_BASEADDRESS
+#define DDR_BASE_ADDR		XPAR_PSU_DDR_1_BASEADDRESS
+#define DDR_HIGH_ADDR		XPAR_PSU_DDR_1_HIGHADDRESS
+#endif
+#endif
+
+#ifndef DDR_BASE_ADDR
 #warning CHECK FOR THE VALID DDR ADDRESS IN XPARAMETERS.H, \
 			DEFAULT SET TO 0x01000000
 #define DDR_BASE_ADDR		0x10000000
@@ -179,11 +183,6 @@
  */
 XAxiVdma AxiVdma;
 
-#ifdef XPAR_INTC_0_DEVICE_ID
-static XIntc Intc;	/* Instance of the Interrupt Controller */
-#else
-static XScuGic Intc;	/* Instance of the Interrupt Controller */
-#endif
 
 /* Data address
  *
@@ -222,10 +221,7 @@ static int StartTransfer(XAxiVdma *InstancePtr);
 static int CheckFrame(int FrameIndex);
 static void BufferInit(UINTPTR BaseAddr, int Length, u8 StartValue);
 
-static int SetupIntrSystem(XAxiVdma *AxiVdmaPtr, u16 ReadIntrId,
-				u16 WriteIntrId);
 
-static void DisableIntrSystem(u16 ReadIntrId, u16 WriteIntrId);
 
 /* Interrupt call back functions
  */
@@ -300,6 +296,7 @@ int main(void)
 	/* The information of the XAxiVdma_Config comes from hardware build.
 	 * The user IP should pass this information to the AXI DMA core.
 	 */
+#ifndef SDT
 	Config = XAxiVdma_LookupConfig(DMA_DEVICE_ID);
 	if (!Config) {
 		xil_printf(
@@ -307,6 +304,15 @@ int main(void)
 
 		return XST_FAILURE;
 	}
+#else
+	Config = XAxiVdma_LookupConfig(XAXIVDMA_BASEADDRESS);
+	if (!Config) {
+		xil_printf(
+		    "No video DMA found for Address %llx\r\n", XAXIVDMA_BASEADDRESS);
+
+		return XST_FAILURE;
+	}
+#endif
 
 	/* Set default read and write count based on HW config*/
 	ReadCount = Config->MaxFrameStoreNum;
@@ -401,11 +407,23 @@ int main(void)
 		return XST_FAILURE;
 	}
 
-	Status = SetupIntrSystem(&AxiVdma, READ_INTR_ID, WRITE_INTR_ID);
+	Status = XSetupInterruptSystem(&AxiVdma, &XAxiVdma_WriteIntrHandler,
+				       Config->IntrId[1], Config->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
 	if (Status != XST_SUCCESS) {
-
 		xil_printf(
-		    "Setup interrupt system failed %d\r\n", Status);
+		    "Setup interrupt system failed for write %d\r\n", Status);
+
+		return XST_FAILURE;
+
+	}
+
+	Status = XSetupInterruptSystem(&AxiVdma, &XAxiVdma_ReadIntrHandler,
+				       Config->IntrId[0], Config->IntrParent,
+				       XINTERRUPT_DEFAULT_PRIORITY);
+	if (Status != XST_SUCCESS) {
+		xil_printf(
+		    "Setup interrupt system failed for read %d\r\n", Status);
 
 		return XST_FAILURE;
 	}
@@ -475,7 +493,8 @@ int main(void)
 	}
 
 Done:
-	DisableIntrSystem(READ_INTR_ID, WRITE_INTR_ID);
+	XDisconnectInterruptCntrl(Config->IntrId[0], Config->IntrParent);
+	XDisconnectInterruptCntrl(Config->IntrId[1], Config->IntrParent);
 
 	if (Status != XST_SUCCESS) {
 		if(Status == XST_VDMA_MISMATCH_ERROR)
@@ -666,179 +685,6 @@ static int StartTransfer(XAxiVdma *InstancePtr)
 	}
 
 	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/*
-*
-* This function setups the interrupt system so interrupts can occur for the
-* DMA.  This function assumes INTC component exists in the hardware system.
-*
-* @param	AxiDmaPtr is a pointer to the instance of the DMA engine
-* @param	ReadIntrId is the read channel Interrupt ID.
-* @param	WriteIntrId is the write channel Interrupt ID.
-*
-* @return	XST_SUCCESS if successful, otherwise XST_FAILURE.
-*
-* @note		None.
-*
-******************************************************************************/
-static int SetupIntrSystem(XAxiVdma *AxiVdmaPtr, u16 ReadIntrId,
-				u16 WriteIntrId)
-{
-	int Status;
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-	XIntc *IntcInstancePtr =&Intc;
-
-
-	/* Initialize the interrupt controller and connect the ISRs */
-	Status = XIntc_Initialize(IntcInstancePtr, INTC_DEVICE_ID);
-	if (Status != XST_SUCCESS) {
-
-		xil_printf( "Failed init intc\r\n");
-		return XST_FAILURE;
-	}
-
-	Status = XIntc_Connect(IntcInstancePtr, ReadIntrId,
-	         (XInterruptHandler)XAxiVdma_ReadIntrHandler, AxiVdmaPtr);
-	if (Status != XST_SUCCESS) {
-
-		xil_printf(
-		    "Failed read channel connect intc %d\r\n", Status);
-		return XST_FAILURE;
-	}
-
-	Status = XIntc_Connect(IntcInstancePtr, WriteIntrId,
-	         (XInterruptHandler)XAxiVdma_WriteIntrHandler, AxiVdmaPtr);
-	if (Status != XST_SUCCESS) {
-
-		xil_printf(
-		    "Failed write channel connect intc %d\r\n", Status);
-		return XST_FAILURE;
-	}
-
-	/* Start the interrupt controller */
-	Status = XIntc_Start(IntcInstancePtr, XIN_REAL_MODE);
-	if (Status != XST_SUCCESS) {
-
-		xil_printf( "Failed to start intc\r\n");
-		return XST_FAILURE;
-	}
-
-	/* Enable interrupts from the hardware */
-	XIntc_Enable(IntcInstancePtr, ReadIntrId);
-	XIntc_Enable(IntcInstancePtr, WriteIntrId);
-
-	Xil_ExceptionInit();
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler)XIntc_InterruptHandler,
-			(void *)IntcInstancePtr);
-
-	Xil_ExceptionEnable();
-
-#else
-
-	XScuGic *IntcInstancePtr = &Intc;	/* Instance of the Interrupt Controller */
-	XScuGic_Config *IntcConfig;
-
-
-	/*
-	 * Initialize the interrupt controller driver so that it is ready to
-	 * use.
-	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfig,
-					IntcConfig->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	XScuGic_SetPriorityTriggerType(IntcInstancePtr, ReadIntrId, 0xA0, 0x3);
-	XScuGic_SetPriorityTriggerType(IntcInstancePtr, WriteIntrId, 0xA0, 0x3);
-
-	/*
-	 * Connect the device driver handler that will be called when an
-	 * interrupt for the device occurs, the handler defined above performs
-	 * the specific interrupt processing for the device.
-	 */
-	Status = XScuGic_Connect(IntcInstancePtr, ReadIntrId,
-				(Xil_InterruptHandler)XAxiVdma_ReadIntrHandler,
-				AxiVdmaPtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	Status = XScuGic_Connect(IntcInstancePtr, WriteIntrId,
-				(Xil_InterruptHandler)XAxiVdma_WriteIntrHandler,
-				AxiVdmaPtr);
-	if (Status != XST_SUCCESS) {
-		return Status;
-	}
-
-	/*
-	 * Enable the interrupt for the DMA device.
-	 */
-	XScuGic_Enable(IntcInstancePtr, ReadIntrId);
-	XScuGic_Enable(IntcInstancePtr, WriteIntrId);
-
-	Xil_ExceptionInit();
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the hardware
-	 * interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_IRQ_INT,
-				(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				IntcInstancePtr);
-
-
-	/*
-	 * Enable interrupts in the Processor.
-	 */
-	Xil_ExceptionEnable();
-
-
-#endif
-
-	return XST_SUCCESS;
-}
-
-/*****************************************************************************/
-/**
-*
-* This function disables the interrupts
-*
-* @param	ReadIntrId is interrupt ID associated w/ DMA read channel
-* @param	WriteIntrId is interrupt ID associated w/ DMA write channel
-*
-* @return	None.
-*
-* @note		None.
-*
-******************************************************************************/
-static void DisableIntrSystem(u16 ReadIntrId, u16 WriteIntrId)
-{
-
-#ifdef XPAR_INTC_0_DEVICE_ID
-	XIntc *IntcInstancePtr =&Intc;
-
-	/* Disconnect the interrupts for the DMA TX and RX channels */
-	XIntc_Disconnect(IntcInstancePtr, ReadIntrId);
-	XIntc_Disconnect(IntcInstancePtr, WriteIntrId);
-#else
-	XScuGic *IntcInstancePtr = &Intc;
-
-	XScuGic_Disable(IntcInstancePtr, ReadIntrId);
-	XScuGic_Disable(IntcInstancePtr, WriteIntrId);
-
-	XScuGic_Disconnect(IntcInstancePtr, ReadIntrId);
-	XScuGic_Disconnect(IntcInstancePtr, WriteIntrId);
-#endif
 }
 
 /*****************************************************************************/
