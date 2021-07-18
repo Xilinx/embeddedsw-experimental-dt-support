@@ -10,6 +10,10 @@
 #include "xil_assert.h"
 #include "xstatus.h"
 
+#ifndef SDT
 int AxiVDMASelfTestExample(u16 DeviceId);
+#else
+int AxiVDMASelfTestExample(UINTPTR BaseAddress);
+#endif
 
 #endif

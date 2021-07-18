@@ -447,6 +447,8 @@ typedef struct {
 							   configuration parameter */
 	int AddrWidth;		  /**< Address Width */
 	u8 HasVFlip;		 /**< Whether hardware has Vertical Flip enabled(c_enable_vert_flip) */
+	u16 IntrId[2]; /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 } XAxiVdma_Config;
 
 /**

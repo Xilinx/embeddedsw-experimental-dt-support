@@ -72,7 +72,7 @@ XAxiVdma_Config *XAxiVdma_LookupConfig(u16 DeviceId)
 #else
 XAxiVdma_Config *XAxiVdma_LookupConfig(UINTPTR BaseAddress)
 {
-	extern XAxiVdma_Config XAxivdma_ConfigTable[];
+	extern XAxiVdma_Config XAxiVdma_ConfigTable[];
 	XAxiVdma_Config *CfgPtr = NULL;
 	u32 Index;
 
