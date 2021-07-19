@@ -1,4 +1,7 @@
-
+##############################################################################
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+##############################################################################
 proc gen_intr {drv_handle file_name args} {
     set file_handle [::hsi::utils::open_include_file $file_name]
     set ips [::hsi::utils::get_common_driver_ips $drv_handle]
