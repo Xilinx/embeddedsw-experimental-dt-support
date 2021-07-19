@@ -1,4 +1,5 @@
-
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 set(BSPCONFIG_description CACHE STRING "Below are software config parameters for the standalone library")
 SET_PROPERTY(CACHE BSPCONFIG_description PROPERTY STRINGS "Below are the software config for the standalone bsp")
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
