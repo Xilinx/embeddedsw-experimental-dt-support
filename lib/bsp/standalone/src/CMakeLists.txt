@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: MIT
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
 message(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake)

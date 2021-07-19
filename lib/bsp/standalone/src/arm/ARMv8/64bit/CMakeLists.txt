@@ -1,3 +1,5 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
 add_subdirectory(gcc)
 add_subdirectory(platform)
 collect (PROJECT_LIB_HEADERS xreg_cortexa53.h)

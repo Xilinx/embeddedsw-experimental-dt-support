@@ -1,3 +1,7 @@
+/******************************************************************************
+* Copyright (C) 2021 Xilinx, Inc.  All rights reserved.
+* SPDX-License-Identifier: MIT
+******************************************************************************/
 #ifndef XUSB_EXAMPLE_CONFIG_H
 #define XUSB_EXAMPLE_CONFIG_H
 
