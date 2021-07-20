@@ -32,6 +32,9 @@
 /***************************** Include Files *********************************/
 
 #include "xuartlite_l.h"
+#ifdef SDT
+#include "xuartlite_config.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -91,5 +94,17 @@ u8 XUartLite_RecvByte(UINTPTR BaseAddress)
 
 	return (u8)XUartLite_ReadReg(BaseAddress, XUL_RX_FIFO_OFFSET);
 }
+
+#ifdef SDT
+#ifdef XPAR_STDIN_IS_UARTLITE
+void outbyte(char c) {
+         XUartLite_SendByte(STDOUT_BASEADDRESS, c);
+}
+
+char inbyte(void) {
+         return XUartLite_RecvByte(STDIN_BASEADDRESS);
+}
+#endif
+#endif
 
 /** @} */
