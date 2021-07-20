@@ -17,6 +17,7 @@ properties:
         - enum:
           - pmu-microblaze
           - xlnx,microblaze-11.0
+          - xlnx,microblaze
           - pmc-microblaze
           - psm-microblaze
 
