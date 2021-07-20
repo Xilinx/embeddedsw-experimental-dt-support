@@ -39,6 +39,9 @@
 /***************************** Include Files *********************************/
 
 #include "xuartns550_l.h"
+#ifdef SDT
+#include "xuartns550_config.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -172,4 +175,15 @@ void XUartNs550_SetBaud(UINTPTR BaseAddress, u32 InputClockHz, u32 BaudRate)
 	 */
 	XUartNs550_SetLineControlReg(BaseAddress, LcrRegister);
 }
+#ifdef SDT
+#ifdef XPAR_STDIN_IS_UARTNS550
+void outbyte(char c) {
+         XUartNs550_SendByte(STDOUT_BASEADDRESS, c);
+}
+
+char inbyte(void) {
+         return XUartNs550_RecvByte(STDIN_BASEADDRESS);
+}
+#endif
+#endif
 /** @} */
