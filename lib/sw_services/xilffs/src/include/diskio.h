@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------/
-/  Low level disk interface module include file   (C)ChaN, 2014          /
+/  Low level disk interface module include file Copyright (C)ChaN, 2014  /
 /-----------------------------------------------------------------------*/
 
 #ifndef DISKIO_DEFINED
