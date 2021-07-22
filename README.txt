@@ -14,9 +14,13 @@ The standalone software is divided into following directories:
 	- mcap/linux
 		software for using MCAP interface on Ultra Scale boards to
 		program 2nd level bitstream
+	- cmake
+		Contains common functions which will be consumed by CMakeLists.txt file
+	- scripts
+		Contains linker templates and spec files for various processors
 
 Every driver, sw_apps and sw_services has one or more of these sub-directories:
-1. data		- contains tcl, mdd, testapp tcl or header files used in Vitis
+1. data		- contains tcl, mdd, testapp tcl or header files used in Vitis and contains yaml and .cmake files used in Yocto Flow.
 2. doc		- documentation of source code in form of pdf or html 
 3. examples	- illustrating different use cases of driver
 4. src		- driver interface code implementing functionality of IP
@@ -85,12 +89,17 @@ Every driver, sw_apps and sw_services has one or more of these sub-directories:
 |
 |-mcap
 |	|-linux
+|
+|-cmake
+|-scripts
+|       |-linker_files
+|       |-specs
 
 
 Building FSBL from git:
 ==============================
 FSBL(zynq_fsbl/zynqmp_fsbl) has 3 directories.
-	1. data - It contains files for Vitis
+	1. data - It contains files for Vitis and Yocto flow
 	2. src  - It contains the FSBL source files
 	3. misc - It contains miscellaneous files required to
 		  compile FSBL.
