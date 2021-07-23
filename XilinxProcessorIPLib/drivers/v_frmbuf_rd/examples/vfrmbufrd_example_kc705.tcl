@@ -1,3 +1,7 @@
+##############################################################################
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+##############################################################################
 # This scripts creates bsp and application, targetted for kc705
 
 proc vfrmbufrd_example args {
