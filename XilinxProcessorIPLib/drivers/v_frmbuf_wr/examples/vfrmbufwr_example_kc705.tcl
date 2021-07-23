@@ -1,3 +1,7 @@
+##############################################################################
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+##############################################################################
 # This tcl file creates BSP and Application and targetted for kc705 board.
 
 
