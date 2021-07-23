@@ -1,3 +1,7 @@
+##############################################################################
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+##############################################################################
 ## \file vpss_example.tcl for kc705
 #Automates the process of generating the downloadable bit & elf files from the provided example xsa file.
 ## Documented procedure \c vpss_example .
