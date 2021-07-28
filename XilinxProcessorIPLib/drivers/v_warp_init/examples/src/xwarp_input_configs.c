@@ -1,3 +1,7 @@
+/******************************************************************************
+* Copyright (C) 2021 Xilinx, Inc.  All rights reserved.
+* SPDX-License-Identifier: MIT
+******************************************************************************/
 #include <math.h>
 #include <string.h>
 #include "xwarp_input_configs.h"
