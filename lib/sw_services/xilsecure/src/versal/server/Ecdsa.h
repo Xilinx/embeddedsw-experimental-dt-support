@@ -1,3 +1,7 @@
+/******************************************************************************
+* Copyright (C) 2021 Xilinx, Inc.  All rights reserved.
+* SPDX-License-Identifier: MIT
+******************************************************************************/
 //
 // ECDSA compact code for RSA5X
 // API definitions
