@@ -15,6 +15,7 @@ properties:
           - xlnx,canfd-1.0
           - xlnx,axi-canfd-2.0
           - xlnx,versal-canfd-2.0
+          - xlnx,canfd-2.0
   reg:
     description: Physical base address and size of the controller register map
   rx-mode:
