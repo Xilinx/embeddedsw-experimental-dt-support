@@ -14,7 +14,7 @@ collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
 collector_list (_deps PROJECT_LIB_DEPS)
 
-SET(COMMON_EXAMPLES xilpuf_regeneration_example.c;xilpuf_registration_example.c;)
+SET(COMMON_EXAMPLES xilpuf_regeneration_example.c;)
 
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/../../../../scripts/linker_files/")
 foreach(EXAMPLE ${COMMON_EXAMPLES})
