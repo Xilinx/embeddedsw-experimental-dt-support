@@ -325,7 +325,11 @@ int XSecure_InitializeIpi(XIpiPsu* const IpiInstPtr)
 	XIpiPsu_Config *IpiCfgPtr;
 
 	/* Look Up the config data */
+#ifdef SDT
+	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_BASEADDR);
+#else
 	IpiCfgPtr = XIpiPsu_LookupConfig(XPAR_XIPIPSU_0_DEVICE_ID);
+#endif
 	if (NULL == IpiCfgPtr) {
 		Status = XST_FAILURE;
 		XSecure_Printf(XSECURE_DEBUG_GENERAL,

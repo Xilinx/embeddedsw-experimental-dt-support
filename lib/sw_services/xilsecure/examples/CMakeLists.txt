@@ -14,7 +14,7 @@ collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
 collector_list (_deps PROJECT_LIB_DEPS)
 
-SET(VERSAL_EXAMPLES xilsecure_versal_aes_example.c;xilsecure_rsa_generic_example.c;xilsecure_sha_example.c;)
+SET(VERSAL_EXAMPLES xilsecure_versal_aes_client_example.c;xilsecure_versal_sha_client_example.c;)
 
 SET(ZYNQMP_EXAMPLES xilsecure_aes_example.c;xilsecure_simple_aes_example.c;xilsecure_rsa_example.c;xilsecure_rsa_generic_example.c;xilsecure_sha_example.c;)
 
