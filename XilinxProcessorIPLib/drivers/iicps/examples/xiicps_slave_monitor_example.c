@@ -32,6 +32,7 @@
 #include "xil_exception.h"
 #include "xil_printf.h"
 #include "xinterrupt_wrap.h"
+#include "xiicps_example.h"
 
 /************************** Constant Definitions ******************************/
 
@@ -71,6 +72,8 @@ volatile u32 SlaveResponse;		/**< Slave Response Flag */
  * their own slave Address in the below array list**/
 u16 SlvAddr[] = {0x54,0x55,0x74,0};
 XIicPs IicInstance;		/* The instance of the IIC device. */
+extern XIicPs_Config XIicPs_ConfigTable[XPAR_XIICPS_NUM_INSTANCES];
+
 /******************************************************************************/
 /**
 *
@@ -221,6 +224,7 @@ static int IicPsSlaveMonitor(u16 Address, UINTPTR BaseAddress)
 #else
 	Status = IicPsConfig(BaseAddress);
 #endif
+
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
@@ -276,7 +280,9 @@ static int IicPsSlaveMonitor(u16 Address, UINTPTR BaseAddress)
 static int IicPsFindDevice(u16 Addr)
 {
 	int Status;
+	u32 BaseAddress;
 
+#ifndef SDT
 	Status = IicPsSlaveMonitor(Addr,0);
 	if (Status == XST_SUCCESS) {
 		return XST_SUCCESS;
@@ -285,6 +291,19 @@ static int IicPsFindDevice(u16 Addr)
 	if (Status == XST_SUCCESS) {
 		return XST_SUCCESS;
 	}
+#else
+	BaseAddress = XIicPs_ConfigTable[0].BaseAddress;
+	Status = IicPsSlaveMonitor(Addr, BaseAddress);
+	if (Status == XST_SUCCESS) {
+		return XST_SUCCESS;
+	}
+	BaseAddress = XIicPs_ConfigTable[1].BaseAddress;
+	Status = IicPsSlaveMonitor(Addr, BaseAddress);
+	if (Status == XST_SUCCESS) {
+		return XST_SUCCESS;
+	}
+#endif
+
 	return XST_FAILURE;
 }
 
