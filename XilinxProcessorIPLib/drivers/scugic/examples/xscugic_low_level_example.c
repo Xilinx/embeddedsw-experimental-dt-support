@@ -221,7 +221,7 @@ static int ScuGicLowLevelExample()
 	XScuGic_WriteICC_SGI1R_EL1(Mask);
 	#endif
 #else
-	XScuGic_WriteReg(DistBaseAddress, XSCUGIC_SFI_TRIG_OFFSET, GIC_DEVICE_INT_MASK);
+	XScuGic_WriteReg(DIST_BASEADDR, XSCUGIC_SFI_TRIG_OFFSET, GIC_DEVICE_INT_MASK);
 #endif
 
 	/*
