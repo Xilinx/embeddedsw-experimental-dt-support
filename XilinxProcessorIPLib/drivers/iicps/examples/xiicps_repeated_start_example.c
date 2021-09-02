@@ -747,7 +747,7 @@ static int FindEepromPageSize(u16 EepromAddr, u32 *PageSize_ptr)
 #ifndef SDT
 static s32 IicPsSlaveMonitor(u16 Address, u16 DeviceId)
 #else
-static int IicPsSlaveMonitor(u16 Address, UINTPTR BaseAddress)
+static s32 IicPsSlaveMonitor(u16 Address, UINTPTR BaseAddress)
 #endif
 {
 	u32 Index,IntrStatusReg;
