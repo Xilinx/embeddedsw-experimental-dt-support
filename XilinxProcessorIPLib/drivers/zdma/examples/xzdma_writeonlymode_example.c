@@ -73,7 +73,7 @@ u32 SrcBuf[4];		/**< Source buffer */
 #else
 u32 DstBuf[300] __attribute__ ((aligned (64))); /**< Destination buffer */
 #endif
-u8 Done = 0;		/**< Done Flag for interrupt generation */
+volatile static u8 Done = 0;	/**< Done Flag for interrupt generation */
 
 /*****************************************************************************/
 /**

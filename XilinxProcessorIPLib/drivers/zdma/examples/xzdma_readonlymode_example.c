@@ -64,7 +64,7 @@ static void DoneHandler(void *CallBackRef);
 
 XZDma ZDma;		/**<Instance of the ZDMA Device */
 u32 SrcBuf[256];	/**< Source buffer */
-u8 Done = 0;		/**< Done flag */
+volatile static u8 Done = 0;	/**< Done flag */
 
 /*****************************************************************************/
 /**

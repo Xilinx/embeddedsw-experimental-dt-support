@@ -80,8 +80,8 @@ u32 Src1Buf[400] __attribute__ ((aligned (64)));/**< Source buffer */
 u32 AlloMem[200] __attribute__ ((aligned (64)));
 			/**< memory allocated for descriptors */
 #endif
-u8 Done = 0;		/**< Variable for Done interrupt */
-u8 Pause = 0;		/**< Variable for Pause interrupt */
+volatile static u8 Done = 0;	/**< Variable for Done interrupt */
+volatile static u8 Pause = 0;	/**< Variable for Pause interrupt */
 
 /*****************************************************************************/
 /**
