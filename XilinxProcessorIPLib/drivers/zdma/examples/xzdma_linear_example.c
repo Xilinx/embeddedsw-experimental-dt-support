@@ -277,6 +277,9 @@ int XZDma_LinearExample(UINTPTR BaseAddress)
 	XZDma_Resume(&ZDma);
 
 	while (Done == 0); /* Wait till DMA done interrupt generated */
+	/* Disable relevant interrupts */
+	XZDma_DisableIntr(&ZDma, (XZDMA_IXR_DMA_DONE_MASK |
+						XZDMA_IXR_DMA_PAUSE_MASK));
 
 	/* Disable relevant interrupts */
 	XZDma_DisableIntr(&ZDma, (XZDMA_IXR_DMA_DONE_MASK |
