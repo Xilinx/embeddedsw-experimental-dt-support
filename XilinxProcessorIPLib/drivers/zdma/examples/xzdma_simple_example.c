@@ -253,10 +253,16 @@ int XZDma_SimpleExample(XZDma *ZdmaInstPtr, UINTPTR BaseAddress)
 	Data.SrcCoherent = 1;
 	Data.Size = SIZE; /* Size in bytes */
 
+	/* Enable required interrupts */
+	XZDma_EnableIntr(ZdmaInstPtr, (XZDMA_IXR_ALL_INTR_MASK));
+
 	XZDma_Start(ZdmaInstPtr, &Data, 1); /* Initiates the data transfer */
 
 	/* Wait till DMA error or done interrupt generated */
 	while (!ErrorStatus && (Done == 0));
+
+	/* Enable required interrupts */
+	XZDma_DisableIntr(ZdmaInstPtr, (XZDMA_IXR_ALL_INTR_MASK));
 
 	if (ErrorStatus) {
 		if (ErrorStatus & XZDMA_IXR_AXI_WR_DATA_MASK)
@@ -266,6 +272,12 @@ int XZDma_SimpleExample(XZDma *ZdmaInstPtr, UINTPTR BaseAddress)
 		return XST_FAILURE;
 	}
 
+	/* Before the destination buffer data is accessed do one more invalidation
+         * to ensure that the latest data is read. This is as per ARM recommendations.
+         */
+	if (!Config->IsCacheCoherent) {
+		Xil_DCacheInvalidateRange((INTPTR)ZDmaDstBuf, SIZE);
+	}
 	/* Checking the data transferred */
 	for (Index = 0; Index < SIZE/4; Index++) {
 		if (ZDmaSrcBuf[Index] != ZDmaDstBuf[Index]) {
@@ -274,6 +286,9 @@ int XZDma_SimpleExample(XZDma *ZdmaInstPtr, UINTPTR BaseAddress)
 	}
 
 	Done = 0;
+
+	/* Reset the DMA to remove all configurations done in this example  */
+	XZDma_Reset(ZdmaInstPtr);
 
 	return XST_SUCCESS;
 }

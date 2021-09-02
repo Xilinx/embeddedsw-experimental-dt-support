@@ -166,7 +166,7 @@ int XZDma_WriteOnlyExample(UINTPTR BaseAddress)
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}
-	XZDma_EnableIntr(&ZDma, XZDMA_IXR_DMA_DONE_MASK);
+	
 	/*
 	 * Connect to the interrupt controller.
 	 */
@@ -219,14 +219,24 @@ int XZDma_WriteOnlyExample(UINTPTR BaseAddress)
 	}
 
 	if (!Config->IsCacheCoherent) {
-	Xil_DCacheInvalidateRange((INTPTR)DstBuf, SIZE);
+		Xil_DCacheFlushRange((INTPTR)DstBuf, SIZE);
 	}
+
+	XZDma_EnableIntr(&ZDma, XZDMA_IXR_DMA_DONE_MASK);
 
 	XZDma_Start(&ZDma, &Data, 1); /* Initiates the data transfer */
 
 	/* Wait till DMA destination done interrupt generated */
 	while (Done == 0);
 
+	XZDma_DisableIntr(&ZDma, XZDMA_IXR_DMA_DONE_MASK);
+
+	/* Before the destination buffer data is accessed do one more invalidation
+         * to ensure that the latest data is read. This is as per ARM recommendations.
+         */
+	if (!Config->IsCacheCoherent) {
+		Xil_DCacheInvalidateRange((INTPTR)DstBuf, SIZE);
+	}
 	/* Validation */
 	if (ZDma.Config.DmaType == 0) { /* For GDMA */
 		for (Index = 0; Index < (SIZE/4)/4; Index++) {
@@ -252,7 +262,10 @@ int XZDma_WriteOnlyExample(UINTPTR BaseAddress)
 		}
 	}
 
-return XST_SUCCESS;
+	/* Reset the DMA to remove all configurations done in this example  */
+	XZDma_Reset(&ZDma);
+
+	return XST_SUCCESS;
 
 }
 
