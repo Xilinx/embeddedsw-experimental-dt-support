@@ -1,6 +1,6 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.3)
 
 option(XILSEM_sem_cfrscan_en "Defines if XilSEM CRAM scan is enabled(1) or disabled (0)." OFF)
 option(XILSEM_sem_npiscan_en "Defines if XilSEM NPI register scan is enabled(1) or disabled (0)." OFF)
