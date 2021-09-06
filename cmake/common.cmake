@@ -1,5 +1,9 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
+find_package( PythonInterp 3.5 REQUIRED)
+
+option(OS_ESW "Open Source embeddedsw FLOW" OFF)
+
 set (CMAKE_INSTALL_LIBDIR "lib")
 function (collector_create name base)
   set_property (GLOBAL PROPERTY "COLLECT_${name}_LIST")
@@ -92,3 +96,47 @@ function(gen_exheader path drvname addr prefix)
         configure_file(${path}/example.h.in ${CMAKE_SOURCE_DIR}/${drvname}_example.h)
     endif()
 endfunction(gen_exheader)
+
+function(gen_bspconfig)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetal_bspconfig_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/common
+  RESULT_VARIABLE output)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/common/MemConfig.cmake ${CMAKE_SOURCE_DIR}/MemConfig.cmake)
+endfunction(gen_bspconfig)
+
+function(get_drvlist)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetaldrvlist_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/../../
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE output)
+endfunction(get_drvlist)
+
+function(gen_drvconfig drvname)
+	if ("${drvname}" STREQUAL "uartps" OR
+	    "${drvname}" STREQUAL "uartpsv")
+        execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetalconfig_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/${drvname}/src/ stdin
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/${drvname}/src/
+  RESULT_VARIABLE output)
+    else()
+        execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetalconfig_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/${drvname}/src/
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/${drvname}/src/
+  RESULT_VARIABLE output)
+    endif()
+endfunction(gen_drvconfig)
+
+function(gen_xparams)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetal_xparameters_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/../../
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE output)
+endfunction(gen_xparams)
+
+function(gen_linker)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetallinker_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE output)
+endfunction(gen_linker)
+
+function(gen_libconfig)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/ hwcmake_metadata ${CMAKE_SOURCE_DIR}/../../../../
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE output)
+endfunction(gen_libconfig)
