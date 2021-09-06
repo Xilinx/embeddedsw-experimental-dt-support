@@ -1,6 +1,6 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.3)
 
 list(LENGTH IPIPSU_NUM_DRIVER_INSTANCES _len)
 
