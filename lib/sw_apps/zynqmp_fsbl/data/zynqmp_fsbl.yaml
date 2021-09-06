@@ -1,0 +1,20 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+%YAML 1.2
+---
+title: Bindings for ZynqMP FSBL application
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+depends_libs:
+    - xiltimer
+    - xilffs
+    - xilsecure
+    - xilpm
+
+lib_config:
+    xilffs:
+        - XILFFS_read_only: ON
+        - XILFFS_use_mkfs : OFF
+...
