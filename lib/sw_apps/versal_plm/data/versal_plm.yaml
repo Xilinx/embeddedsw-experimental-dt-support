@@ -1,0 +1,28 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+%YAML 1.2
+---
+title: Bindings for Versal PLM application
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+depends_libs:
+    - xiltimer
+    - xilffs
+    - xilpdi
+    - xilplmi
+    - xilloader
+    - xilpm
+    - xilsecure
+    - xilsem
+    - xilpuf  
+
+lib_config:
+    xilffs:
+        - XILFFS_read_only: ON
+        - XILFFS_use_mkfs : OFF
+        - XILFFS_word_access : OFF
+        - XILFFS_enable_multi_partition : ON
+        - XILFFS_num_logical_vol : 10
+...
