@@ -20,3 +20,9 @@ linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/../../../../scripts/linker_files/")
 add_executable(lwip_echo_server.elf ${SOURCES})
 target_link_libraries(lwip_echo_server.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 target_include_directories(lwip_echo_server.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
+if (${OS_ESW})
+   set (INCLUDE_DIRS
+       "${PROJECT_BINARY_DIR}/../recipe-sysroot/usr/include/include/"
+       "${CMAKE_BINARY_DIR}/include")
+  target_include_directories(lwip_echo_server.elf PUBLIC ${INCLUDE_DIRS})
+endif()
