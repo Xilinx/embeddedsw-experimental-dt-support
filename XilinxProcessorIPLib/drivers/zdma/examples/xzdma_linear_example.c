@@ -251,7 +251,7 @@ int XZDma_LinearExample(UINTPTR BaseAddress)
 	 */
 	if (!Config->IsCacheCoherent) {
 	    Xil_DCacheFlushRange((INTPTR)Data[0].SrcAddr, Data[0].Size);
-	    Xil_DCacheInvalidateRange((INTPTR)Data[0].DstAddr, Data[0].Size)
+	    Xil_DCacheInvalidateRange((INTPTR)Data[0].DstAddr, Data[0].Size);
 	    Xil_DCacheFlushRange((INTPTR)Data[1].SrcAddr, Data[1].Size);
 	    Xil_DCacheInvalidateRange((INTPTR)Data[1].DstAddr, Data[1].Size);
 	}
