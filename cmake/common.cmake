@@ -112,6 +112,7 @@ endfunction(get_drvlist)
 
 function(gen_drvconfig drvname)
 	if ("${drvname}" STREQUAL "uartps" OR
+	    "${drvname}" STREQUAL "uartlite" OR
 	    "${drvname}" STREQUAL "uartpsv")
         execute_process(COMMAND ${PYTHON_EXECUTABLE} $ENV{LOPPER_PATH}/lopper.py $ENV{SYSTEM_DTFILE} -- baremetalconfig_xlnx ${ESW_MACHINE} ${CMAKE_SOURCE_DIR}/${drvname}/src/ stdin
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/${drvname}/src/
