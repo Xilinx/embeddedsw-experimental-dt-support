@@ -8,5 +8,6 @@ maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
 depends_libs:
+    - freertos10_xilinx
     - xiltimer
 ...
