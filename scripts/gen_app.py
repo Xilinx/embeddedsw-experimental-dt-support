@@ -25,7 +25,15 @@ required_argument = parser.add_argument_group('Required arguments')
 required_argument.add_argument('-s', '--sdt-path', action='store',
                   help='Specify the System device-tree path (till system-top.dts file)', required=True)
 required_argument.add_argument('-p', '--proc', action='store',
-                  help='Specify the processor name', required=True)
+                  help=textwrap.dedent('''\
+                        Specify the processor name supported processors are
+                        - cortexa72
+                        - cortexa53
+                        - cortexr5
+                        - microblaze-pmu
+                        - microblaze-plm
+                        - microblaze-psm
+                        '''), required=True)
 required_argument.add_argument('-n', '--name', action='store',
                   help=textwrap.dedent('''\
                         Specify the name of the application supported apps are 
@@ -40,7 +48,8 @@ required_argument.add_argument('-n', '--name', action='store',
                         - versal_plm
                         - versal_psmfw
                         - <Driver Name for compiling driver examples>
-                        '''))
+                        - <Library Name for compiling library examples>
+                        '''), required=True)
 parser.add_argument('-w', '--workdir', action='store',
                   help='Workspace directory')
 parser.add_argument('-r', '--repo', action='store',
@@ -127,7 +136,7 @@ def handle_dep(yaml_file, repo, build_dir, tool_chain_file):
                 srcdir = repo + str("/lib/sw_services/%s/" % libname)
                 yaml_file = repo + str("/lib/sw_services/%s/" % libname) + str("/data/%s.yaml" % libname)
                 libsrc = build_dir + str("/src/lib/sw_services/%s/" % libname)
-            elif re.search("freertos", os_type):
+            elif re.search("freertos", os_type) or re.search("freertos", name):
                 srcdir = repo + str("/ThirdParty/bsp/freertos10_xilinx/")
                 libsrc = build_dir + str("/src/ThirdParty/bsp/freertos10_xilinx/")
                 yaml_file = repo + str("/ThirdParty/bsp/freertos10_xilinx/data/freertos10_xilinx.yaml")
@@ -150,7 +159,7 @@ def add_lib(lib_name, build_dir, repo, tool_chain_file):
         helsrc = build_dir + str("/src/lib/sw_services/%s/" % lib_name)
         yaml_file = repo + str("/lib/sw_services/%s/" % lib_name) + str("/data/%s.yaml" % lib_name)
     else:
-        if re.search("freertos", os_type):
+        if re.search("freertos", os_type) or re.search("freertos", name):
             srcdir = repo + str("/ThirdParty/bsp/freertos10_xilinx/")
             helsrc = build_dir + str("/src/ThirdParty/bsp/freertos10_xilinx/")
             yaml_file = repo + str("/ThirdParty/bsp/freertos10_xilinx/data/freertos10_xilinx.yaml")
@@ -174,7 +183,7 @@ def build_lib(build_dir, lib_name, tool_chain_file, yaml_file, lib_config):
     if lib_name.startswith('x'):
         cmake_src = build_dir + str("/src/lib/sw_services/%s/src/" % lib_name)
     else:
-        if re.search("freertos", os_type):
+        if re.search("freertos", os_type) or re.search("freertos", name):
             cmake_src = build_dir + str("/src/ThirdParty/bsp/freertos10_xilinx/src/")
         else:
             cmake_src = build_dir + str("/src/ThirdParty/sw_services/%s/src/" % lib_name)
@@ -232,6 +241,7 @@ lib_dir = 0
 my_event_handler = 0
 os_type = 0
 repo = 0
+name = 0
 
 def update_timestamp(workspace):
     statinfo = os.stat(workspace)
@@ -270,6 +280,7 @@ def main():
     global lib_dir
     global os_type
     global repo
+    global name
 
     sdt = args.sdt_path
     proc = args.proc
@@ -379,7 +390,7 @@ def main():
              tmp_str = '"{}"'.format("${CMAKE_ASM_FLAGS} -Os -flto -ffat-lto-objects -DARMA53_64")
              fd.write("\n set( CMAKE_ASM_FLAGS %s)\n" % tmp_str)
 
-         if re.search("freertos", os_type):
+         if re.search("freertos", os_type) or re.search("freertos", name):
              fd.write("\n set( CMAKE_SYSTEM_NAME FreeRTOS)\n")
     
     # Build xilstandalone
@@ -496,7 +507,17 @@ def main():
         pathlib.Path('build_%s' % name).mkdir(parents=True, exist_ok=True)
 
     is_drv_ex = [drv for drv in drvlist if re.search(name, drv)]
-    if is_drv_ex:
+    lib_list = ["xilffs", "xilflash", "xilfpga", "xilisf", "xilmailbox", "xilnvm", "xilpm", "xilpuf", "xilsecure", "xilsem", "xilskey"]
+    is_lib_ex = [lib for lib in lib_list if re.search(name, lib)]
+    if is_lib_ex:
+        add_lib(name, build_dir, repo, tool_chain_file)
+        cmakesrc = build_dir + str("/src/lib/sw_services/%s/examples/" % name)
+        app_src = build_dir + str("/src/lib/sw_services/%s/" % name)
+        app_build_dir = build_dir + str("/build_%s-example" % name)
+        os.chdir(build_dir)
+        if not os.path.isdir(app_build_dir):
+            pathlib.Path('build_%s-example' % name).mkdir(parents=True, exist_ok=True)
+    elif is_drv_ex:
         cmakesrc = build_dir + str("/src/XilinxProcessorIPLib/drivers/%s/examples/" % name)
         app_src = build_dir + str("/src/XilinxProcessorIPLib/drivers/%s/" % name)
         os.chdir(cmakesrc)
