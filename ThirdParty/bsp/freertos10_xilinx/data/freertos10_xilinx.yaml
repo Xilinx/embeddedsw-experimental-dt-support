@@ -16,6 +16,9 @@ depends:
   - ttcps
   - scugic
 
+depends_libs:
+    - xiltimer
+
 required:
     tmrctr:
         - reg
