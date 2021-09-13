@@ -41,7 +41,9 @@ extern "C" {
 #if defined(XPS_BOARD_ZCU102) || defined(XPS_BOARD_ZCU106)		\
 		|| defined(XPS_BOARD_ZCU104) || defined(XPS_BOARD_ZCU111) \
 		|| defined(XPS_BOARD_ZCU216) || defined(XPS_BOARD_ZCU208)
+#if defined(XPAR_XIICPS_0_BASEADDR)
 #include "xiicps.h"
+#endif
 /************************** Constant Definitions *****************************/
 #define GPIO_MIO31_MASK	0x00000020U
 
