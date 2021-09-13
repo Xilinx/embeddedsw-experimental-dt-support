@@ -35,10 +35,16 @@
 ******************************************************************************/
 /***************************** Include Files *********************************/
 #include "xfsbl_board.h"
+
+#if defined(XPS_BOARD_ZCU102)
+static void XFsbl_PcieReset(void);
+#endif
+
 #if defined(XPS_BOARD_ZCU102) || defined(XPS_BOARD_ZCU106)		\
 		|| defined(XPS_BOARD_ZCU104) || defined(XPS_BOARD_ZCU111) \
 		|| defined(XPS_BOARD_ZCU216) || defined(XPS_BOARD_ZCU208) \
 		|| defined(XPS_BOARD_ZCU670)
+#if defined(XPAR_XIICPS_0_BASEADDR)
 /************************** Constant Definitions *****************************/
 
 /**************************** Type Definitions *******************************/
@@ -53,9 +59,6 @@ static u32 XFsbl_CalVadj(u16 MinVoltage, u16 MaxVoltage);
 #endif
 static u32 XFsbl_BoardConfig(void);
 static u32 XFsbl_FMCEnable(XIicPs* I2c0InstancePtr, XIicPs* I2c1InstancePtr);
-#if defined(XPS_BOARD_ZCU102)
-static void XFsbl_PcieReset(void);
-#endif
 /************************** Variable Definitions *****************************/
 #if defined(XPS_BOARD_ZCU104) || defined(XPS_BOARD_ZCU216) || \
 	defined(XPS_BOARD_ZCU208) || defined(XPS_BOARD_ZCU670)
@@ -758,6 +761,7 @@ END:
 	return UStatus;
 
 }
+#endif
 
 #if defined(XPS_BOARD_ZCU102)
 /*****************************************************************************/
@@ -828,10 +832,12 @@ u32 XFsbl_BoardInit(void)
 		|| defined(XPS_BOARD_ZCU216) || defined(XPS_BOARD_ZCU208) \
 		|| defined(XPS_BOARD_ZCU670)
 	/* Program I2C to configure GT lanes */
+#if defined(XPAR_XIICPS_0_BASEADDR)
 	Status = XFsbl_BoardConfig();
 	if (Status != XFSBL_SUCCESS) {
 		goto END;
 	}
+#endif
 
 #if defined(XPS_BOARD_ZCU102)
 	XFsbl_PcieReset();
