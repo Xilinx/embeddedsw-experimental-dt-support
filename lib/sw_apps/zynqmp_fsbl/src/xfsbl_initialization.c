@@ -2010,7 +2010,7 @@ static void XFsbl_ClearPendingInterrupts(void)
  *****************************************************************************/
 void XFsbl_MarkDdrAsReserved(u8 Cond)
 {
-#if defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR) && !defined (ARMR5)
+#if (defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR) || defined (XPAR_PSU_DDR_0_BASEADDRESS)) && !defined (ARMR5)
 	u32 Attrib = ATTRIB_MEMORY_A53_64;
 	u64 BlockNum;
 
