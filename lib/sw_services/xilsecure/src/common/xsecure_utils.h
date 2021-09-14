@@ -51,6 +51,9 @@ extern "C" {
 #include "xstatus.h"
 #include "xil_assert.h"
 #include "xil_mem.h"
+#ifdef SDT
+#include "xsecure_config.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 #define XSECURE_RESET_SET		(1U) /**< To set the core into reset */

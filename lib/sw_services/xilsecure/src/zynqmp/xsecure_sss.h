@@ -32,6 +32,9 @@ extern "C" {
 
 /***************************** Include Files *********************************/
 #include "xil_types.h"
+#ifdef SDT
+#include "xsecure_config.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 /** @cond xsecure_internal */

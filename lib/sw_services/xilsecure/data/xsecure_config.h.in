@@ -6,5 +6,6 @@
 #define XSECURE_CONFIG_H
 
 #cmakedefine XSECURE_TRUSTED_ENVIRONMENT
+#cmakedefine XSECURE_TPM_ENABLE
 
 #endif /* XSECURE_CONFIG_H */
