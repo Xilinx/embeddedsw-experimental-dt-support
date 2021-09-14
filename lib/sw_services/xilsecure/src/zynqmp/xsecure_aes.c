@@ -1118,8 +1118,8 @@ static s32 XSecure_AesChunkDecrypt(XSecure_Aes *InstancePtr, const u8 *Src,
 			 * setting CSU SSS CFG register to PCAP with DMA as
 			 * source
 			 */
-			Status = (s32)XSecure_SssPcap(&InstancePtr->SssInstance,
-				InstancePtr->CsuDmaPtr->Config.DeviceId);
+			Status = XSecure_SssPcap(&InstancePtr->SssInstance,
+						0);
 			if (Status != (u32)XST_SUCCESS){
 				goto END;
 			}
