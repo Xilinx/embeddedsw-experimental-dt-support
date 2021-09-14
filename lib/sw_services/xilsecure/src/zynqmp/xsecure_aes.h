@@ -87,6 +87,9 @@ extern "C" {
 #include "xcsudma.h"
 #include "xil_util.h"
 #include "xsecure_sss.h"
+#ifdef SDT
+#include "xsecure_config.h"
+#endif
 
 /************************** Constant Definitions ****************************/
 /** @cond xsecure_internal
