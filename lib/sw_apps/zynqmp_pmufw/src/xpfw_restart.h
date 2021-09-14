@@ -13,7 +13,11 @@ extern "C" {
 #include "xil_types.h"
 #include "pm_master.h"
 
+#ifdef SDT
+#define FSBL_STORE_ADDR					(0x7FF00000 + 0x80000U)
+#else
 #define FSBL_STORE_ADDR					(XPAR_MICROBLAZE_DDR_RESERVE_SA + 0x80000U)
+#endif
 #define FSBL_LOAD_ADDR					0xFFFC0000U
 #define FSBL_IMAGE_SIZE					(170U*1024U)
 #define SHA3_HASH_LENGTH_IN_WORDS		12U
