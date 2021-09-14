@@ -329,7 +329,11 @@
 #define LPDDR4_OLD_MAP_OFFSET	0x4000U
 
 /* DDR reserved address to store training data */
+#ifdef SDT
+#define RESERVED_ADDRESS	0x7FF00000
+#else
 #define RESERVED_ADDRESS	XPAR_MICROBLAZE_DDR_RESERVE_SA
+#endif
 
 /* DIMM address mirroring */
 #define DDRC_DIMMCTL_DIMM_ADDR_MIRR_EN	(0x00000002U)

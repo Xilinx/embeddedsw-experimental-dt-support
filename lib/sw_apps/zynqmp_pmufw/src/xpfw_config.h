@@ -507,6 +507,12 @@ extern "C" {
 #define CONNECT_PMU_GPO_5
 #endif
 
+#ifdef SDT
+#if defined(XPAR_XDDRCPSU_0_BASEADDR)
+#define XPAR_DDRCPSU_0_DEVICE_ID XPAR_XDDRCPSU_0_BASEADDR
+#endif
+#endif
+
 #ifdef XPAR_DDRCPSU_0_DEVICE_ID
 #if (USE_DDR_FOR_APU_RESTART_VAL) && (!defined(USE_DDR_FOR_APU_RESTART))
 #define USE_DDR_FOR_APU_RESTART
