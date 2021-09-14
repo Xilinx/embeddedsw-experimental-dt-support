@@ -286,7 +286,7 @@ u32 XFsbl_PmInit(void)
 	u32 UStatus;
 /* Proceed only if SYSCFG is enabled */
 #ifdef XPAR_XILPM_ENABLED
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 	s32 Status ;
 	XIpiPsu IpiInstance;
 	XIpiPsu_Config *Config;
@@ -310,7 +310,7 @@ u32 XFsbl_PmInit(void)
 		UStatus = XFSBL_SUCCESS;
 		goto END;
 	}
-#ifndef XPAR_XIPIPSU_0_DEVICE_ID
+#ifndef XPAR_XIPIPSU_0_BASEADDR
 	else {
 		UStatus = XFSBL_ERROR_PM_INIT;
 		XFsbl_Printf(DEBUG_GENERAL,
@@ -319,7 +319,7 @@ u32 XFsbl_PmInit(void)
 	}
 #endif
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 	/* Initialize IPI peripheral */
 	Config = XIpiPsu_LookupConfig(IPI_DEVICE_ID);
 	if (Config == NULL) {

@@ -58,7 +58,7 @@ static void XFsbl_FiqHandler (void);
  */
 static s32 XFsbl_Strcmp(const char* Str1Ptr,  const char* Str2Ptr);
 /************************** Variable Definitions *****************************/
-#if defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR) && !defined (ARMR5)
+#if (defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR) || defined(XPAR_PSU_DDR_0_BASEADDRESS)) && !defined (ARMR5)
 #ifdef ARMA53_64
 extern void MMUTableL1(void);
 extern void MMUTableL2(void);
@@ -598,7 +598,7 @@ u32 XFsbl_IsolationRestore(u32 IsolationMask)
 	return Status;
 }
 
-#if defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR) && !defined (ARMR5)
+#if (defined (XPAR_PSU_DDR_0_S_AXI_BASEADDR) || defined(XPAR_PSU_DDR_0_BASEADDRESS)) && !defined (ARMR5)
 /*****************************************************************************
 *
 * Set the memory attributes for a section, in the translation table.

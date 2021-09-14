@@ -910,7 +910,8 @@ extern "C" {
 #define XFSBL_QSPI_LINEAR_BASE_ADDRESS_END		(0xDFFFFFFFU)
 
 #if defined(XPAR_PSU_DDR_0_S_AXI_BASEADDR) 	\
-		|| defined(XPAR_PSU_R5_DDR_0_S_AXI_BASEADDR)
+		|| defined(XPAR_PSU_R5_DDR_0_S_AXI_BASEADDR) \
+		|| defined(XPAR_PSU_DDR_0_BASEADDRESS)
 #define XFSBL_PS_DDR
 #endif
 
@@ -953,7 +954,11 @@ extern "C" {
 #ifdef ARMR5
 #define XFSBL_PS_DDR_END_ADDRESS		(XPAR_PSU_R5_DDR_0_S_AXI_HIGHADDR)
 #else
+#ifdef SDT
+#define XFSBL_PS_DDR_END_ADDRESS		(XPAR_PSU_DDR_0_HIGHADDRESS)
+#else
 #define XFSBL_PS_DDR_END_ADDRESS		(XPAR_PSU_DDR_0_S_AXI_HIGHADDR)
+#endif
 #endif
 #endif
 
