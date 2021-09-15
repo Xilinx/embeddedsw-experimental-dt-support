@@ -285,7 +285,7 @@ u32 XFsbl_Qspi24Init(u32 DeviceFlags)
 	 * TBD: XIP Support
 	 */
 
-	switch ((u32)(XPAR_PSU_QSPI_0_QSPI_MODE)) {
+	switch ((u32)(XPAR_XQSPIPSU_0_CONNECTION_MODE)) {
 
 		case XQSPIPSU_CONNECTION_MODE_SINGLE:
 		{
@@ -992,7 +992,7 @@ u32 XFsbl_Qspi32Init(u32 DeviceFlags)
 	 * TBD
 	 */
 
-	switch ((u32)XPAR_PSU_QSPI_0_QSPI_MODE) {
+	switch ((u32)XPAR_XQSPIPSU_0_CONNECTION_MODE) {
 
 		case XQSPIPSU_CONNECTION_MODE_SINGLE:
 		{
