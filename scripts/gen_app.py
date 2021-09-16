@@ -272,6 +272,17 @@ def get_timestamp(workspace):
                 return False
     return True
 
+def get_machine(sdt):
+    with open(sdt, 'r') as fd:
+        file_lines = fd.readlines()
+        match = [line for line in file_lines if re.search("cpus_a53", line)]
+        if match:
+            machine = "ZynqMP"
+        else:
+            machine = "Versal"
+
+    return machine
+
 def main():
     global sdt
     global lopper_path
@@ -385,10 +396,25 @@ def main():
          fd.seek(0, 0)
          fd.writelines(content)
          if re.search("zynqmp_fsbl", name):
-             tmp_str = '"{}"'.format("${CMAKE_C_FLAGS} -Os -flto -ffat-lto-objects -DARMA53_64")
-             fd.write("\n set( CMAKE_C_FLAGS %s)\n" % tmp_str)
-             tmp_str = '"{}"'.format("${CMAKE_ASM_FLAGS} -Os -flto -ffat-lto-objects -DARMA53_64")
-             fd.write("\n set( CMAKE_ASM_FLAGS %s)\n" % tmp_str)
+             if re.search("cortexa53", proc):
+                 tmp_str = '"{}"'.format("${CMAKE_C_FLAGS} -Os -flto -ffat-lto-objects -DARMA53_64")
+                 fd.write("\n set( CMAKE_C_FLAGS %s)\n" % tmp_str)
+                 tmp_str = '"{}"'.format("${CMAKE_ASM_FLAGS} -Os -flto -ffat-lto-objects -DARMA53_64")
+                 fd.write("\n set( CMAKE_ASM_FLAGS %s)\n" % tmp_str)
+             elif re.search("cortexr5", proc):
+                 tmp_str = '"{}"'.format("${CMAKE_C_FLAGS} -Os -flto -ffat-lto-objects -DARMR5")
+                 fd.write("\n set( CMAKE_C_FLAGS %s)\n" % tmp_str)
+                 tmp_str = '"{}"'.format("${CMAKE_ASM_FLAGS} -Os -flto -ffat-lto-objects -DARMR5")
+                 fd.write("\n set( CMAKE_ASM_FLAGS %s)\n" % tmp_str)
+
+         if re.search("cortexr5", proc):
+             machine_type = get_machine(sdt)
+             if re.search("ZynqMP", machine_type):
+                 str1 = "cortexr5-zynqmp"
+                 tmp_str1 = '"{}"'.format(str1)
+                 fd.write("\n set( ESW_MACHINE %s)\n" % tmp_str1)
+                 tmp_str1 = '"{}"'.format(machine_type)
+                 fd.write("\n set( CMAKE_MACHINE %s)\n" % tmp_str1)
 
          if re.search("freertos", os_type) or re.search("freertos", name):
              fd.write("\n set( CMAKE_SYSTEM_NAME FreeRTOS)\n")
