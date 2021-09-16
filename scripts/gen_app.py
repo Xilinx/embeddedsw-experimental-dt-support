@@ -321,6 +321,30 @@ def main():
             pathlib.Path(workspace).mkdir(parents=True, exist_ok=True)
         workspace = str("/") + workspace
 
+    cwd = os.getcwd()
+    build_dir = cwd + str(workspace)
+    os.chdir(build_dir)
+
+    lopper_path = os.environ['LOPPER_PATH'] + str("/lopper.py")
+    if re.search("cortexa53", proc):
+        a53_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-a53-imux.dts")
+        bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
+        Cmd = [lopper_path, '--enhanced', '-i', a53_lops, sdt, bm_sdt]
+        retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+        sdt = bm_sdt
+    elif re.search("cortexa72", proc):
+        a72_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-a72-imux.dts")
+        bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
+        Cmd = [lopper_path, '--enhanced', '-i', a72_lops, sdt, bm_sdt]
+        retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+        sdt = bm_sdt
+    elif re.search("cortexr5", proc):
+        r5_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-r5-imux.dts")
+        bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
+        Cmd = [lopper_path, '--enhanced', '-i', r5_lops, sdt, bm_sdt]
+        retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+        sdt = bm_sdt
+
     os.environ["SYSTEM_DTFILE"] = sdt
     os.environ["LOPPER_DTC_FLAGS"] = "-b 0 -@"
 
@@ -338,10 +362,6 @@ def main():
         if machine:
             machine = machine[0].split("ESW_MACHINE")
             machine = machine[1].split(")")[0]
-
-    cwd = os.getcwd()
-    build_dir = cwd + str(workspace)
-    os.chdir(build_dir)
 
     pathlib.Path(build_dir + str('/recipe-sysroot/usr/')).mkdir(parents=True, exist_ok=True)
     include_dir = build_dir + str("/recipe-sysroot/usr/include")
@@ -420,7 +440,6 @@ def main():
              fd.write("\n set( CMAKE_SYSTEM_NAME FreeRTOS)\n")
     
     # Build xilstandalone
-    lopper_path = os.environ['LOPPER_PATH'] + str("/lopper.py")
     os.chdir(build_dir)
     srcdir = bspsrc + str("/src/")
 
