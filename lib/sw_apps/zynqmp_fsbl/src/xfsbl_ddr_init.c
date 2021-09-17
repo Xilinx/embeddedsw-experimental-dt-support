@@ -44,7 +44,9 @@
 #ifdef XFSBL_PS_DDR
 #if defined(XPAR_DYNAMIC_DDR_ENABLED) || defined(XPAR_XDDRCPSU_0_DDRC_DYNAMIC_DDR_CONFIG_ENABLED)
 
+#if defined(XPAR_XIICPS_0_BASEADDR)
 #include "xiicps.h"
+#endif
 #include "xfsbl_ddr_init.h"
 
 /************************** Constant Definitions *****************************/
@@ -6637,6 +6639,7 @@ END:
  *			returns XFSBL_SUCCESS on success
  *
  *****************************************************************************/
+#if defined(XPAR_XIICPS_0_BASEADDR)
 static u32 XFsbl_IicReadSpdEeprom(u8 *SpdData)
 {
 	XIicPs IicInstance;		/* The instance of the IIC device. */
@@ -6846,6 +6849,7 @@ static u32 XFsbl_IicReadSpdEeprom(u8 *SpdData)
 END:
 	return UStatus;
 }
+#endif
 
 /*****************************************************************************/
 /**
@@ -6876,11 +6880,13 @@ u32 XFsbl_DdrInit(void)
 	};
 
 	/* Get the Model Part Number from the SPD stored in EEPROM */
+#if defined(XPAR_XIICPS_0_BASEADDR)
 	Status = XFsbl_IicReadSpdEeprom(SpdData);
 	if (Status != XFSBL_SUCCESS) {
 		Status = XFSBL_FAILURE;
 		goto END;
 	}
+#endif
 
 #if defined(XPS_BOARD_ZCU102) || defined(XPS_BOARD_ZCU106) \
 	|| defined(XPS_BOARD_ZCU111) || defined(XPS_BOARD_ZCU216) \
