@@ -329,20 +329,23 @@ def main():
     if re.search("cortexa53", proc):
         a53_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-a53-imux.dts")
         bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
-        Cmd = [lopper_path, '--enhanced', '-i', a53_lops, sdt, bm_sdt]
-        retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+        if not os.path.isfile(bm_sdt):
+            Cmd = [lopper_path, '--enhanced', '-i', a53_lops, sdt, bm_sdt]
+            retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
         sdt = bm_sdt
     elif re.search("cortexa72", proc):
         a72_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-a72-imux.dts")
         bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
-        Cmd = [lopper_path, '--enhanced', '-i', a72_lops, sdt, bm_sdt]
-        retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+        if not os.path.isfile(bm_sdt):
+            Cmd = [lopper_path, '--enhanced', '-i', a72_lops, sdt, bm_sdt]
+            retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
         sdt = bm_sdt
     elif re.search("cortexr5", proc):
         r5_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-r5-imux.dts")
         bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
-        Cmd = [lopper_path, '--enhanced', '-i', r5_lops, sdt, bm_sdt]
-        retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+        if not os.path.isfile(bm_sdt):
+            Cmd = [lopper_path, '--enhanced', '-i', r5_lops, sdt, bm_sdt]
+            retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
         sdt = bm_sdt
 
     os.environ["SYSTEM_DTFILE"] = sdt
@@ -609,7 +612,6 @@ def main():
     for image in os.listdir(app_build_dir):
         if image.endswith(".elf"):
             copy_file(image, bin_dir)
-
 
 if __name__ == '__main__':
     main()
