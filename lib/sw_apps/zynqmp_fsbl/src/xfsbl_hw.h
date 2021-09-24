@@ -1018,6 +1018,12 @@ extern "C" {
 /* AMS PS Sysmon ANALOG_BUS value */
 #define PS_SYSMON_ANALOG_BUS_VAL 0X00003210U
 
+/* Dynamic DDR define for SDT flow */
+#ifdef SDT
+#if XPAR_XDDRCPSU_0_DDRC_DYNAMIC_DDR_CONFIG_ENABLED
+#define XPAR_DYNAMIC_DDR_ENABLED
+#endif
+#endif
 /****************************************************************************/
 /**
 *
