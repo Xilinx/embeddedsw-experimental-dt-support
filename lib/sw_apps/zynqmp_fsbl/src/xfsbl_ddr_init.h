@@ -42,7 +42,7 @@ extern "C" {
 #include "xfsbl_hw.h"
 
 #ifdef XFSBL_PS_DDR
-#if defined(XPAR_DYNAMIC_DDR_ENABLED) || defined(XPAR_XDDRCPSU_0_DDRC_DYNAMIC_DDR_CONFIG_ENABLED)
+#if defined(XPAR_DYNAMIC_DDR_ENABLED)
 /***************************** Include Files *********************************/
 #include "psu_init.h"
 
