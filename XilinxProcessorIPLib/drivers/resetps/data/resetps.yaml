@@ -10,7 +10,7 @@ maintainers:
 properties:
   compatible:
     items:
-      - const: xlnx,zynqmp-reset
+      - const: xlnx,psu-crf-apb-1.0
 
 config:
     - XResetPs_Config
