@@ -31,7 +31,7 @@
 
 /* Xilinx includes. */
 #include "xscugic.h"
-#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 #include "xttcps.h"
 #else
 #include "xiltimer.h"
@@ -57,7 +57,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
 								__attribute__((weak));
 #endif
 
-#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 /* Timer used to generate the tick interrupt. */
 XTtcPs xTimerInstance;
 XScuGic xInterruptController;
@@ -66,7 +66,7 @@ extern uintptr_t IntrControllerAddr;
 #endif
 /*-----------------------------------------------------------*/
 
-#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 void FreeRTOS_SetupTickInterrupt( void )
 {
 	/*
@@ -138,7 +138,7 @@ void FreeRTOS_SetupTickInterrupt( void )
 
 void FreeRTOS_ClearTickInterrupt( void )
 {
-#ifndef XPAR_XILTIMER_ENABLED
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 	XTtcPs_ClearInterruptStatus( &xTimerInstance, XTtcPs_GetInterruptStatus( &xTimerInstance ) );
 	__asm volatile( "DSB SY" );
 	__asm volatile( "ISB SY" );
