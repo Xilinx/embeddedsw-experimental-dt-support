@@ -194,7 +194,7 @@ void FreeRTOS_Tick_Handler( void );
  * pdPASS is returned if the function executes successfully.  Any other value
  * being returned indicates that the function did not execute correctly.
  */
-#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 BaseType_t xPortInstallInterruptHandler( uint8_t ucInterruptID, XInterruptHandler pxHandler, void *pvCallBackRef );
 #else
 BaseType_t xPortInstallInterruptHandler( uint16_t ucInterruptID, XInterruptHandler pxHandler, void *pvCallBackRef );
@@ -210,7 +210,7 @@ BaseType_t xPortInstallInterruptHandler( uint16_t ucInterruptID, XInterruptHandl
  * interrupt controller.  Peripheral IDs are defined in the xparameters.h header
  * file, which is itself part of the BSP project.
  */
-#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 void vPortEnableInterrupt( uint8_t ucInterruptID );
 #else
 void vPortEnableInterrupt( uint16_t ucInterruptID );
@@ -226,7 +226,7 @@ void vPortEnableInterrupt( uint16_t ucInterruptID );
  * interrupt controller.  Peripheral IDs are defined in the xparameters.h header
  * file, which is itself part of the BSP project.
  */
-#if !defined(XPAR_XILTIMER_ENABLED) || !defined(SDT)
+#if !defined(XPAR_XILTIMER_ENABLED) && !defined(SDT)
 void vPortDisableInterrupt( uint8_t ucInterruptID );
 #else
 void vPortDisableInterrupt( uint16_t ucInterruptID );
