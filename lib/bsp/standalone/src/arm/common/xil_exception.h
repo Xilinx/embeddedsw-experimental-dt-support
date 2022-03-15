@@ -66,7 +66,9 @@
 #include "xil_types.h"
 #include "xpseudo_asm.h"
 #include "bspconfig.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

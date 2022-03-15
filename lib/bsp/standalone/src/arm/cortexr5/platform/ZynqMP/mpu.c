@@ -60,11 +60,11 @@
 #include "xil_mpu.h"
 #include "xpseudo_asm.h"
 #include "bspconfig.h"
+#include "xdebug.h"
 #ifdef SDT
 #include "xmem_config.h"
 #else
 #include "xparameters.h"
-#include "xdebug.h"
 #endif
 
 /***************** Macros (Inline Functions) Definitions *********************/
