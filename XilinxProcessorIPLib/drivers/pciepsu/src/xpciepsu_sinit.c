@@ -82,9 +82,11 @@ XPciePsu_Config *XPciePsu_LookupConfig(UINTPTR BrigReg)
 					XPciePsu_ConfigTable[Index].Ecam == 0xff ||
 					XPciePsu_ConfigTable[Index].NpMemBaseAddr == 0xff ||
 					XPciePsu_ConfigTable[Index].NpMemMaxAddr == 0xff ||
+#if defined(__aarch64__) || defined(__arch64__)
 					XPciePsu_ConfigTable[Index].PMemBaseAddr == 0xff ||
 					XPciePsu_ConfigTable[Index].PMemMaxAddr == 0xff ||
-					XPciePsu_ConfigTable[Index].PciReg == 0xff){
+#endif
+					XPciePsu_ConfigTable[Index].PciReg == 0xffU){
 				CfgPtr = NULL;
 				goto End;
 			}
