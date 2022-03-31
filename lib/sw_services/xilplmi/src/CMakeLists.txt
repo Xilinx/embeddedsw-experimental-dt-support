@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8.9)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 project(xilplmi)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilplmi.cmake NO_POLICY_SCOPE)
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)

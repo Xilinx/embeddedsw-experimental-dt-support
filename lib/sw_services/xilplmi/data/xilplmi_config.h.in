@@ -1,0 +1,26 @@
+/******************************************************************************
+* Copyright (C) 2022 Xilinx, Inc.  All rights reserved.
+* SPDX-License-Identifier: MIT
+******************************************************************************/
+#ifndef XILPLMI_CONFIG_H
+#define XILPLMI_CONFIG_H
+
+#cmakedefine	PLM_PRINT_NO_UART
+#cmakedefine	PLM_PRINT	
+#cmakedefine	PLM_DEBUG
+#cmakedefine	PLM_DEBUG_INFO
+#cmakedefine	PLM_DEBUG_DETAILED
+#cmakedefine	PLM_DEBUG_MODE
+#cmakedefine	PLM_PRINT_PERF
+#cmakedefine	PLM_QSPI_EXCLUDE
+#cmakedefine	PLM_SD_EXCLUDE
+#cmakedefine	PLM_OSPI_EXCLUDE
+#cmakedefine	PLM_SEM_EXCLUDE
+#cmakedefine	PLM_SECURE_EXCLUDE
+#cmakedefine	PLM_USB_EXCLUDE
+#cmakedefine	PLM_NVM_EXCLUDE
+#cmakedefine	PLM_PUF_EXCLUDE
+#cmakedefine	PLM_ENABLE_STL 
+
+
+#endif /* XILPLMI_CONFIG_H */

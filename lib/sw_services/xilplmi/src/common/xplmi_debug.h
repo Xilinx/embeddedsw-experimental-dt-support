@@ -52,6 +52,9 @@ extern "C" {
 #include "xplmi_event_logging.h"
 #include "xplmi_proc.h"
 #include "xparameters.h"
+#ifdef SDT
+#include "xilplmi_config.h"
+#endif
 
 /**@cond xplmi_internal
  * @{
