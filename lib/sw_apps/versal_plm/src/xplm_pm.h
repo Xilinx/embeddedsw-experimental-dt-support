@@ -41,7 +41,7 @@ extern "C" {
 #include "xparameters.h"
 
 /************************** Constant Definitions *****************************/
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 #define XPLM_PSM_HEALTH_CHK				(0xCU)
 #define XPLM_PSM_ALIVE_COUNTER_ADDR		(0xF20140C8U)
 #define XPLM_PSM_API_KEEP_ALIVE			(5U)
@@ -67,7 +67,7 @@ extern "C" {
 
 int XPlm_PmInit(void);
 int XPlm_ProcessPmcCdo(void *Arg);
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 int XPlm_CreateKeepAliveTask(void *PtrMilliSeconds);
 int XPlm_RemoveKeepAliveTask(void);
 #endif /* XPAR_XIPIPSU_0_DEVICE_ID */

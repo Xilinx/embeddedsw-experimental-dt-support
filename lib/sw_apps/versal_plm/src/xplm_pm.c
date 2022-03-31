@@ -91,7 +91,7 @@
 /************************** Function Prototypes ******************************/
 static void XPlm_PmRequestCb(const u32 IpiMask, const XPmApiCbId_t EventId, u32 *Payload);
 static int XPlm_ConfigureDefaultNPll(void);
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 static u32 XPlm_UpdateCounterVal(u8 Val);
 static int XPlm_SendKeepAliveEvent(void);
 static int XPlm_KeepAliveTask(void *Arg);
@@ -115,7 +115,7 @@ static u8 XPlm_SetAliveStsVal(u8 Val);
 *****************************************************************************/
 static void XPlm_PmRequestCb(const u32 IpiMask, const XPmApiCbId_t EventId, u32 *Payload)
 {
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 	XStatus Status = XST_FAILURE;
 
 	if ((PM_INIT_SUSPEND_CB == EventId) || (PM_NOTIFY_CB == EventId)) {
@@ -284,7 +284,7 @@ END:
 	return Status;
 }
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 /*****************************************************************************/
 /**
 * @brief	This function updates the counter value

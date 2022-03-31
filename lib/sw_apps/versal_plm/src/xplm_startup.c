@@ -88,7 +88,7 @@ int XPlm_AddStartUpTasks(void)
 	int Status = XST_FAILURE;
 	u32 Index;
 	XPlmi_TaskNode *Task;
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 	static u32 MilliSeconds = XPLM_DEFAULT_FTTI_TIME;
 #endif /* XPAR_XIPIPSU_0_DEVICE_ID */
 
@@ -100,7 +100,7 @@ int XPlm_AddStartUpTasks(void)
 		{XPlm_PreBootTasks, NULL},
 		{XPlm_LoadBootPdi, NULL},
 		{XPlm_HookAfterBootPdi, NULL},
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 		{XPlm_CreateKeepAliveTask, (void *)&MilliSeconds},
 #endif /* XPAR_XIPIPSU_0_DEVICE_ID */
 #ifdef XPLM_SEM
