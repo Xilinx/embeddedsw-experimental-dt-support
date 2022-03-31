@@ -7,9 +7,15 @@ project(xilpuf)
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)
-collect (PROJECT_LIB_SOURCES xpuf.c)
-collect (PROJECT_LIB_HEADERS xpuf.h)
-collect (PROJECT_LIB_HEADERS xpuf_hw.h)
+
+add_subdirectory(common)
+if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze"))
+add_subdirectory(server)
+else()
+add_subdirectory(client)
+endif()
+
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
