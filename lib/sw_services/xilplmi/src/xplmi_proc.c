@@ -55,7 +55,11 @@
 #include "xplmi_scheduler.h"
 #include "xplmi_debug.h"
 #include "xplmi_err.h"
+#ifndef SDT
 #include "microblaze_sleep.h"
+#else
+#include "sleep.h"
+#endif
 
 /**@cond xplmi_internal
  * @{

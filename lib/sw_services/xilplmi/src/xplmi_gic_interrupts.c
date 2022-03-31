@@ -225,7 +225,7 @@ void XPlmi_GicIntrHandler(void *CallbackRef)
  *****************************************************************************/
 static void XPlmi_GicAddTask(u32 PlmIntrId)
 {
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if defined(XPAR_XIPIPSU_0_DEVICE_ID) || defined(XPAR_XIPIPSU_0_BASEADDR)
 	u16 IpiIntrVal;
 	u16 IpiMaskVal;
 	u8 IpiIndex;
