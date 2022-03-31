@@ -35,3 +35,5 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/lib
 if (${OS_ESW})
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/libxilsecure_pmc.a ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a)
 endif()
+collect (PROJECT_LIB_SOURCES xsecure_cryptochk.c)
+collect (PROJECT_LIB_HEADERS xsecure_cryptochk.h)
