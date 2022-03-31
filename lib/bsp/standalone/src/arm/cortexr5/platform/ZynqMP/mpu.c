@@ -75,8 +75,8 @@
 
 /************************** Constant Definitions *****************************/
 #ifdef SDT
-#define XPAR_PSU_R5_DDR_0_S_AXI_BASEADDR XPAR_PSU_DDR_0_BASEADDRESS
-#define XPAR_PSU_R5_DDR_0_S_AXI_HIGHADDR XPAR_PSU_DDR_0_HIGHADDRESS
+#define XPAR_PSU_R5_DDR_0_LOW_ADDR XPAR_PSU_DDR_0_BASEADDRESS
+#define XPAR_PSU_R5_DDR_0_HIGH_ADDR XPAR_PSU_DDR_0_HIGHADDRESS
 #endif
 
 /************************** Variable Definitions *****************************/
@@ -184,7 +184,11 @@ void Init_MPU(void)
 	Addr = 0x00000000U;
 #ifdef	XPAR_PSU_R5_DDR_0_LOW_ADDR
 	/* If the DDR is present, configure region as per DDR size */
+#ifdef SDT
+	size = (XPAR_PSU_R5_DDR_0_HIGH_ADDR - XPAR_PSU_R5_DDR_0_LOW_ADDR);
+#else
 	size = (XPAR_PSU_R5_DDR_0_HIGH_ADDR - XPAR_PSU_R5_DDR_0_LOW_ADDR) + 1;
+#endif
 	if (size < 0x80000000) {
 		/* Lookup the size.  */
 		for (i = 0; i < sizeof region_size / sizeof region_size[0]; i++) {

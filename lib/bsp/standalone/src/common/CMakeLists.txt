@@ -52,3 +52,6 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa9")
 collect (PROJECT_LIB_SOURCES xcortexa9_g.c)
 endif()
 
+if("${CMAKE_MACHINE}" STREQUAL "Versal")
+add_subdirectory(versal)
+endif()
