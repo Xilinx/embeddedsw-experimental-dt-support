@@ -36,6 +36,9 @@
 /************************** Function Prototypes ******************************/
 static void XMicroblaze_ModifyInterval(XTimer *InstancePtr, u32 delay,
 				       XTimer_DelayType DelayType);
+u32 Xil_GetMBFrequency(void);
+u32 Xil_SetMBFrequency(u32 Val);
+static u32 MBFreq;
 /****************************************************************************/
 /**
  * Initialize the microblaze sleep timer
@@ -49,6 +52,7 @@ u32 XilSleepTimer_Init(XTimer *InstancePtr)
 {
 	InstancePtr->XTimer_ModifyInterval = XMicroblaze_ModifyInterval;
 	InstancePtr->XSleepTimer_Stop = NULL;
+	MBFreq = XGet_CpuFreq();
 
 	return XST_SUCCESS;
 }
@@ -72,7 +76,7 @@ static void XMicroblaze_ModifyInterval(XTimer *InstancePtr, u32 delay,
 #ifndef SDT
         u32 CpuFreq = XPAR_CPU_CORE_CLOCK_FREQ_HZ;
 #else
-        u32 CpuFreq = XGet_CpuFreq();
+        u32 CpuFreq = Xil_GetMBFrequency();
 #endif
         u32 iterpersec = CpuFreq / 4;
 	u32 iters = iterpersec / DelayType;
@@ -91,6 +95,38 @@ static void XMicroblaze_ModifyInterval(XTimer *InstancePtr, u32 delay,
 			: "r"(iters), "r"(delay)
 			: "r0", "r7"
 	);
+}
+
+/*****************************************************************************/
+/**
+* @brief	Sets variable which stores Microblaze frequency value
+* @param	Val - Frequency value to be set
+* @return	XST_SUCCESS - If frequency updated successfully
+* 			XST_INVALID_PARAM - If specified frequency value is not valid
+*
+* @note		It must be called after runtime change in Microblaze frequency,
+* 			failing to do so would result in to incorrect behavior of sleep
+* 			routines
+*
+******************************************************************************/
+u32 Xil_SetMBFrequency(u32 Val)
+{
+	if ( Val != 0) {
+		MBFreq = Val;
+		return XST_SUCCESS;
+	}
+	return XST_INVALID_PARAM;
+}
+
+/*****************************************************************************/
+/**
+* @brief	Returns current Microblaze frequency value
+* @return	MBFreq - Current Microblaze frequency value
+*
+******************************************************************************/
+u32 Xil_GetMBFrequency(void)
+{
+	return MBFreq;
 }
 #endif
 
