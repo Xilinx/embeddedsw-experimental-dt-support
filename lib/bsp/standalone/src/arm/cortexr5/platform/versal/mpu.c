@@ -156,10 +156,9 @@ void Init_MPU(void)
 #ifdef XPAR_AXI_NOC_DDR_LOW_0_BASEADDR
 	/* If the DDR is present, configure region as per DDR size */
 	size = (XPAR_AXI_NOC_DDR_LOW_0_HIGHADDR - XPAR_AXI_NOC_DDR_LOW_0_BASEADDR) + 1;
-#endif
-#ifdef XPAR_AXI_NOC_0_BASEADDRESS
-	size = (XPAR_AXI_NOC_0_BASEADDRESS - XPAR_AXI_NOC_0_HIGHADDRESS) + 1;
-#endif
+#elif defined(XPAR_AXI_NOC_0_BASEADDRESS)
+	size = (XPAR_AXI_NOC_0_HIGHADDRESS - XPAR_AXI_NOC_0_BASEADDRESS) + 1;
+
 	if (size < 0x80000000) {
 		/* Lookup the size.  */
 		for (i = 0; i < (sizeof (region_size) / sizeof (region_size[0])); i++) {
