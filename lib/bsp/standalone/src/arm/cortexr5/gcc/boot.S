@@ -374,11 +374,8 @@ init:
 	orr 	r1,r1,r0
 	dsb
 	mcr	p15,0,r1,c1,c0,0		/* Enable cache  */
-	isb					/* isb	flush prefetch buffer */
-#ifndef versal
-	bl Print_DDRSize_Warning
-#endif
-
+	isb
+					/* isb	flush prefetch buffer */
 /* Warning message to be removed after 2016.1 */
 /* USEAMP was introduced in 2015.4 with ZynqMP and caused confusion with USE_AMP */
 #ifdef USEAMP
@@ -404,6 +401,10 @@ init:
 	bic r1, r1, #(0x1 << 2)
 	str r1, [r0]
 #endif
+	ldr r0, =RPU_0_CFG
+	ldr r1, [r0]
+	bic r1, r1, #(0x1 << 2)
+	str r1, [r0]
 #endif
 #endif
 /* enable asynchronous abort exception */
