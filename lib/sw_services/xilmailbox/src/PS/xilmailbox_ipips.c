@@ -309,7 +309,11 @@ static XStatus XIpiPs_RegisterIrq(XScuGic *IntcInstancePtr,
 	}
 
 	/* Check if the GIC is already setup by this time */
+#ifndef SDT
 	if (XScuGic_IsInitialized(XPAR_SCUGIC_0_DEVICE_ID) == 1U) {
+#else
+	if (XScuGic_IsInitialized(0) == 1U) {
+#endif
 		/*
 		 * GIC is already initialized, just register handlers using the
 		 * interrupt Ids and return success.
