@@ -16,7 +16,8 @@ depends_libs:
     - xilpm
     - xilsecure
     - xilsem
-    - xilpuf  
+    - xilpuf
+    - xilnvm 
 
 lib_config:
     xilffs:
