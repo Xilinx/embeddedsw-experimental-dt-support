@@ -200,7 +200,7 @@ def build_lib(build_dir, lib_name, tool_chain_file, yaml_file, lib_config):
             if gen_libconfig:
                 cwd = os.getcwd()
                 os.chdir(cmake_src)
-                os.system("%s %s -- %s %s %s %s %s" % (lopper_path, sdt, "bmcmake_metadata_xlnx", machine, cmake_src, "hwcmake_metadata", srcdir))
+                os.system("lopper %s -- %s %s %s %s %s" % (sdt, "bmcmake_metadata_xlnx", machine, cmake_src, "hwcmake_metadata", srcdir))
                 os.chdir(cwd)
 
     cmake_config = ""
@@ -325,27 +325,36 @@ def main():
     build_dir = cwd + str(workspace)
     os.chdir(build_dir)
 
-    lopper_path = os.environ['LOPPER_PATH'] + str("/lopper.py")
+    try:
+        lopper_path = subprocess.check_output('which lopper', shell=True)
+        lopper_path = lopper_path.decode("utf-8")
+    except:
+        pass
+
+    if not lopper_path:
+        print("ERROR: couln't find lopper please install it\n\r")
+        return
+    else:
+        lops_path = os.path.dirname(lopper_path)
+        lops_dir = os.path.dirname(lops_path)  + str("/lib/python*/site-packages/lopper/lops")
+
     if re.search("cortexa53", proc):
-        a53_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-a53-imux.dts")
+        a53_lops = lops_dir + str("/lop-a53-imux.dts")
         bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
         if not os.path.isfile(bm_sdt):
-            Cmd = [lopper_path, '--enhanced', '-i', a53_lops, sdt, bm_sdt]
-            retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+            os.system("lopper --enhanced -i %s %s %s" % (a53_lops, sdt, bm_sdt))
         sdt = bm_sdt
     elif re.search("cortexa72", proc):
-        a72_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-a72-imux.dts")
+        a72_lops = lops_dir + str("/lop-a72-imux.dts")
         bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
         if not os.path.isfile(bm_sdt):
-            Cmd = [lopper_path, '--enhanced', '-i', a72_lops, sdt, bm_sdt]
-            retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+            os.system("lopper --enhanced -i %s %s %s" % (a72_lops, sdt, bm_sdt))
         sdt = bm_sdt
     elif re.search("cortexr5", proc):
-        r5_lops = os.environ['LOPPER_PATH'] + str("/lops/lop-r5-imux.dts")
+        r5_lops = lops_dir + str("/lop-r5-imux.dts")
         bm_sdt = os.getcwd() + str("/") + proc + str("_baremetal.dts")
         if not os.path.isfile(bm_sdt):
-            Cmd = [lopper_path, '--enhanced', '-i', r5_lops, sdt, bm_sdt]
-            retCode = subprocess.check_call(Cmd, stderr=subprocess.STDOUT, shell=False)
+            os.system("lopper --enhanced -i %s %s %s" % (r5_lops, sdt, bm_sdt))
         sdt = bm_sdt
 
     os.environ["SYSTEM_DTFILE"] = sdt
@@ -449,7 +458,7 @@ def main():
     # Lopper Assist Handling
     src_cmndir = bspsrc + str("/src/common")
     os.chdir(src_cmndir)
-    os.system("%s %s -- %s %s %s" % (lopper_path, sdt, "baremetal_bspconfig_xlnx", machine, srcdir))
+    os.system("lopper %s -- %s %s %s" % (sdt, "baremetal_bspconfig_xlnx", machine, srcdir))
     cmd = ["cp", "%s/MemConfig.cmake"%src_cmndir, srcdir]
     retCode = subprocess.check_call(cmd, stderr=subprocess.STDOUT, shell=False)
 
@@ -476,7 +485,7 @@ def main():
     # Build libxil
     # Get list of drivers
     os.chdir(build_dir)
-    os.system("%s %s -- %s %s %s" % (lopper_path, sdt, "baremetaldrvlist_xlnx", machine, repo))
+    os.system("lopper %s -- %s %s %s" % (sdt, "baremetaldrvlist_xlnx", machine, repo))
     drvlist = 0
     with open('distro.conf', 'r') as fd:
         drvlist = fd.readline()
@@ -501,8 +510,8 @@ def main():
             os.chdir(common_srcdir)
             intc_src = repo + str("/XilinxProcessorIPLib/drivers/intc/src/") 
             gic_src = repo + str("/XilinxProcessorIPLib/drivers/scugic/src/")
-            os.system("%s %s -- %s %s %s" % (lopper_path, sdt, "baremetalconfig_xlnx", machine, intc_src))
-            os.system("%s %s -- %s %s %s" % (lopper_path, sdt, "baremetalconfig_xlnx", machine, gic_src))
+            os.system("lopper %s -- %s %s %s" % (sdt, "baremetalconfig_xlnx", machine, intc_src))
+            os.system("lopper %s -- %s %s %s" % (sdt, "baremetalconfig_xlnx", machine, gic_src))
 
     os.chdir(build_dir)
     libxilbuild_dir = build_dir + str("/build_libxil")
@@ -569,7 +578,7 @@ def main():
         cmakesrc = build_dir + str("/src/XilinxProcessorIPLib/drivers/%s/examples/" % name)
         app_src = build_dir + str("/src/XilinxProcessorIPLib/drivers/%s/" % name)
         os.chdir(cmakesrc)
-        os.system("%s %s -- %s %s %s %s" % (lopper_path, sdt, "bmcmake_metadata_xlnx", machine, cmakesrc, "drvcmake_metadata"))
+        os.system("lopper %s -- %s %s %s %s" % (sdt, "bmcmake_metadata_xlnx", machine, cmakesrc, "drvcmake_metadata"))
     else:
         srcdir = repo + str("/lib/sw_apps/%s/" % name)
         app_src = build_dir + str("/src/lib/sw_apps/%s/" % name)
@@ -578,9 +587,9 @@ def main():
 
     os.chdir(cmakesrc)
     if re.search("memory_tests", name):
-        os.system("%s %s -- %s %s %s memtest" % (lopper_path, sdt, "baremetallinker_xlnx", machine, cmakesrc))
+        os.system("lopper %s -- %s %s %s memtest" % (sdt, "baremetallinker_xlnx", machine, cmakesrc))
     else:
-        os.system("%s %s -- %s %s %s" % (lopper_path, sdt, "baremetallinker_xlnx", machine, cmakesrc))
+        os.system("lopper %s -- %s %s %s" % (sdt, "baremetallinker_xlnx", machine, cmakesrc))
     srcdir = build_dir + str("/src/")
     yamlfile = app_src + str("/data/%s.yaml" % name)
     if os.path.isfile(yaml_file):
@@ -593,7 +602,7 @@ def main():
                 gen_libconfig = ""
 
             if gen_libconfig:
-                os.system("%s %s -- %s %s %s %s %s" % (lopper_path, sdt, "bmcmake_metadata_xlnx", machine, cmakesrc, "hwcmake_metadata", srcdir))
+                os.system("lopper %s -- %s %s %s %s %s" % (sdt, "bmcmake_metadata_xlnx", machine, cmakesrc, "hwcmake_metadata", srcdir))
 
     if re.search("empty_application", name):
         empty_app_src = os.environ["CUSTOM_SRC"]
@@ -601,7 +610,7 @@ def main():
 
 
     if re.search("peripheral_tests", name):
-        os.system("%s %s -- %s %s %s" % (lopper_path, sdt, "baremetal_gentestapp_xlnx", machine, srcdir))
+        os.system("lopper %s -- %s %s %s" % (sdt, "baremetal_gentestapp_xlnx", machine, srcdir))
 
     os.chdir(app_build_dir)
     cmakeCmd = ["cmake", cmakesrc, "-DCMAKE_TOOLCHAIN_FILE=%s"%tool_chain_file, "-DOS_ESW=ON"]
