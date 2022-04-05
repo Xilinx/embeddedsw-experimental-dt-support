@@ -9,3 +9,4 @@ maintainers:
 
 depends_libs:
     - xilsecure
+    - xilmailbox
