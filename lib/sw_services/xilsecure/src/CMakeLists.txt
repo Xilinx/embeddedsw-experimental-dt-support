@@ -10,7 +10,11 @@ collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 enable_language(C ASM)
-if(NOT ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72"))
+if(("${CMAKE_MACHINE}" STREQUAL "Versal") AND
+   NOT ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72") AND
+   NOT ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexr5"))
+add_subdirectory(common)
+elseif(("${CMAKE_MACHINE}" STREQUAL "ZynqMP"))
 add_subdirectory(common)
 endif()
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
