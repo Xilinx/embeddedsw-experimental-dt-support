@@ -32,11 +32,11 @@ required:
     - compatible
     - reg
     - xlnx,ipi-bitmask
-    - xlnx,ipi-id
+    - xlnx,ipi-buf-index
     - interrupts
     - interrupt-parent
     - xlnx,ipi-target-count
     - child,required:
         - xlnx,ipi-bitmask
-        - xlnx,ipi-id
+        - xlnx,ipi-buf-index
 ...
