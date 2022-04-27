@@ -37,6 +37,7 @@
 
 #include "lwip/tcp.h"
 #include "xiltimer.h"
+#include "xinterrupt_wrap.h"
 
 #if LWIP_DHCP==1
 volatile int dhcp_timoutcntr = 24;
@@ -114,7 +115,7 @@ void init_timer()
 {
 	/* Calibrate the platform timer for 1 ms */
 	XTimer_SetInterval(1);
-	XTimer_SetHandler(TimerCounterHandler, 0);
+	XTimer_SetHandler(TimerCounterHandler, 0, XINTERRUPT_DEFAULT_PRIORITY);
 }
 
 void cleanup_platform()
