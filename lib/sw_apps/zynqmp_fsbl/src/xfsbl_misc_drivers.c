@@ -216,7 +216,7 @@ static u32 XFsbl_ConvertTime_WdtCounter(u32 seconds)
 	{
 		PrescalerValue = 0U;
 	}
-	time = (double)(PrescalerValue) / (double)XPAR_XWDTPS_0_WDT_CLK_FREQ_HZ;
+	time = (double)(PrescalerValue) / (double)XPAR_XWDTPS_0_CLOCK_FREQ;
 
 	CounterValue = seconds / time;
 
