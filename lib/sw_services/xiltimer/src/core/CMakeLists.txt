@@ -1,6 +1,7 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-if ("${XILTIMER_sleep_timer}" STREQUAL "Default")
+if (("${XILTIMER_sleep_timer}" STREQUAL "Default") OR
+    ("${XILTIMER_tick_timer}" STREQUAL "None"))
     add_subdirectory(default_timer)
 endif()
 
