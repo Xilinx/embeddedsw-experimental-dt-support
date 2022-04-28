@@ -822,13 +822,13 @@ extern "C" {
 /**
  * Definition for WDT to be included
  */
-#if (!defined(FSBL_WDT_EXCLUDE) && defined(XPAR_PSU_WDT_0_DEVICE_ID))
+#if (!defined(FSBL_WDT_EXCLUDE) && defined(XPAR_LPD_WATCHDOG_BASEADDR))
 #define XFSBL_WDT_PRESENT
-#define XFSBL_WDT_DEVICE_ID	XPAR_PSU_WDT_0_DEVICE_ID
+#define XFSBL_WDT_DEVICE_ID	XPAR_LPD_WATCHDOG_BASEADDR
 #define XFSBL_WDT_MASK		PMU_GLOBAL_ERROR_SRST_EN_1_LPD_SWDT_MASK
-#elif (!defined(FSBL_WDT_EXCLUDE) && defined(XPAR_PSU_WDT_1_DEVICE_ID))
+#elif (!defined(FSBL_WDT_EXCLUDE) && defined(XPAR_WATCHDOG0_BASEADDR))
 #define XFSBL_WDT_PRESENT
-#define XFSBL_WDT_DEVICE_ID	XPAR_PSU_WDT_1_DEVICE_ID
+#define XFSBL_WDT_DEVICE_ID	XPAR_WATCHDOG0_BASEADDR
 #define XFSBL_WDT_MASK		PMU_GLOBAL_ERROR_SRST_EN_1_FPD_SWDT_MASK
 #endif
 
@@ -847,7 +847,7 @@ extern "C" {
 /**
  * Definition for QSPI to be included
  */
-#if (!defined(FSBL_QSPI_EXCLUDE) && defined(XPAR_XQSPIPSU_0_DEVICEID))
+#if (!defined(FSBL_QSPI_EXCLUDE) && defined(XPAR_XQSPIPSU_0_BASEADDR))
 #define XFSBL_QSPI
 #define XFSBL_QSPI_BASEADDRESS	XPAR_XQSPIPSU_0_BASEADDR
 #define XFSBL_QSPI_BUSWIDTH_ONE			0U
@@ -858,7 +858,7 @@ extern "C" {
 /**
  * Definition for NAND to be included
  */
-#if (!defined(FSBL_NAND_EXCLUDE) && defined(XPAR_XNANDPSU_0_DEVICE_ID))
+#if (!defined(FSBL_NAND_EXCLUDE) && defined(XPAR_XNANDPSU_0_BASEADDR))
 #define XFSBL_NAND
 #endif
 
