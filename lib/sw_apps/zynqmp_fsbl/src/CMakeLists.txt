@@ -27,6 +27,9 @@ find_library(_lib_path ${_lib})
 
 collector_list (_deps PROJECT_LIB_DEPS)
 
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/psu_init.h defs)
+list(PREPEND defs "#include \"xfsbl_hw.h\"\n\n")
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/psu_init.h ${defs})
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${D}${libdir})
 file(GLOB SOURCES "*.c")
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
