@@ -41,7 +41,10 @@ extern "C" {
 
 /***************************** Include Files *********************************/
 #include "xil_types.h"
+#include "xstatus.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xil_assert.h"
 #include "xsysmonpsv_supplylist.h"
 
@@ -66,6 +69,8 @@ typedef void (*XSysMonPsv_Handler)(void *CallbackRef);
  */
 typedef struct {
 	UINTPTR BaseAddress; /**< Register base address */
+	u16 IntrId;     /** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
+	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
 	u8 Supply_List[XSYSMONPSV_MAX_SUPPLIES]; /**< Maps voltage supplies in
                                                   use to the Supply registers */
 } XSysMonPsv_Config;
