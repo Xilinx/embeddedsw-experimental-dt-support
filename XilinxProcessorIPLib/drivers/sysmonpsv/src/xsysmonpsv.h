@@ -194,60 +194,6 @@ typedef enum {
 
 /*@}*/
 
-/**
- * @brief This typedef contains configuration information for a device.
- * @{
- */
-typedef struct {
-        UINTPTR BaseAddress;    /**< Register base address */
-	u16 IntrId;	/** Bits[11:0] Interrupt-id Bits[15:12] trigger type and level flags */
-	UINTPTR IntrParent; /** Bit[0] Interrupt parent type Bit[64/32:1] Parent base address */
-        u8 Supply_List[XSYSMONPSV_MAX_SUPPLIES];/**< Maps voltage supplies in
-                                                  use to the Supply registers */
-} XSysMonPsv_Config;
-
-/*@}*/
-
-/**
- * @brief This is an interrupt callback structure where callbacks and the
- * callback reference is stored.
- * @{
- */
-typedef struct {
-        XSysMonPsv_Handler Handler;     /**< Event handler */
-        void *CallbackRef;              /**< Callback reference for
-                                          event handler */
-        XSysMonPsv_Supply Supply;       /**< Supply for which event is set */
-        u32 IsCallbackSet;              /**< Flag to check if a callback has
-                                          been set */
-} XSysMonPsv_EventHandler;
-
-/*@}*/
-
-/**
- * @brief The XSysmonPsv driver instance data. The user is required to allocate a
- * variable of this type for the SYSMON device in the system. A pointer
- * to a variable of this type is then passed to the driver API functions.
- *
- * @{
- */
-typedef struct {
-        XSysMonPsv_Config Config;       /**< Device configuration */
-#if !defined (VERSAL_PLM)
-        XSysMonPsv_EventHandler
-                SupplyEvent[XSYSMONPSV_MAX_SUPPLIES];   /**< EventList will
-                                                          have callbacks for
-                                                          events supported
-                                                          by sysmon */
-        XSysMonPsv_EventHandler TempEvent; /**< Device Temperature event
-                                            handler information */
-        XSysMonPsv_EventHandler OTEvent; /**< OT event handler information */
-#endif
-        u32 IsReady;                    /**< Is device ready */
-} XSysMonPsv;
-
-/*@}*/
-
 /************************* Variable Definitions ******************************/
 
 /***************** Macros (Inline Functions) Definitions *********************/
