@@ -352,7 +352,11 @@ int XSysMonPsv_SetupInterrupts(XScuGic *IntcInstancePtr,
 	XScuGic_Config *IntcConfig;
 
 	/* Initialize the interrupt controller driver */
+#ifdef SDT
+	IntcConfig = XScuGic_LookupConfig(InstancePtr->Config.IntrParent);
+#else
 	IntcConfig = XScuGic_LookupConfig(0);
+#endif
 	if (NULL == IntcConfig) {
 		return XST_FAILURE;
 	}
