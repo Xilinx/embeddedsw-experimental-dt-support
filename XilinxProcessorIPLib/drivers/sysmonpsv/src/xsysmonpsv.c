@@ -69,6 +69,8 @@ s64 XSysMonPsv_CfgInitialize(XSysMonPsv *InstancePtr, XSysMonPsv_Config *CfgPtr)
 
 	/* Set the values read from the device config and the base address. */
 	InstancePtr->Config.BaseAddress = CfgPtr->BaseAddress;
+	InstancePtr->Config.IntrId = CfgPtr->IntrId;
+	InstancePtr->Config.IntrParent = CfgPtr->IntrParent;
 
 	/* Map Supplies to supply registers */
 	for (i = 0U; i < XSYSMONPSV_MAX_SUPPLIES; i++) {
