@@ -25,6 +25,7 @@ properties:
   xlnx,has-cd: Indicates Card Detect pin
   xlnx,has-wp: Write Protect for the device
   xlnx,has-emio: Indicates if device is connected to EMIO
+  xlnx,slot-type: Indicates SD slot type depending on Slot type selection
 
 config:
     - XSdPs_Config
@@ -38,6 +39,7 @@ required:
     - xlnx,bus-width
     - xlnx,mio-bank
     - xlnx,has-emio
+    - xlnx,slot-type
     - xlnx,is-cache-coherent
     - clocks
 ...
