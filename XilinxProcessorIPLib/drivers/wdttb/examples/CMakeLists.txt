@@ -42,6 +42,10 @@ else()
     list(APPEND COMMON_EXAMPLES ${EXAMPLE_LIST})
 endif()
 
+if(("${CMAKE_MACHINE}" STREQUAL "Versal") AND (("${XWDTTB_BASEADDRESS}" STREQUAL "0xfd4d0000") OR ("${XWDTTB_BASEADDRESS}" STREQUAL "0xff120000")))
+    list(APPEND COMMON_EXAMPLES xwdttb_winwdt_example.c;xwdttb_winwdt_intr_example.c;)
+endif()
+
 foreach(EXAMPLE ${COMMON_EXAMPLES})
     string(REGEX REPLACE "\\.[^.]*$" "" EXAMPLE ${EXAMPLE})
     add_executable(${EXAMPLE}.elf ${EXAMPLE})
