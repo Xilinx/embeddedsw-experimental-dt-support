@@ -27,7 +27,7 @@ required:
     - compatible
     - reg
     - xlnx,enable-window-wdt
-    - interrupts: 2
+    - interrupts: 4
     - interrupt-parent
 
 examples:
