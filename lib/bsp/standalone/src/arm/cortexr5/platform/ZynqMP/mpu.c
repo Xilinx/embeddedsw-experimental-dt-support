@@ -74,7 +74,7 @@
 /**************************** Type Definitions *******************************/
 
 /************************** Constant Definitions *****************************/
-#ifdef SDT
+#if defined(SDT) && defined(XPAR_PSU_DDR_0_BASEADDRESS)
 #define XPAR_PSU_R5_DDR_0_LOW_ADDR XPAR_PSU_DDR_0_BASEADDRESS
 #define XPAR_PSU_R5_DDR_0_HIGH_ADDR XPAR_PSU_DDR_0_HIGHADDRESS
 #endif
