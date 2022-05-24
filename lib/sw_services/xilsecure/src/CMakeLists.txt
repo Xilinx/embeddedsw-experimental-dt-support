@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilsecure.cmake)
 project(xilsecure)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilsecure.cmake NO_POLICY_SCOPE)
@@ -10,11 +11,8 @@ collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 enable_language(C ASM)
-if(("${CMAKE_MACHINE}" STREQUAL "Versal") AND
-   NOT ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72") AND
-   NOT ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexr5"))
-add_subdirectory(common)
-elseif(("${CMAKE_MACHINE}" STREQUAL "ZynqMP"))
+
+if(${XILSECURE_Mode} OR "${CMAKE_MACHINE}" STREQUAL "ZynqMP")
 add_subdirectory(common)
 endif()
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
