@@ -9,5 +9,6 @@ option(XILSECURE_tpm_support "Enables decryption of bitstream to memory and then
 if(XILSECURE_tpm_support)
 	set(XSECURE_TPM_ENABLE " ")
 endif()
+option(XILSECURE_Mode "Enables Client or Server mode for xilsecure versal" OFF)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../data/xsecure_config.h.in ${CMAKE_BINARY_DIR}/include/xsecure_config.h)
