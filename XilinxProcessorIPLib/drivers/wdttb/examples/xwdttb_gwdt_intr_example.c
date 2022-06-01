@@ -215,7 +215,7 @@ int WdtTbIntrExample(XWdtTb *GWdtInstancePtr, UINTPTR BaseAddress)
 				      GWdtIntrId);
 #else
 	Status = XSetupInterruptSystem(GWdtInstancePtr, &GWdtIntrHandler,
-				       Config->IntrId[1],
+				       Config->IntrId[2],
 				       Config->IntrParent,
 				       XINTERRUPT_DEFAULT_PRIORITY);
 #endif
@@ -250,7 +250,7 @@ int WdtTbIntrExample(XWdtTb *GWdtInstancePtr, UINTPTR BaseAddress)
 #ifndef SDT
 	GWdtDisableIntrSystem(IntcInstancePtr, GWdtIntrId);
 #else
-	XDisconnectInterruptCntrl(Config->IntrId[1], Config->IntrParent);
+	XDisconnectInterruptCntrl(Config->IntrId[2], Config->IntrParent);
 #endif
 
 	/*
