@@ -12,7 +12,11 @@ include_directories(${CMAKE_BINARY_DIR}/include)
 
 enable_language(C ASM)
 
-if(${XILSECURE_Mode} OR "${CMAKE_MACHINE}" STREQUAL "ZynqMP")
+if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR 
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblazeel") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze") OR
+   ${XILSECURE_Mode} OR "${CMAKE_MACHINE}" STREQUAL "ZynqMP")
 add_subdirectory(common)
 endif()
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
