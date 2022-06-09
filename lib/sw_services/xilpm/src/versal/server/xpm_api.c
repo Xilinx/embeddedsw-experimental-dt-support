@@ -2105,7 +2105,7 @@ done:
 void XPm_ProcessAckReq(const u32 Ack, const u32 IpiMask, const int Status,
 		       const u32 NodeId, const u32 NodeState)
 {
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if (defined (XPAR_XIPIPSU_0_DEVICE_ID)) || (defined (SDT))
 	if (0U == IpiMask) {
 		goto done;
 	}

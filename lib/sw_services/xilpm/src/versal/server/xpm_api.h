@@ -25,7 +25,7 @@ extern "C" {
 
 #define MAX_BASEADDR_LEN	3
 
-#ifdef XPAR_XIPIPSU_0_DEVICE_ID
+#if (defined (XPAR_XIPIPSU_0_DEVICE_ID)) || (defined (SDT))
 /* Macros for IPI responses (return values and callbacks) */
 #define IPI_RESPONSE1(Mask, Arg0)						\
 {										\
