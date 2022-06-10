@@ -446,7 +446,7 @@ static int XLoader_LoadReadBackPdi(XPlmi_Cmd *Cmd)
 	XPlmi_ReadBackProps DefaultReadBack = {
 		XPLMI_READBACK_DEF_DST_ADDR, 0U, 0U
 	};
-
+	
 	ReadBack.DestAddr = (u64)Cmd->Payload[XLOADER_CMD_READBACK_PDIADDR_HIGH_INDEX];
 	ReadBack.DestAddr = ((u64)(Cmd->Payload[XLOADER_CMD_READBACK_PDIADDR_LOW_INDEX]) |
 		(ReadBack.DestAddr << 32U));
