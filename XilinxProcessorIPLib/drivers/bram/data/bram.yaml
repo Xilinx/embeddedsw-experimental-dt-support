@@ -70,7 +70,4 @@ required:
     - xlnx,bram-mem-ctrl-high-address
     - interrupts
     - interrupt-parent
-examples:
-    xbram_intr_example.c:
-        - interrupts
 ...
