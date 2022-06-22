@@ -87,7 +87,7 @@ XBram_Config *XBram_LookupConfig(u32 BaseAddress)
 	u32 Index;
 
 	for (Index = (u32)0x0; XBram_ConfigTable[Index].Name != NULL; Index++) {
-		if ((XBram_ConfigTable[Index].CtrlBaseAddress == BaseAddress) ||
+		if ((XBram_ConfigTable[Index].BaseAddress == BaseAddress) ||
 				!BaseAddress) {
 			CfgPtr = &XBram_ConfigTable[Index];
 			break;
