@@ -39,12 +39,20 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define BRAM_DEVICE_ID		XPAR_BRAM_0_DEVICE_ID
+#else
+#define BRAM_DEVICE_ID		XPAR_XBRAM_0_BASEADDR
+#endif
 
 
 /************************** Function Prototypes ******************************/
 
+#ifndef SDT
 int BramExample(u16 DeviceId);
+#else
+int BramExample(u32 BaseAddress);
+#endif
 static void InitializeECC(XBram_Config *ConfigPtr, u32 EffectiveAddr);
 
 
@@ -102,7 +110,11 @@ int main(void)
 * @note		None.
 *
 ******************************************************************************/
+#ifndef SDT
 int BramExample(u16 DeviceId)
+#else
+int BramExample(u32 BaseAddress)
+#endif
 {
 	int Status;
 	XBram_Config *ConfigPtr;
@@ -116,7 +128,11 @@ int BramExample(u16 DeviceId)
 	 * Use this configuration info down below when initializing this
 	 * driver.
 	 */
+#ifndef SDT
 	ConfigPtr = XBram_LookupConfig(DeviceId);
+#else
+	ConfigPtr = XBram_LookupConfig(BaseAddress);
+#endif
 	if (ConfigPtr == (XBram_Config *) NULL) {
 		return XST_FAILURE;
 	}
