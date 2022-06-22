@@ -130,6 +130,7 @@ typedef struct {
 	u16 DeviceId;			   /**< Unique ID  of device */
 #else
 	char *Name;
+	u32 BaseAddress;
 #endif
 	u32 DataWidth;			   /**< BRAM data width */
 	int EccPresent;			   /**< Is ECC supported in H/W */
@@ -157,6 +158,12 @@ typedef struct {
 	UINTPTR MemHighAddress;		   /**< Device memory high address */
 	UINTPTR CtrlBaseAddress;		   /**< Device register base address.*/
 	UINTPTR CtrlHighAddress;		   /**< Device register base address.*/
+#ifdef SDT
+	u16 IntrId;			   /** Bits[11:0] Interrupt-id Bits[15:12]
+				 	    * trigger type and level flags */
+	UINTPTR IntrParent;		  /** Bit[0] Interrupt parent type Bit[64/32:1]
+				 	    * Parent base address */
+#endif
 } XBram_Config;
 
 /**
