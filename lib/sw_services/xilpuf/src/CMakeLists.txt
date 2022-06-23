@@ -2,15 +2,19 @@
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilpuf.cmake)
 project(xilpuf)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilpuf.cmake NO_POLICY_SCOPE)
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)
 
+enable_language(C ASM)
+
 add_subdirectory(common)
-if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
-   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze"))
+if (("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
+(${XILPUF_Mode}))
 add_subdirectory(server)
 else()
 add_subdirectory(client)
