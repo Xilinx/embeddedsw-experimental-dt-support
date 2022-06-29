@@ -322,6 +322,7 @@ def main():
         workspace = str("/") + workspace
 
     cwd = os.getcwd()
+    sdt_dir = os.path.dirname(sdt)
     build_dir = cwd + str(workspace)
     os.chdir(build_dir)
 
@@ -584,6 +585,12 @@ def main():
         app_src = build_dir + str("/src/lib/sw_apps/%s/" % name)
         cmakesrc = build_dir + str("/src/lib/sw_apps/%s/src/" % name)
         copy_tree(srcdir, app_src)
+        if re.search("zynqmp_fsbl", name):
+            psu_init_c = sdt_dir + str("/psu_init.c")
+            psu_init_h = sdt_dir + str("/psu_init.h")
+            if os.path.isfile(psu_init_c) and os.path.isfile(psu_init_h):
+                copy_file(psu_init_c, cmakesrc)
+                copy_file(psu_init_h, cmakesrc)
 
     os.chdir(cmakesrc)
     if re.search("memory_tests", name):
