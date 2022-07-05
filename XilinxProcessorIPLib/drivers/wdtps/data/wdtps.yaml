@@ -24,7 +24,7 @@ config:
 required:
     - compatible
     - reg
-    - xlnx,clock-freq
+    - xlnx,wdt-clk-freq-hz
     - interrupts
     - interrupt-parent
 
