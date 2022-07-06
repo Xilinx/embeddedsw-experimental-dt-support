@@ -576,7 +576,11 @@ void XScuGic_UnmapAllInterruptsFromCpu(XScuGic *InstancePtr, u8 Cpu_Identifier);
 void XScuGic_Stop(XScuGic *InstancePtr);
 void XScuGic_SetCpuID(u32 CpuCoreId);
 u32 XScuGic_GetCpuID(void);
+#ifndef SDT
 u8 XScuGic_IsInitialized(u32 DeviceId);
+#else
+u8 XScuGic_IsInitialized(u32 BaseAddress);
+#endif
 /*
  * Initialization functions in xscugic_sinit.c
  */
