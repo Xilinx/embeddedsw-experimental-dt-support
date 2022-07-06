@@ -37,7 +37,7 @@
 #include "xscugic.h"
 #endif
 #include "sleep.h"
-
+#include "xinterrupt_wrap.h"
 /**************************** Type Definitions *******************************/
 
 /************************** Function Prototypes ******************************/
@@ -295,83 +295,17 @@ static u32 XIpiPs_RecvData(XMailbox *InstancePtr, void *MsgBufferPtr,
 static XStatus XIpiPs_RegisterIrq(XScuGic *IntcInstancePtr,
 				  XMailbox *InstancePtr,
 				  u32 IpiIntrId) {
-	s32 Status = (s32)XST_FAILURE;
-	XScuGic_Config *IntcConfigPtr;
+	XMailbox_Agent *DataPtr = &InstancePtr->Agent;
+	XIpiPsu *IpiInstancePtr = &DataPtr->IpiInst;
 
-	/* Initialize the interrupt controller driver */
-#ifndef SDT
-	IntcConfigPtr = XScuGic_LookupConfig(XPAR_SCUGIC_0_DEVICE_ID);
-#else
-	IntcConfigPtr = XScuGic_LookupConfig(0);
-#endif
-	if (NULL == IntcConfigPtr) {
-		return (s32)XST_FAILURE;
-	}
+	XSetupInterruptSystem(InstancePtr, (Xil_InterruptHandler)
+		XIpiPs_IntrHandler, IpiIntrId, IpiInstancePtr->Config.IntrParent, 
+		XINTERRUPT_DEFAULT_PRIORITY);
 
-	/* Check if the GIC is already setup by this time */
-#ifndef SDT
-	if (XScuGic_IsInitialized(XPAR_SCUGIC_0_DEVICE_ID) == 1U) {
-#else
-	if (XScuGic_IsInitialized(0) == 1U) {
-#endif
-		/*
-		 * GIC is already initialized, just register handlers using the
-		 * interrupt Ids and return success.
-		 */
-		XScuGic_RegisterHandler(IntcConfigPtr->CpuBaseAddress,
-					IpiIntrId,
-					(Xil_InterruptHandler)XIpiPs_IntrHandler,
-					(void *)InstancePtr);
-
-		XScuGic_RegisterHandler(IntcConfigPtr->CpuBaseAddress,
-					XMAILBOX_INTR_ID,
-					(Xil_InterruptHandler)XIpiPs_ErrorIntrHandler,
-					(void *)InstancePtr);
-		/* Enable the interrupt for the device */
-		XScuGic_EnableIntr(IntcConfigPtr->DistBaseAddress, IpiIntrId);
-		XScuGic_EnableIntr(IntcConfigPtr->DistBaseAddress, XMAILBOX_INTR_ID);
-
-		return (s32)XST_SUCCESS;
-	}
-
-	Status = XScuGic_CfgInitialize(IntcInstancePtr, IntcConfigPtr,
-				       IntcConfigPtr->CpuBaseAddress);
-	if (Status != XST_SUCCESS) {
-		return (s32)XST_FAILURE;
-	}
-
-	/*
-	 * Connect the interrupt controller interrupt handler to the
-	 * hardware interrupt handling logic in the processor.
-	 */
-	Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT,
-			(Xil_ExceptionHandler)XScuGic_InterruptHandler,
-				     IntcInstancePtr);
-
-	Status = XScuGic_Connect(IntcInstancePtr, IpiIntrId,
-				 (Xil_InterruptHandler) XIpiPs_IntrHandler,
-				 (void *)InstancePtr);
-	if (Status != XST_SUCCESS) {
-		return (s32)XST_FAILURE;
-
-	}
-
-	Status = XScuGic_Connect(IntcInstancePtr, XMAILBOX_INTR_ID,
-				 (Xil_InterruptHandler) XIpiPs_ErrorIntrHandler,
-				 (void *)InstancePtr);
-	if (Status != XST_SUCCESS) {
-		return (s32)XST_FAILURE;
-	}
-
-
-	/* Enable the interrupt for the device */
-	XScuGic_Enable(IntcInstancePtr, IpiIntrId);
-	XScuGic_Enable(IntcInstancePtr, XMAILBOX_INTR_ID);
-
-	/* Enable interrupts */
-	Xil_ExceptionEnable();
-
-	return Status;
+	XSetupInterruptSystem(InstancePtr, (Xil_InterruptHandler)
+		XIpiPs_IntrHandler, XMAILBOX_INTR_ID, IpiInstancePtr->Config.IntrParent,
+		XINTERRUPT_DEFAULT_PRIORITY);
+	return XST_SUCCESS;
 }
 
 /*****************************************************************************/
