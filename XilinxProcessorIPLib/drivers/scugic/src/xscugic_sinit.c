@@ -101,7 +101,7 @@ XScuGic_Config *XScuGic_LookupConfig(UINTPTR BaseAddress)
 	u32 Index;
 
 	for (Index = 0U; XScuGic_ConfigTable[Index].Name != NULL; Index++) {
-		if (XScuGic_ConfigTable[Index].DistBaseAddress == BaseAddress) {
+		if ((XScuGic_ConfigTable[Index].DistBaseAddress == BaseAddress) || !BaseAddress) { 
 			CfgPtr = &XScuGic_ConfigTable[Index];
 			break;
 		}
