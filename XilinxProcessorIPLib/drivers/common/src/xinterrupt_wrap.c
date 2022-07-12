@@ -276,6 +276,8 @@ IntrId,  UINTPTR IntcParent, u16 Priority)
 	XEnableIntrId(IntrId, IntcParent);
 	Xil_ExceptionInit();
 	Xil_ExceptionEnable();
+#if defined (XPAR_SCUGIC)
 	ScuGicInitialized = TRUE;
+#endif
 	return XST_SUCCESS;
 }
