@@ -358,6 +358,8 @@ def main():
         if not os.path.isfile(bm_sdt):
             os.system("lopper --enhanced -i %s %s %s" % (r5_lops, sdt, bm_sdt))
         sdt = bm_sdt
+    else:
+        sdt = str(sdt)
 
     os.environ["SYSTEM_DTFILE"] = sdt
     os.environ["LOPPER_DTC_FLAGS"] = "-b 0 -@"
