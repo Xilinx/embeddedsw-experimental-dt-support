@@ -1,1 +1,0 @@
-This is the application for VCU118 TX only configuration.
