@@ -322,6 +322,7 @@ def main():
         workspace = str("/") + workspace
 
     cwd = os.getcwd()
+    sdt = pathlib.Path(sdt).resolve()
     sdt_dir = os.path.dirname(sdt)
     build_dir = cwd + str(workspace)
     os.chdir(build_dir)
