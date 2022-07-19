@@ -1,6 +1,6 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.14.7)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Lwip211Example.cmake NO_POLICY_SCOPE)
 project(lwip211)
@@ -28,6 +28,7 @@ foreach(x IN LISTS TOTAL_AXIETHERNET_PROP_LIST)
     list(GET y -1 connected_ip)
     list(GET y -2 axieth_rxcsum)
     list(GET y -3 axieth_txcsum)
+    math(EXPR connected_ip "${connected_ip} & 0xF" OUTPUT_FORMAT HEXADECIMAL)
     if (${connected_ip} EQUAL 0x1)
        set(CONFIG_AXIFIFO 1)
     elseif (${connected_ip} EQUAL 0x2)

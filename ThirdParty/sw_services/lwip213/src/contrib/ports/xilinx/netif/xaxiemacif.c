@@ -52,11 +52,6 @@
 #include "xaxiemacif_hw.h"
 
 #include "xparameters.h"
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-#include "xscugic.h"
-#else
-#include "xintc.h"
-#endif
 
 #if LWIP_IPV6
 #include "lwip/ethip6.h"
