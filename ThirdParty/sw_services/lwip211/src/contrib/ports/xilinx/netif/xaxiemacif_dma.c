@@ -44,12 +44,6 @@
 #include "netif/xadapter.h"
 #include "netif/xaxiemacif.h"
 
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
-#include "xscugic.h"
-#else
-#include "xintc_l.h"
-#endif
-
 #include "xstatus.h"
 
 #include "xlwipconfig.h"
@@ -63,7 +57,6 @@
 #include "xil_mmu.h"
 #endif
 
-#if XLWIP_CONFIG_INCLUDE_AXIETH_ON_ZYNQ == 1
 #ifndef XCACHE_FLUSH_DCACHE_RANGE
 #define XCACHE_FLUSH_DCACHE_RANGE(data, length)	\
 		Xil_DCacheFlushRange((UINTPTR)data, length)
@@ -71,8 +64,6 @@
 #ifndef XCACHE_INVALIDATE_DCACHE_RANGE
 #define XCACHE_INVALIDATE_DCACHE_RANGE(data, length)	\
 		Xil_DCacheInvalidateRange((u32)data, length)
-#endif
-
 #endif
 
 /* Byte alignment of BDs */
