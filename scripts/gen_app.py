@@ -116,7 +116,8 @@ def handle_dep(yaml_file, repo, build_dir, tool_chain_file):
         for drv in dep_drvlist:
             srcdir = repo + str("/XilinxProcessorIPLib/drivers/%s/" % drv)
             drvsrc = build_dir + str("/src/XilinxProcessorIPLib/drivers/%s/" % drv)
-            copy_tree(srcdir, drvsrc)
+            if not os.path.isdir(drvsrc):
+                copy_tree(srcdir, drvsrc)
 
     if dep_liblist:
         for libname in dep_liblist:
