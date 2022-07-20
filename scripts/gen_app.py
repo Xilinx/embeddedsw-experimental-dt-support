@@ -301,6 +301,7 @@ def main():
     repo = os.path.abspath(repo)
     os_type = check_type(args.os)
     lib = args.lib
+    abspath = False
     c_flags = check_type(args.compiler_flags)
     l_flags = check_type(args.linker_flags)
     include_path = check_type(args.include_path)
@@ -316,15 +317,23 @@ def main():
             pathlib.Path('workspace').mkdir(parents=True, exist_ok=True)
         workspace = "/workspace"
     else:
-        work = os.getcwd() + str("/") + workspace
-        if not os.path.isdir(work):
-            pathlib.Path(workspace).mkdir(parents=True, exist_ok=True)
-        workspace = str("/") + workspace
+        if os.path.isabs(workspace):
+            abspath = True
+            if not os.path.isdir(workspace):
+                pathlib.Path(workspace).mkdir(parents=True, exist_ok=True)
+        else:
+            work = os.getcwd() + str("/") + workspace
+            if not os.path.isdir(work):
+                pathlib.Path(workspace).mkdir(parents=True, exist_ok=True)
+                workspace = str("/") + workspace
 
     cwd = os.getcwd()
     sdt = pathlib.Path(sdt).resolve()
     sdt_dir = os.path.dirname(sdt)
     build_dir = cwd + str(workspace)
+    if abspath:
+        build_dir = str(workspace)
+
     os.chdir(build_dir)
 
     try:
