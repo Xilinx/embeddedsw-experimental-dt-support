@@ -73,9 +73,9 @@ int XConnectToInterruptCntrl(u32 IntrId, void *IntrHandler, void *CallBackRef, U
 	{
 
 #if defined (XPAR_SCUGIC)
-		if (!ScuGicInitialized) {
+		if (ScuGicInitialized) {
 			Doconnect = 1;
-		} else if (XScuGic_IsInitialized(BaseAddr) != 1U) {
+		} else if (XScuGic_IsInitialized(BaseAddr) == 1U) {
 			Doconnect = 1;
 		}
                 if (Doconnect) {
