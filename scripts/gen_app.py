@@ -50,10 +50,10 @@ required_argument.add_argument('-n', '--name', action='store',
                         - <Driver Name for compiling driver examples>
                         - <Library Name for compiling library examples>
                         '''), required=True)
+required_argument.add_argument('-r', '--repo', action='store',
+                  help='Specify repo path', required=True)
 parser.add_argument('-w', '--workdir', action='store',
                   help='Workspace directory')
-parser.add_argument('-r', '--repo', action='store',
-                  help='Specify repo path')
 parser.add_argument('-o', '--os', action='store',
                   help='Specify OS (Default: standalone)')
 parser.add_argument('-l', '--lib', action='append', nargs='*',
