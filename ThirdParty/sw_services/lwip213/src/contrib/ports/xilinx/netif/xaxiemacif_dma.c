@@ -682,7 +682,7 @@ XStatus init_axi_dma(struct xemac_s *xemac)
 		return ERR_IF;
 	}
 	/* initialize DMA */
-	baseaddr = xaxiemacif->axi_ethernet.Config.AxiDevBaseAddress;
+	baseaddr = xaxiemacif->axi_ethernet.AxiDevBaseAddress;
 #ifndef SDT
 	dmaconfig = XAxiDma_LookupConfigBaseAddr(baseaddr);
 #else
