@@ -20,7 +20,7 @@ LIST_INDEX(${index} ${DRIVER_INSTANCES} "${NUM_DRIVER_INSTANCES}")
 list(GET TOTAL_EXAMPLE_LIST ${index} ex_list)
 list(GET REG_LIST ${index} reg)
 SET(XAXIPMON_BASEADDRESS "${reg}")
-SET(COMMON_EXAMPLES xaxipmon_ocm_example.c;xaxipmon_polled_example.c;)
+SET(COMMON_EXAMPLES xaxipmon_polled_example.c;)
 SET(EXAMPLE_LIST "${${ex_list}}" CACHE STRING "Driver Example List")
 SET_PROPERTY(CACHE EXAMPLE_LIST PROPERTY STRINGS "${${ex_list}}")
 
@@ -41,6 +41,11 @@ if (${valid_ex})
 else()
     list(APPEND COMMON_EXAMPLES ${EXAMPLE_LIST})
 endif()
+
+if("${CMAKE_MACHINE}" STREQUAL "ZynqMP") 
+    list(APPEND COMMON_EXAMPLES xaxipmon_ocm_example.c;)
+endif()
+
 
 foreach(EXAMPLE ${COMMON_EXAMPLES})
     string(REGEX REPLACE "\\.[^.]*$" "" EXAMPLE ${EXAMPLE})
