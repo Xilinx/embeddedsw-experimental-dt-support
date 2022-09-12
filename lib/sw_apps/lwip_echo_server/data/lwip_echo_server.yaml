@@ -7,6 +7,12 @@ title: Bindings for lwip echo server application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+supported_processors:
+  - psu_cortexa53
+  - psu_cortexr5
+  - psv_cortexa72
+  - psv_cortexr5
+
 properties:
   reg:
     description: Physical base address and size of the controller register map

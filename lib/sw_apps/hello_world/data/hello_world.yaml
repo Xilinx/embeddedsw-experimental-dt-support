@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
-title: Bindings for ZynqMP FSBL application
+title: Bindings for hello world
 
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
@@ -12,17 +12,4 @@ supported_processors:
   - psu_cortexr5
   - psv_cortexa72
   - psv_cortexr5
-
-depends_libs:
-    - xiltimer
-    - xilffs
-    - xilsecure
-    - xilpm
-
-lib_config:
-    xilffs:
-        - XILFFS_read_only: ON
-        - XILFFS_use_mkfs : OFF
-    xilsecure:
-        - XILSECURE_tpm_support: ON
 ...
