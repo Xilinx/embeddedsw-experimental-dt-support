@@ -2,17 +2,14 @@
 # SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
-title: Bindings for ZynqMP PMUFW application
+title: Bindings for memory test
 
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
 supported_processors:
-  - psu_pmu
-
-depends_libs:
-    - xiltimer
-    - xilfpga
-    - xilsecure
-    - xilskey
+  - psu_cortexa53
+  - psu_cortexr5
+  - psv_cortexa72
+  - psv_cortexr5
 ...

@@ -7,6 +7,9 @@ title: Bindings for Versal PLM application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+supported_processors:
+  - psv_pmc
+
 depends_libs:
     - xiltimer
     - xilffs

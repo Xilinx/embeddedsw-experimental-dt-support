@@ -7,6 +7,12 @@ title: Bindings for freertos hello world application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+supported_processors:
+  - psu_cortexa53
+  - psu_cortexr5
+  - psv_cortexa72
+  - psv_cortexr5
+
 depends_libs:
     - freertos10_xilinx
     - xiltimer
