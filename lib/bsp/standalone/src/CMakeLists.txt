@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
 message(${CMAKE_CURRENT_SOURCE_DIR})
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake)
-#include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/common.cmake)
 project(xilstandalone)
 
@@ -80,4 +78,4 @@ endif()
 set_target_properties(xilstandalone PROPERTIES LINKER_LANGUAGE C)
 install(TARGETS xilstandalone LIBRARY DESTINATION ${CMAKE_LIBRARY_PATH} ARCHIVE DESTINATION ${CMAKE_LIBRARY_PATH})
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION ${CMAKE_INCLUDE_PATH}/..) 
-install(FILES ${CMAKE_SOURCE_DIR}/common.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../ RENAME commonConfig.cmake) 
+install(FILES ${CMAKE_SOURCE_DIR}/common.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../ RENAME Findcommon.cmake) 
