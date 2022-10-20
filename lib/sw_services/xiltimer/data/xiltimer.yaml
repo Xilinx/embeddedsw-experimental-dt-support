@@ -20,12 +20,4 @@ required:
         - reg
     ttcps:
         - reg
-
-depends_libs:
-    - xilffs
-
-lib_config:
-    xilffs:
-        - XILFFS_read_only: ON
-        - XILFFS_use_mkfs : OFF
 ...
