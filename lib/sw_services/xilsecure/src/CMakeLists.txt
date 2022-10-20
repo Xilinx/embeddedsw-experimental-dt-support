@@ -1,11 +1,10 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilsecure.cmake)
 project(xilsecure)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilsecure.cmake NO_POLICY_SCOPE)
+include(${CMAKE_SOURCE_DIR}/xilsecure.cmake NO_POLICY_SCOPE)
+find_package(common)
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)
@@ -37,4 +36,5 @@ file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 #execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/versal/libxilsecure_pmc.a ${CMAKE_BINARY_DIR}/libxilsecure.a)
 add_library(xilsecure STATIC ${_sources})
 set_target_properties(xilsecure PROPERTIES LINKER_LANGUAGE C)
-install(TARGETS xilsecure LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/build ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS xilsecure LIBRARY DESTINATION ${CMAKE_LIBRARY_PATH} ARCHIVE DESTINATION ${CMAKE_LIBRARY_PATH})
+install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION ${CMAKE_INCLUDE_PATH}/..) 
