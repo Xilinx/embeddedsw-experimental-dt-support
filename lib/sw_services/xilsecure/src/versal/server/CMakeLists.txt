@@ -56,6 +56,8 @@ endif()
 
 if (${OS_ESW})
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/libxilsecure_pmc.a ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a)
+    #execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a) ${CMAKE_LIBRARY_PATH}/libxilsecure_pmc.a)
+    file(COPY ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a DESTINATION ${CMAKE_LIBRARY_PATH} FOLLOW_SYMLINK_CHAIN)
 
 endif()
 
