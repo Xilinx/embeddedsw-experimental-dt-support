@@ -109,19 +109,17 @@ class App_gen(BSP):
     def generate_app(self):
         srcdir = os.path.join(self.esw_apps_dir, f"{self.name}/src/")
         os.chdir(self.wsdir)
+        linker_cmd = f"lopper {self.sdt} -- baremetallinker_xlnx {self.machine} {srcdir}"
         if self.name == "memory_tests":
-            runcmd(f"lopper {self.sdt} -- baremetallinker_xlnx {self.machine} {srcdir} memtest")
+            runcmd(f"{linker_cmd} memtest")
         else:
-            runcmd(f"lopper {self.sdt} -- baremetallinker_xlnx {self.machine} {srcdir}")
+            runcmd(linker_cmd)
         linker_dir = os.path.join(self.wsdir,'linker_files')
         linker_src = os.path.join(self.repo,'scripts/linker_files')
         copy_directory(linker_src,linker_dir)
         copy_directory(srcdir, self.wsdir)
-        dep_dict = self.check_dependency(self.name)
         if self.name == "peripheral_tests":
             runcmd(f"lopper {self.sdt} -- baremetal_gentestapp_xlnx {self.machine} {self.repo}")
-        if dep_dict[self.name].get('required'):
-            runcmd(f"lopper {self.sdt} -- bmcmake_metadata_xlnx {self.machine} {srcdir} hwcmake_metadata {self.repo}")
         app_work_dir = os.path.join(self.wsdir,f'build_{self.name}')
         mkdir(app_work_dir)
         os.chdir(app_work_dir)

@@ -72,13 +72,11 @@ class BSP:
                 # 3. Generate _g.c file
                 try:
                     os.chdir(drvsrc)
-                    drv_has_metadata = srcdir + str("../data/%s.yaml" % drv)
-                    if os.path.isfile(drv_has_metadata):
-                        print(f"Generating _g.c for the driver {drv}\n\r")
-                        if re.match("uartps", drv):
-                            runcmd(f"lopper {self.sdt} -- baremetalconfig_xlnx {self.machine} {srcdir} stdin")
-                        else:
-                            runcmd(f"lopper {self.sdt} -- baremetalconfig_xlnx {self.machine} {srcdir}")
+                    print(f"Generating _g.c for the driver {drv}\n\r")
+                    if re.match("uartps", drv):
+                        runcmd(f"lopper {self.sdt} -- baremetalconfig_xlnx {self.machine} {srcdir} stdin")
+                    else:
+                        runcmd(f"lopper {self.sdt} -- baremetalconfig_xlnx {self.machine} {srcdir}")
                 except:
                     pass
 
@@ -167,9 +165,7 @@ class BSP:
 
         for lib in libs_to_build:
             build_hw_metadata = False
-            if lib == self.name:
-                continue
-            print(f"lib is {lib}")
+            print(f"Building metadata for {lib}")
             cmake_cmd_append = ""
             if lib in lib_params_dict.keys():
                 for entries in lib_params_dict[lib]:
@@ -181,12 +177,19 @@ class BSP:
 
             comp_dir = self.get_comp_dir(lib)
             srcdir = os.path.join(comp_dir, 'src/')
+            lopper_metadata_cmd = f"lopper {self.sdt} -- bmcmake_metadata_xlnx {self.machine} {srcdir} hwcmake_metadata {self.repo}"
+
+            if lib == self.name and build_hw_metadata:
+                os.chdir(self.wsdir)
+                runcmd(lopper_metadata_cmd)
+                continue
+
             dstdir = os.path.join(self.libsrc_folder, f"{lib}/src")
             copy_directory(srcdir, dstdir)
             os.chdir(dstdir)
             # Generate h/w meta-data
             if build_hw_metadata:
-                runcmd(f"lopper {self.sdt} -- bmcmake_metadata_xlnx {self.machine} {srcdir} hwcmake_metadata {self.repo}")
+                runcmd(lopper_metadata_cmd)
             # Compile 
             build_lib = os.path.join(dstdir,f'build_{lib}')
             reset(build_lib)
@@ -203,5 +206,5 @@ class BSP:
     def lib_addition(self):
         self.add_lib(self.name)
         if self.lib:
-            for lib_name in lib:
+            for lib_name in self.lib:
                 self.add_lib(lib_name)
