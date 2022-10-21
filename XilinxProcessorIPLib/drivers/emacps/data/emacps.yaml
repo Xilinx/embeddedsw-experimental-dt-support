@@ -12,6 +12,7 @@ properties:
     OneOf:
       - items:
         - enum:
+          - xlnx,zynqmp-gem
           - cdns,zynqmp-gem
           - cdns,zynq-gem
         - enum:
