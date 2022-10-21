@@ -179,9 +179,10 @@ class BSP:
             srcdir = os.path.join(comp_dir, 'src/')
             lopper_metadata_cmd = f"lopper {self.sdt} -- bmcmake_metadata_xlnx {self.machine} {srcdir} hwcmake_metadata {self.repo}"
 
-            if lib == self.name and build_hw_metadata:
-                os.chdir(self.wsdir)
-                runcmd(lopper_metadata_cmd)
+            if lib == self.name:
+                if build_hw_metadata:
+                    os.chdir(self.wsdir)
+                    runcmd(lopper_metadata_cmd)
                 continue
 
             dstdir = os.path.join(self.libsrc_folder, f"{lib}/src")
