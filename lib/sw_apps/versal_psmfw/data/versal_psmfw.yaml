@@ -7,6 +7,9 @@ title: Bindings for Versal PSMFW application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+depends_libs:
+    - xiltimer
+
 supported_processors:
   - psv_psm
 ...
