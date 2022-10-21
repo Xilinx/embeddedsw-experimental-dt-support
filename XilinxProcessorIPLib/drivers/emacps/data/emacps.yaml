@@ -16,7 +16,9 @@ properties:
           - cdns,zynqmp-gem
           - cdns,zynq-gem
         - enum:
+          - xlnx,versal-gem
           - cdns,versal-gem
+          - cdns,gem
   reg:
     description: Physical base address and size of the controller register map
   dma-coherent:
