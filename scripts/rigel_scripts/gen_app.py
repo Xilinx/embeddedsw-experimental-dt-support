@@ -157,7 +157,6 @@ if __name__ == '__main__':
                           help=textwrap.dedent('''\
                                 Specify the name of the application supported apps are 
                                 - hello_world 
-                                - empty_application
                                 - memory_tests
                                 - peripheral_tests
                                 - zynqmp_fsbl
