@@ -7,6 +7,9 @@ title: Bindings for peripheral test app
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+depends_libs:
+    - xiltimer
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

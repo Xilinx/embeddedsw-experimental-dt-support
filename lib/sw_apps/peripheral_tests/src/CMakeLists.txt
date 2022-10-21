@@ -13,9 +13,7 @@ collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
 collector_list (_deps PROJECT_LIB_DEPS)
 
-LOAD_CACHE("${CMAKE_CURRENT_SOURCE_DIR}")
-
 file(GLOB SOURCES "*.c")
-linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
+linker_gen("${CMAKE_SOURCE_DIR}/linker_files/")
 add_executable(executable.elf ${SOURCES})
 target_link_libraries(executable.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
