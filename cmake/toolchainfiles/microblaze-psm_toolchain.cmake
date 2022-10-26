@@ -1,3 +1,4 @@
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set( ESW_MACHINE "microblaze-psm")
 set( CMAKE_C_COMPILER mb-gcc )
 set( CMAKE_CXX_COMPILER mb-g++ )

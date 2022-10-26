@@ -1,3 +1,4 @@
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set( ESW_MACHINE "cortexa72-versal")
 set( CMAKE_C_COMPILER aarch64-none-elf-gcc )
 set( CMAKE_CXX_COMPILER aarch64-none-elf-g++ )
