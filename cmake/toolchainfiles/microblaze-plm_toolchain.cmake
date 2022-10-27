@@ -1,5 +1,4 @@
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set( ESW_MACHINE "microblaze-plm")
 set( CMAKE_C_COMPILER mb-gcc )
 set( CMAKE_CXX_COMPILER mb-g++ )
 set( CMAKE_C_COMPILER_LAUNCHER  )

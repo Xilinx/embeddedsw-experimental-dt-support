@@ -1,5 +1,4 @@
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set( ESW_MACHINE "cortexr5-versal")
 set( CMAKE_C_COMPILER armr5-none-eabi-gcc )
 set( CMAKE_CXX_COMPILER armr5-none-eabi-g++ )
 set( CMAKE_C_COMPILER_LAUNCHER  )
