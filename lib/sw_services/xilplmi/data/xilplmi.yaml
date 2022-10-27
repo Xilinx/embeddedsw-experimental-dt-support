@@ -2,20 +2,14 @@
 # SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
-title: Bindings for xilnvm library.
+title: Bindings for xilplmi library
 
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
 supported_processors:
-  - psu_pmc
-  - psu_psm
   - psv_pmc
-  - psv_psm
 
 supported_os:
   - standalone
-
-depends_libs:
-    - xiltimer
-    - xilplmi
+...
