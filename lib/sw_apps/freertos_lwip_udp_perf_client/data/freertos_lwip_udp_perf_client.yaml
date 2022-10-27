@@ -13,6 +13,15 @@ properties:
   interrupts:
     description: Interrupt property of the controller
 
+supported_processors:
+    - psu_cortexa53
+    - psu_cortexr5
+    - psv_cortexa72
+    - psv_cortexr5
+
+supported_os:
+    - freertos10_xilinx
+
 depends:
     - emaclite
     - axiethernet

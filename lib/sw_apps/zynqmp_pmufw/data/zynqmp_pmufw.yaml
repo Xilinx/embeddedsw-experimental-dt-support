@@ -10,6 +10,9 @@ maintainers:
 supported_processors:
   - psu_pmu
 
+supported_os:
+  - standalone
+
 depends_libs:
     - xiltimer
     - xilfpga

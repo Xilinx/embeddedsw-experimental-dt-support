@@ -16,4 +16,7 @@ supported_processors:
 depends_libs:
     - freertos10_xilinx
     - xiltimer
+
+supported_os:
+    - freertos10_xilinx
 ...

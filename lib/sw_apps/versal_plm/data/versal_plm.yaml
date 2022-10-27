@@ -10,6 +10,9 @@ maintainers:
 supported_processors:
   - psv_pmc
 
+supported_os:
+  - standalone
+
 depends_libs:
     - xiltimer
     - xilffs

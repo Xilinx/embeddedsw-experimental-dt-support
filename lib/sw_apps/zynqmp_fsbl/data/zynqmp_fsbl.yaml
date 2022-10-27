@@ -11,6 +11,9 @@ supported_processors:
   - psu_cortexa53
   - psu_cortexr5
 
+supported_os:
+  - standalone
+
 depends_libs:
     - xiltimer
     - xilffs

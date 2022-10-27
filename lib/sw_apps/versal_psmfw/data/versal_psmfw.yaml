@@ -12,4 +12,7 @@ depends_libs:
 
 supported_processors:
   - psv_psm
+
+supported_os:
+  - standalone
 ...

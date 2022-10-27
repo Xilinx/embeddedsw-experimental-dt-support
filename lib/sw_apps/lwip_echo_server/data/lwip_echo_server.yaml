@@ -13,6 +13,9 @@ supported_processors:
   - psv_cortexa72
   - psv_cortexr5
 
+supported_os:
+  - standalone
+
 properties:
   reg:
     description: Physical base address and size of the controller register map

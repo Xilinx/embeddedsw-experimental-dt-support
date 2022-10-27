@@ -24,6 +24,9 @@ supported_processors:
   - psv_cortexa72
   - psv_cortexr5
 
+supported_os:
+    - freertos10_xilinx
+
 depends:
     - emaclite
     - axiethernet
