@@ -7,6 +7,8 @@ title: Bindings for memory test
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: This application tests Memory Regions present in the hardware.
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

@@ -7,6 +7,8 @@ title: Bindings for Versal PLM application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Platform Loader and Manager for versal.
+
 supported_processors:
   - psv_pmc
 

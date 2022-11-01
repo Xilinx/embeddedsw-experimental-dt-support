@@ -7,6 +7,8 @@ title: Bindings for empty application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: A blank C project.
+
 depends_libs:
     - xiltimer
 

@@ -7,6 +7,8 @@ title: Bindings for freertos hello world application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: FreeRTOS Hello World application.
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

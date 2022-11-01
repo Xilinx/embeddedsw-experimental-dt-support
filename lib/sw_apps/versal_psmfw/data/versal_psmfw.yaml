@@ -7,6 +7,8 @@ title: Bindings for Versal PSMFW application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Processing System Management Unit Firmware for versal.
+
 depends_libs:
     - xiltimer
 
