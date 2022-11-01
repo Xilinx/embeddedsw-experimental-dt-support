@@ -7,6 +7,9 @@ title: Bindings for xilfpga library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: |-
+  XilFPGA library provides an interface to the Linux or bare-metal users for configuring the PL over PCAP from PS.
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

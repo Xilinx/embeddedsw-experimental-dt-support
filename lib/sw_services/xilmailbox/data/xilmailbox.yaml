@@ -7,6 +7,8 @@ title: Bindings for xilmailbox library application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Xilinx Versal Platform Loader Library.
+
 properties:
   reg:
     description: Physical base address and size of the controller register map

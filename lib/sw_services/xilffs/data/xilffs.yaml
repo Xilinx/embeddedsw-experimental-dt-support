@@ -7,6 +7,8 @@ title: Bindings for xilffs library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Generic Fat File System Library.
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

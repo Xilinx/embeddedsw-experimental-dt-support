@@ -7,6 +7,8 @@ title: Bindings for xilpm library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Platform Management API Library for ZynqMP and Versal.
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

@@ -7,6 +7,8 @@ title: Bindings for xilnvm library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Xilinx NVM Library provides interface to accessing eFUSE and BBRAM of Versal.
+
 supported_processors:
   - psu_pmc
   - psu_psm

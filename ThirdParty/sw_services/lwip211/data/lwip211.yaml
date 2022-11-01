@@ -7,6 +7,9 @@ title: Bindings for lwip library
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: |-
+  lwip211 library lwIP (light weight IP) is an open source TCP/IP stack configured for Xilinx hard and soft Ethernet MACs.
+
 properties:
   reg:
     description: Physical base address and size of the controller register map
