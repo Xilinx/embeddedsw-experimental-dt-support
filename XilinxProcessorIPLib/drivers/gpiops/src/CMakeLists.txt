@@ -1,6 +1,6 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.15)
 #include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 project(gpiops)
 
@@ -18,6 +18,8 @@ collect (PROJECT_LIB_SOURCES xgpiops_intr.c)
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
+if (NOT ${OS_ESW})
 add_library(gpiops STATIC ${_sources})
 set_target_properties(gpiops PROPERTIES LINKER_LANGUAGE C)
-#install(TARGETS gpiops LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/build ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS gpiops LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/build ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
