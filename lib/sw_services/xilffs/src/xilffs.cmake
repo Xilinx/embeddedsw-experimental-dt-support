@@ -84,4 +84,4 @@ if (${XILFFS_fs_interface})
 	endif()
 
 endif()
-configure_file(${CMAKE_SOURCE_DIR}/xilffs_config.h.in ${CMAKE_BINARY_DIR}/include/xilffs_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xilffs_config.h.in ${CMAKE_BINARY_DIR}/include/xilffs_config.h)

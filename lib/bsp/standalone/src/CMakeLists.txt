@@ -76,6 +76,8 @@ if (${OS_ESW}
     target_compile_definitions(xilstandalone PRIVATE FREERTOS_BSP)
 endif()
 set_target_properties(xilstandalone PROPERTIES LINKER_LANGUAGE C)
+file(COPY ${CMAKE_SOURCE_DIR}/common.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../)
+file(RENAME ${CMAKE_INCLUDE_PATH}/../../common.cmake ${CMAKE_INCLUDE_PATH}/../../Findcommon.cmake)
+
 install(TARGETS xilstandalone LIBRARY DESTINATION ${CMAKE_LIBRARY_PATH} ARCHIVE DESTINATION ${CMAKE_LIBRARY_PATH})
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION ${CMAKE_INCLUDE_PATH}/..) 
-install(FILES ${CMAKE_SOURCE_DIR}/common.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../ RENAME Findcommon.cmake) 
