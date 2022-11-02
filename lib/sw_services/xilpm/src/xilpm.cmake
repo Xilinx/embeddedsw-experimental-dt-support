@@ -4,4 +4,4 @@ cmake_minimum_required(VERSION 3.3)
 
 set(XPAR_XILPM_ENABLED " ")
 
-configure_file(${CMAKE_SOURCE_DIR}/xpm_config.h.in ${CMAKE_BINARY_DIR}/include/xpm_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xpm_config.h.in ${CMAKE_BINARY_DIR}/include/xpm_config.h)

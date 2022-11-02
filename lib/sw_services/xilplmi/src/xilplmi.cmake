@@ -67,4 +67,4 @@ if (XILPLMI_plm_stl_en)
 	set(PLM_ENABLE_STL " ")
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/xilplmi_config.h.in ${CMAKE_BINARY_DIR}/include/xilplmi_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xilplmi_config.h.in ${CMAKE_BINARY_DIR}/include/xilplmi_config.h)

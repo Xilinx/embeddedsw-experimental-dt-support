@@ -11,4 +11,4 @@ if(XILSECURE_tpm_support)
 endif()
 option(XILSECURE_Mode "Enables Client or Server mode for xilsecure versal" OFF)
 
-configure_file(${CMAKE_SOURCE_DIR}/xsecure_config.h.in ${CMAKE_BINARY_DIR}/include/xsecure_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xsecure_config.h.in ${CMAKE_BINARY_DIR}/include/xsecure_config.h)

@@ -47,4 +47,4 @@ else()
 	set(XSK_USER_DEVICE_NUMSLR ${XILSKEY_device_numslr})
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/xilskey_config.h.in ${CMAKE_BINARY_DIR}/include/xilskey_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xilskey_config.h.in ${CMAKE_BINARY_DIR}/include/xilskey_config.h)

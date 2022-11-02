@@ -372,5 +372,5 @@ if(("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeRTOS") AND
     endif()
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/lwipopts.h.in ${CMAKE_BINARY_DIR}/include/lwipopts.h)
-configure_file(${CMAKE_SOURCE_DIR}/xlwipconfig.h.in ${CMAKE_BINARY_DIR}/include/xlwipconfig.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lwipopts.h.in ${CMAKE_BINARY_DIR}/include/lwipopts.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xlwipconfig.h.in ${CMAKE_BINARY_DIR}/include/xlwipconfig.h)

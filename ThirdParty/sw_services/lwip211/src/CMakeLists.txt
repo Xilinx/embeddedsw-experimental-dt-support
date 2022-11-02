@@ -9,15 +9,15 @@ collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(${CMAKE_BINARY_DIR}/include)
 
-set(LWIP_DIR ${CMAKE_SOURCE_DIR}/lwip-2.1.1) 
+set(LWIP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lwip-2.1.1) 
 set(LWIP_INCLUDE_DIRS
     "${LWIP_DIR}/src"
     "${LWIP_DIR}/src/include"
-    "${CMAKE_SOURCE_DIR}/contrib/ports/xilinx/include"
-    "${CMAKE_SOURCE_DIR}/contrib/ports/xilinx/include/arch"
-    "${CMAKE_SOURCE_DIR}/contrib/ports/xilinx/include/netif"
+    "${CMAKE_CURRENT_SOURCE_DIR}/contrib/ports/xilinx/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/contrib/ports/xilinx/include/arch"
+    "${CMAKE_CURRENT_SOURCE_DIR}/contrib/ports/xilinx/include/netif"
 )
-include(${CMAKE_SOURCE_DIR}/Filelists.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Filelists.cmake NO_POLICY_SCOPE)
 collect (PROJECT_LIB_SOURCES ${lwipnoapps_SRCS})
 
 list(LENGTH EMACLITE_NUM_DRIVER_INSTANCES CONFIG_EMACLITE)
@@ -49,10 +49,12 @@ list(APPEND TOTAL_MAC_INSTANCES ${EMACLITE_NUM_DRIVER_INSTANCES})
 SET(MAC_INSTANCES "${TOTAL_MAC_INSTANCES}" CACHE STRING "MAC Instances")
 SET_PROPERTY(CACHE MAC_INSTANCES PROPERTY STRINGS "${TOTAL_MAC_INSTANCES}")
 
-include(${CMAKE_SOURCE_DIR}/lwip211.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/lwip211.cmake NO_POLICY_SCOPE)
 
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 file(COPY ${LWIP_INCLUDE_DIRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
+file(COPY ${CMAKE_BINARY_DIR}/include/lwipopts.h DESTINATION ${CMAKE_INCLUDE_PATH}/)
+file(COPY ${CMAKE_BINARY_DIR}/include/xlwipconfig.h DESTINATION ${CMAKE_INCLUDE_PATH}/)
 add_library(lwip211 STATIC ${_sources})
 target_include_directories(lwip211 PUBLIC ${LWIP_INCLUDE_DIRS})
 set_target_properties(lwip211 PROPERTIES LINKER_LANGUAGE C)

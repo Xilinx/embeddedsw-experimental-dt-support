@@ -11,4 +11,4 @@ else()
     list(GET IPIPSU0_PROP_LIST 1 XMAILBOX_IPI_CHANNEL_ID)
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/xilmailbox_hwconfig.h.in ${CMAKE_BINARY_DIR}/include/xilmailbox_hwconfig.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xilmailbox_hwconfig.h.in ${CMAKE_BINARY_DIR}/include/xilmailbox_hwconfig.h)
