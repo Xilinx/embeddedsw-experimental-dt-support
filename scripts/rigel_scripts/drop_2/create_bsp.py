@@ -5,28 +5,28 @@ import lopper
 from utils import *
 import re
 from repo import Repo
-import time
+#import time
 
 class Domain(Repo):
     def __init__(self,args,domain_create=True):
-        super().__init__(args.get('repo'))
-        self.wsdir = get_abs_path(args['wsdir'])
-        self.proc = args.get('proc')
-        self.domain_name = args.get('domain_name')
-        self.os = args.get('os')
-        self.app = args.get('app','')
-        self.toolchain_file = None
-        if args.get('sdt'):
-            self.sdt = get_abs_path(args['sdt'])
-            self.family = get_machine(self.sdt)
-        self.domaindir = os.path.join(self.wsdir,self.proc,self.domain_name)
-        self.bspdir = os.path.join(self.domaindir,'bsp')
-        self.lops_dir = os.path.join(os.path.dirname(lopper.__file__),'lops')
-        self.include_folder = os.path.join(self.bspdir,'include')
-        self.lib_folder = os.path.join(self.bspdir,'lib')
-        self.libsrc_folder = os.path.join(self.bspdir,'libsrc')
-        self.domain_config_file = os.path.join(self.domaindir,'.domain.yaml')
+        Repo.__init__(self, args.get('repo'))
         if domain_create:
+            self.wsdir = get_abs_path(args.get('wsdir',''))
+            self.proc = args.get('proc')
+            self.domain_name = args.get('domain_name')
+            self.os = args.get('os')
+            self.app = args.get('app','')
+            self.toolchain_file = None
+            if args.get('sdt'):
+                self.sdt = get_abs_path(args['sdt'])
+                self.family = get_machine(self.sdt)
+            self.domaindir = os.path.join(self.wsdir,self.proc,self.domain_name)
+            self.bspdir = os.path.join(self.domaindir,'bsp')
+            self.lops_dir = os.path.join(os.path.dirname(lopper.__file__),'lops')
+            self.include_folder = os.path.join(self.bspdir,'include')
+            self.lib_folder = os.path.join(self.bspdir,'lib')
+            self.libsrc_folder = os.path.join(self.bspdir,'libsrc')
+            self.domain_config_file = os.path.join(self.domaindir,'.domain.yaml')
             mkdir(self.bspdir)
             #validate_if_exist(self.domain_config_file,'domain',self.domain_name)
 
@@ -77,9 +77,11 @@ class Domain(Repo):
         lib_list = []
         lib_params_dict = {}
         hw_metadata = False
+        if not is_app:
+            lib_list = [comp_name]
         if is_file(yaml_file):
             schema = load_yaml(yaml_file)
-            lib_list = schema.get('depends_libs',[])
+            lib_list += schema.get('depends_libs',[])
             if schema.get('lib_config',{}):
                 for entry in schema['lib_config'].keys():
                     try:
@@ -112,8 +114,7 @@ class Domain(Repo):
         lib_list, lib_params_dict, hw_metadata = self.lib_dependency(comp, is_app)
         cmake_lib_list = ''
         for entry in lib_list:
-            if entry != self.app:
-                cmake_lib_list += f"{entry};"
+            cmake_lib_list += f"{entry};"
         app_config = {}
         cmake_cmd_append = ""
 
@@ -139,19 +140,19 @@ class Domain(Repo):
             os.chdir(dstdir)
 
             if build_hw_metadata:
-                startTime = time.time()
+                #startTime = time.time()
                 runcmd(f"lopper {self.sdt} -- bmcmake_metadata_xlnx {self.proc} {srcdir} hwcmake_metadata {self.repo}")
-                executionTime = (time.time() - startTime)
-                print('Execution time in seconds for bmcmake metadata: ' + str(executionTime))
+                #executionTime = (time.time() - startTime)
+                #print('Execution time in seconds for bmcmake metadata: ' + str(executionTime))
  
         build_lib = os.path.join(self.libsrc_folder,f'build_configs/xillib')
         mkdir(build_lib)
         copy_file(os.path.join(self.esw_lib_dir,'CMakeLists.txt'),f"{build_lib}{os.path.sep}")
         os.chdir(build_lib)
-        startTime = time.time()
+        #startTime = time.time()
         runcmd(f'cmake . {cmake_paths_append} -DOS_ESW=ON -DLIB_LIST="{cmake_lib_list}" {cmake_cmd_append}')
-        executionTime = (time.time() - startTime)
-        print('Execution time in seconds for cmake: ' + str(executionTime))
+        #executionTime = (time.time() - startTime)
+        #print('Execution time in seconds for cmake: ' + str(executionTime))
 
         update_yaml(self.domain_config_file, 'domain', 'lib_config', lib_params_dict)
         update_yaml(self.domain_config_file, 'domain', 'app_config', app_config)
@@ -193,6 +194,7 @@ def create_domain(args):
     bspsrc = os.path.join(obj.libsrc_folder,'standalone/src')
     copy_directory(os_srcdir, bspsrc)
     copy_file(f"{bspsrc}/common.cmake",os.path.join(obj.domaindir,'Findcommon.cmake'), silent_discard=False)
+
     os.chdir(obj.libsrc_folder)
 
     runcmd(f"lopper {obj.sdt} -- baremetaldrvlist_xlnx {obj.proc} {obj.repo}")
@@ -230,17 +232,20 @@ def create_domain(args):
         }
 
     write_yaml(obj.domain_config_file, data)
-    if is_file(obj.domain_config_file):
-        print(f"Successfully Generated Domain {obj.domain_name}")
 
     if obj.app:
         obj.add_lib(obj.app, cmake_paths_append, is_app=True)
+    elif obj.os == "freertos":
+        obj.add_lib("freertos10_xilinx", cmake_paths_append, is_app=False)
+
+    if is_file(obj.domain_config_file):
+        print(f"Successfully Generated Domain {obj.domain_name}")
 
 
 if __name__ == '__main__':
-    import time
-    startTime = time.time()
-    parser = argparse.ArgumentParser(description='Generate bsp for different template applications',
+    #import time
+    #startTime = time.time()
+    parser = argparse.ArgumentParser(description='Create bsp for the given sdt, os, processor and template app',
                                      usage='use "python %(prog)s --help" for more information',
                                      formatter_class=argparse.RawTextHelpFormatter)
     required_argument = parser.add_argument_group('Required arguments')
@@ -250,15 +255,26 @@ if __name__ == '__main__':
                                 '''), required=True)
     required_argument.add_argument('-s', '--sdt', action='store',
                                     help='Specify the System device-tree path (till system-top.dts file)', required=True)
-    required_argument.add_argument('-name', '--domain_name', action='store',help='Platform Workspace directory', default='standalone_domain')
-    required_argument.add_argument('-w', '--wsdir', action='store',help='Workspace directory', required=True)
+    required_argument.add_argument('-name', '--domain_name', action='store',help='Name of the Domain directory', default='standalone_domain')
+    required_argument.add_argument('-w', '--wsdir', action='store',help='Workspace directory where domain will be created', required=True)
     parser.add_argument('-os', '--os', action='store', default='standalone', help='Specify OS (Default: standalone)', choices=['standalone','freertos'])
     parser.add_argument('-r', '--repo', action='store', default='',
-                          help='Specify repo path')
-    parser.add_argument('-template', '--app', action='store', default='', help='Specify template app name')
+                          help='Specify esw repo path')
+    parser.add_argument('-template', '--app', action='store', default='', help=textwrap.dedent('''\
+                            'Specify template app name. Available names are:
+                                - hello_world
+                                - memory_tests
+                                - peripheral_tests
+                                - zynqmp_fsbl
+                                - zynqmp_pmufw
+                                - lwip_echo_server
+                                - freertos_hello_world
+                                - versal_plm
+                                - versal_psmfw
+                            '''))
     
     args = vars(parser.parse_args())
-    print(args)
+    #print(args)
     create_domain(args)
-    executionTime = (time.time() - startTime)
-    print('Execution time in seconds: ' + str(executionTime))
+    #executionTime = (time.time() - startTime)
+    #print('Execution time in seconds: ' + str(executionTime))

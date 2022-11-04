@@ -7,7 +7,7 @@ from repo import Repo
 
 class BSP(Repo):
     def __init__(self,args):
-        super().__init__(args.get('repo'))
+        Repo.__init__(self, args.get('repo'))
         self.domain_path = get_abs_path(args.get('domain_path'))
         self.domain_config_file = os.path.join(self.domain_path,'.domain.yaml')
         validate_if_not_exist(self.domain_config_file,'domain',get_base_name(self.domain_path))
@@ -65,7 +65,7 @@ def generate_bsp(args):
     obj.build_lib()
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate bsp for different template applications',
+    parser = argparse.ArgumentParser(description='Build the created bsp',
                                      usage='use "python %(prog)s --help" for more information',
                                      formatter_class=argparse.RawTextHelpFormatter)
     required_argument = parser.add_argument_group('Required arguments')

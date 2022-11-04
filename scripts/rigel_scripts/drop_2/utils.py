@@ -8,6 +8,20 @@ import subprocess
 from pathlib import Path
 from distutils.dir_util import copy_tree
 from typing import Any, List, Optional, Dict
+from collections.abc import MutableMapping
+
+def delete_keys_from_dict(dictionary, keys):
+    keys_set = set(keys)  # Just an optimization for the "if key in keys" lookup.
+
+    modified_dict = {}
+    for key, value in dictionary.items():
+        if key not in keys_set:
+            if isinstance(value, MutableMapping):
+                modified_dict[key] = delete_keys_from_dict(value, keys_set)
+            else:
+                modified_dict[key] = value  # or copy.deepcopy(value) if a copy is desired for non-dicts.
+    return modified_dict
+
 
 def is_file(filepath: str, silent_discard: bool = True) -> bool:
     """Return True if the file exists Else returns False and raises Not Found Error Message.
@@ -162,22 +176,22 @@ def write_yaml(filepath: str, data):
     with open(filepath, 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False, sort_keys=False)
 
-def update_yaml(filepath: str, dir_type, key, data):
+def update_yaml(filepath: str, dir_type, key, data, action="add"):
     new_data = fetch_yaml_data(filepath, dir_type)
-    try:
-        if isinstance(data, dict):
-            new_data[key] = {**new_data[key] , **data}
-        elif isinstance(data, list):
-            new_data[key] += data
-        else:
+    if action == "add":
+        try:
+            if isinstance(data, dict):
+                new_data[key] = {**new_data[key] , **data}
+            elif isinstance(data, list):
+                new_data[key] += data
+            else:
+                new_data[key] = data
+        except KeyError:
             new_data[key] = data
-    except KeyError:
-        new_data[key] = data
+    elif action == "remove":
+        new_data = delete_keys_from_dict(new_data, key)
 
     write_yaml(filepath, new_data)
-    if is_file(filepath):
-        print(f"Successfully Modified {dir_type.title()} {filepath}")
-
 
 def add_newline(File, newline):
     with open(File, "a") as fd:
