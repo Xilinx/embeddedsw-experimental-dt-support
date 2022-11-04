@@ -36,4 +36,4 @@ if (${XILFPGA_secure_readback})
     set(XFPGA_SECURE_READBACK_MODE " ")
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/xfpga_config.h.in ${CMAKE_BINARY_DIR}/include/xfpga_config.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xfpga_config.h.in ${CMAKE_BINARY_DIR}/include/xfpga_config.h)
