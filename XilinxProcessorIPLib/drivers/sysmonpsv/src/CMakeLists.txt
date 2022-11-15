@@ -27,13 +27,15 @@ list(APPEND defs "\n\n#endif")
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/xsysmonpsv_supplylist.h ${defs})
 
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/xsysmonpsv_g.c defs)
-if ("${DRIVER_OPTPROP_0_LIST}" STREQUAL "")
+string(FIND "${defs}" "XSysMonPsv_Supply_Arr"_index)
+if ((${_index} EQUAL -1) AND
+    ("${DRIVER_OPTPROP_0_LIST}" STREQUAL ""))
     list(APPEND defs ";\\")
     list(APPEND defs "\n\nconst char *XSysMonPsv_Supply_Arr[] = {\n")
     list(APPEND defs "};\\")
     list(APPEND defs "\n")
+    file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/xsysmonpsv_g.c ${defs})
 endif()
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/xsysmonpsv_g.c ${defs})
 
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
