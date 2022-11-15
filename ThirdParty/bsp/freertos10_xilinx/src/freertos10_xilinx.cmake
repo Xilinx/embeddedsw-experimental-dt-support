@@ -1,7 +1,7 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.3)
-include(${CMAKE_SOURCE_DIR}/Freertos10_xilinxExample.cmake * NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos10_xilinxExample.cmake * NO_POLICY_SCOPE)
 
 find_package(common)
 #kernel behavior settings
@@ -390,4 +390,4 @@ else()
     endif()
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/FreeRTOSConfig.h.in ${CMAKE_BINARY_DIR}/include/FreeRTOSConfig.h)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOSConfig.h.in ${CMAKE_BINARY_DIR}/include/FreeRTOSConfig.h)
