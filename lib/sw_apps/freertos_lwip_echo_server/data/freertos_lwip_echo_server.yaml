@@ -17,7 +17,6 @@ properties:
 
 depends_libs:
     - lwip211
-    - freertos10_xilinx
     - xiltimer
 
 supported_processors:

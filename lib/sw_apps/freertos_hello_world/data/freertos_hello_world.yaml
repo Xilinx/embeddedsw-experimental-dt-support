@@ -16,7 +16,6 @@ supported_processors:
   - psv_cortexr5
 
 depends_libs:
-    - freertos10_xilinx
     - xiltimer
 
 supported_os:
