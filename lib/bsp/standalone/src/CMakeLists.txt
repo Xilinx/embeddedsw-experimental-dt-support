@@ -74,11 +74,7 @@ endif()
 if (${NON_YOCTO}
     AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeRTOS"))
     target_compile_definitions(xilstandalone PRIVATE FREERTOS_BSP)
-    file(COPY ${CMAKE_SOURCE_DIR}/common.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../)
-    file(RENAME ${CMAKE_INCLUDE_PATH}/../../common.cmake ${CMAKE_INCLUDE_PATH}/../../Findcommon.cmake)
-else()
-    file(COPY ${CMAKE_SOURCE_DIR}/common.cmake DESTINATION ${CMAKE_MODULE_PATH}/)
-    file(RENAME ${CMAKE_MODULE_PATH}/common.cmake ${CMAKE_MODULE_PATH}/Findcommon.cmake)
+    file(COPY ${CMAKE_SOURCE_DIR}/Findcommon.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../)
 endif()
 set_target_properties(xilstandalone PROPERTIES LINKER_LANGUAGE C)
 
