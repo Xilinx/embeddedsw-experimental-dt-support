@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
 message(${CMAKE_CURRENT_SOURCE_DIR})
-include(${CMAKE_CURRENT_SOURCE_DIR}/common.cmake)
 project(xilstandalone)
 
 set(Mem_DIR "${CMAKE_SOURCE_DIR}")
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
+find_package(common)
 find_package(Mem)
 list(APPEND defs "#ifndef XMEM_CONFIG_H_\n")
 list(APPEND defs "#define XMEM_CONFIG_H_\n\n")
