@@ -5,7 +5,6 @@ message(${CMAKE_CURRENT_SOURCE_DIR})
 project(xilstandalone)
 
 set(Mem_DIR "${CMAKE_SOURCE_DIR}")
-set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 
 find_package(common)
 find_package(Mem)
@@ -75,7 +74,6 @@ endif()
 if (${NON_YOCTO}
     AND ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeRTOS"))
     target_compile_definitions(xilstandalone PRIVATE FREERTOS_BSP)
-    file(COPY ${CMAKE_SOURCE_DIR}/Findcommon.cmake DESTINATION ${CMAKE_INCLUDE_PATH}/../../)
 endif()
 set_target_properties(xilstandalone PROPERTIES LINKER_LANGUAGE C)
 
