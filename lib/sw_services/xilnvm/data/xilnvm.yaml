@@ -19,5 +19,5 @@ supported_os:
   - standalone
 
 depends_libs:
-    - xiltimer
-    - xilplmi
+    xiltimer: {}
+    xilplmi: {}

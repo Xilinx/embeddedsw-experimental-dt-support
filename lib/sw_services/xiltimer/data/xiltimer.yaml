@@ -27,10 +27,6 @@ supported_os:
   - freertos10_xilinx
 
 depends:
-  - tmrctr
-  - ttcps
-
-required:
     tmrctr:
         - reg
     ttcps:

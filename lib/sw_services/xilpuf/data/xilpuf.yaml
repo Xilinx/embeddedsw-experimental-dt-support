@@ -18,4 +18,4 @@ supported_os:
   - standalone
 
 depends_libs:
-    - xilplmi
+    xilplmi: {}

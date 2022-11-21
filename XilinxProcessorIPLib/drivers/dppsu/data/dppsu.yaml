@@ -29,6 +29,6 @@ optional:
     - interrupts 
 
 depends:
-    - avbuf
-    - video_common
+    avbuf: []
+    video_common: []
 ...

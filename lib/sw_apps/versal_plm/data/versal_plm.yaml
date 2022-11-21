@@ -16,22 +16,19 @@ supported_os:
   - standalone
 
 depends_libs:
-    - xiltimer
-    - xilffs
-    - xilpdi
-    - xilplmi
-    - xilloader
-    - xilpm
-    - xilsecure
-    - xilsem
-    - xilpuf
-    - xilnvm 
-
-lib_config:
+    xiltimer: {}
     xilffs:
-        - XILFFS_read_only: ON
-        - XILFFS_use_mkfs : OFF
-        - XILFFS_word_access : OFF
-        - XILFFS_enable_multi_partition : ON
-        - XILFFS_num_logical_vol : 10
+      XILFFS_read_only: ON
+      XILFFS_use_mkfs : OFF
+      XILFFS_word_access : OFF
+      XILFFS_enable_multi_partition : ON
+      XILFFS_num_logical_vol : 10
+    xilpdi: {}
+    xilplmi: {}
+    xilloader: {}
+    xilpm: {}
+    xilsecure: {}
+    xilsem: {}
+    xilpuf: {}
+    xilnvm: {}
 ...

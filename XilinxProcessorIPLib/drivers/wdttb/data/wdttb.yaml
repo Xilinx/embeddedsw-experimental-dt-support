@@ -63,5 +63,5 @@ examples:
     - interrupts
 
 depends:
-   - clockps
+   clockps: []
 ...

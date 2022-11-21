@@ -11,15 +11,10 @@ properties:
   reg:
     description: Physical base address and size of the controller register map
 
-depends:
-  - tmrctr
-  - ttcps
-  - scugic
-
 depends_libs:
-    - xiltimer
+    xiltimer: {}
 
-required:
+depends:
     tmrctr:
         - reg
         - interrupts

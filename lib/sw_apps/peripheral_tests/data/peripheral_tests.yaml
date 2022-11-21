@@ -10,7 +10,7 @@ maintainers:
 description: Simple test routines for all peripherals in the hardware.
 
 depends_libs:
-    - xiltimer
+    xiltimer: {}
 
 supported_processors:
   - psu_cortexa53

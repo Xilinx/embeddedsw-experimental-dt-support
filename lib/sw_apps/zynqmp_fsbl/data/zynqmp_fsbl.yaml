@@ -18,15 +18,11 @@ supported_os:
   - standalone
 
 depends_libs:
-    - xiltimer
-    - xilffs
-    - xilsecure
-    - xilpm
-
-lib_config:
+    xiltimer: {}
     xilffs:
-        - XILFFS_read_only: ON
-        - XILFFS_use_mkfs : OFF
+      XILFFS_read_only: ON
+      XILFFS_use_mkfs : OFF
     xilsecure:
-        - XILSECURE_tpm_support: ON
+      XILSECURE_tpm_support: ON
+    xilpm: {}
 ...

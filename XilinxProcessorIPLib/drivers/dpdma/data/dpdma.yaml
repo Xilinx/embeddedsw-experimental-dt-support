@@ -26,5 +26,5 @@ optional:
     - interrupts 
 
 depends:
-    - video_common
+    video_common: []
 ...

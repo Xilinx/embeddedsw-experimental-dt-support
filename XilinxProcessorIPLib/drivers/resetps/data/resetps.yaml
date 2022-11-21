@@ -20,5 +20,5 @@ required:
     - reg
 
 depends:
-    - clockps
+    clockps: []
 ...

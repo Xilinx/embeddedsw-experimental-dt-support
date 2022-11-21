@@ -19,8 +19,9 @@ supported_os:
   - standalone
 
 depends_libs:
-  - xilpm
-  - xilpdi
-  - xilffs
-  - xilsecure
-  - xilpuf
+  xilplmi: {}
+  xilpm: {}
+  xilpdi: {}
+  xilffs: {}
+  xilsecure: {}
+  xilpuf: {}

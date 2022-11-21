@@ -26,25 +26,6 @@ properties:
     description: Interrupt property of the controller
 
 depends:
-    - emaclite
-    - axiethernet
-    - emacps
-    - tmrctr
-    - ttcps
-
-depends_libs:
-    - lwip211
-    - xiltimer
-
-lib_config:
-    lwip211:
-        - lwip_api_mode: RAW_API
-        - lwip_dhcp_does_arp_check: ON
-        - lwip_dhcp: ON
-        - lwip_ipv6_enable: OFF
-        - lwip_pbuf_pool_size: 2048
-
-required:
     emaclite:
         - reg
         - interrupts
@@ -60,4 +41,14 @@ required:
     ttcps:
         - reg
         - interrupts
+
+depends_libs:
+    lwip211:
+        lwip_api_mode: RAW_API
+        lwip_dhcp_does_arp_check: ON
+        lwip_dhcp: ON
+        lwip_ipv6_enable: OFF
+        lwip_pbuf_pool_size: 2048
+    xiltimer: {}
+
 ...

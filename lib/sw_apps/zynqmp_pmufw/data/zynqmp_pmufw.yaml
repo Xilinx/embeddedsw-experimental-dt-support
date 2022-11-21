@@ -16,8 +16,8 @@ supported_os:
   - standalone
 
 depends_libs:
-    - xiltimer
-    - xilfpga
-    - xilsecure
-    - xilskey
+    xiltimer: {}
+    xilfpga: {}
+    xilsecure: {}
+    xilskey: {}
 ...

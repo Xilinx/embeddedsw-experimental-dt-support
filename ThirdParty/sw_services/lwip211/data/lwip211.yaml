@@ -38,11 +38,6 @@ supported_os:
   - freertos10_xilinx
 
 depends:
-    - emaclite
-    - axiethernet
-    - emacps
-
-required:
     emaclite:
         - reg
         - interrupts

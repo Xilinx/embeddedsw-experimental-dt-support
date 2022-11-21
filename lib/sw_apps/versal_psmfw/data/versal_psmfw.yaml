@@ -10,7 +10,7 @@ maintainers:
 description: Processing System Management Unit Firmware for versal.
 
 depends_libs:
-    - xiltimer
+    xiltimer: {}
 
 supported_processors:
   - psv_psm

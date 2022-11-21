@@ -10,7 +10,7 @@ maintainers:
 description: A blank C project.
 
 depends_libs:
-    - xiltimer
+    xiltimer: {}
 
 supported_processors:
   - psu_cortexa53
