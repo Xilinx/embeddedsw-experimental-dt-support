@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 find_package( PythonInterp 3.5 REQUIRED)
 
-option(OS_ESW "Open Source embeddedsw FLOW" OFF)
+option(NON_YOCTO "Non Yocto embeddedsw FLOW" OFF)
 
 set (CMAKE_INSTALL_LIBDIR "lib")
 function (collector_create name base)

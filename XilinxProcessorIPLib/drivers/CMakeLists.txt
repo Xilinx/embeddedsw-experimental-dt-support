@@ -1,24 +1,26 @@
 cmake_minimum_required(VERSION 3.15)
 project(libxil)
 
-if (${OS_ESW})
+if (${NON_YOCTO})
 find_package(common)
 include_directories(${CMAKE_BINARY_DIR}/include)
 set(DRVLIST_DIR "${CMAKE_SOURCE_DIR}")
 find_package(DRVLIST)
-collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
-collector_list (_sources PROJECT_LIB_SOURCES)
 FOREACH(DRIVER ${DRIVER_LIST})
     STRING(REGEX REPLACE "-" "_" DRIVER ${DRIVER})
     add_subdirectory(${DRIVER}/src)
-    collector_list (_sources PROJECT_LIB_SOURCES)
-    foreach (src ${_sources})
-        list (APPEND sources ${DRIVER}/src/${src})
-    endforeach()
+    list(APPEND OBJS ${CMAKE_BINARY_DIR}/${DRIVER}/src/CMakeFiles/${DRIVER}.dir/*.obj)
 ENDFOREACH()
-add_library(xil STATIC ${sources})
-set_target_properties(xil PROPERTIES LINKER_LANGUAGE C)
-install(TARGETS xil LIBRARY DESTINATION ${CMAKE_LIBRARY_PATH} ARCHIVE DESTINATION ${CMAKE_LIBRARY_PATH})
+
+set(XIL_LIB ${CMAKE_BINARY_DIR}/libxil.a)
+add_custom_target(combined ALL
+	COMMAND ${CMAKE_AR} -qcs ${XIL_LIB} ${OBJS}
+	COMMAND ${CMAKE_COMMAND} -E copy ${XIL_LIB} ${CMAKE_LIBRARY_PATH}
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	DEPENDS ${DRIVER_LIST})
+add_library(xil STATIC IMPORTED GLOBAL)
+add_dependencies(xil combined)
+set_target_properties(xil PROPERTIES IMPORTED_LOCATION ${XIL_LIB} LINKER_LANGUAGE C)
 install(DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION ${CMAKE_INCLUDE_PATH}/..)
 else()
 include_directories(${CMAKE_BINARY_DIR}/include)

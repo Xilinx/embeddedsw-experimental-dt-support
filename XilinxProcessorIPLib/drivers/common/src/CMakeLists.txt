@@ -1,9 +1,9 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 2.8.9)
-#include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 project(common)
 
+find_package(common)
 set(INTC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(SCUGIC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 find_package(INTC)
@@ -30,8 +30,5 @@ collect (PROJECT_LIB_SOURCES xinterrupt_wrap.c)
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
-if (NOT ${OS_ESW})
 add_library(common STATIC ${_sources})
 set_target_properties(common PROPERTIES LINKER_LANGUAGE C)
-#install(TARGETS common LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/build ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-endif()
