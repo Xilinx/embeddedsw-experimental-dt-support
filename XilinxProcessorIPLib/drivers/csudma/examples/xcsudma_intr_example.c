@@ -59,6 +59,7 @@
  */
 #ifndef SDT
 #define CSUDMA_DEVICE_ID  XPAR_XCSUDMA_0_DEVICE_ID /* CSU DMA device Id */
+#endif
 #ifdef XPAR_INTC_0_DEVICE_ID
 #define INTC		XIntc
 #define INTG_INTC_DEVICE_ID	XPAR_INTC_0_DEVICE_ID
