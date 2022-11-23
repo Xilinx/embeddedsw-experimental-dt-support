@@ -27,6 +27,7 @@ required:
     - compatible
     - reg
     - xlnx,enable-window-wdt
+    - xlnx,wdt-clk-freq-hz
     - interrupts: 4
     - interrupt-parent
 
