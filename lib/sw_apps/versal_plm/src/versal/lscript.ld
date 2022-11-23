@@ -185,6 +185,15 @@ SECTIONS
    __bss_end = .;
 } > tmr_ram_cntlr_Mem
 
+
+.drvcfg_sec : {
+    . = ALIGN(8);
+     __drvcfgsecdata_start = .;
+    KEEP (*(.drvcfg_sec))
+    __drvcfgsecdata_end = .;
+    __drvcfgsecdata_size = __drvcfgsecdata_end - __drvcfgsecdata_start;
+} > tmr_ram_cntlr_Mem
+
 _SDA_BASE_ = __sdata_start + ((__sbss_end - __sdata_start) / 2 );
 
 _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
