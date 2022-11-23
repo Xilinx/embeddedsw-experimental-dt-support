@@ -38,7 +38,9 @@ extern "C" {
 
 /***************************** Include Files *********************************/
 
+#ifndef SDT
 #include "xparameters.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 /* Message RAM related params */
