@@ -58,7 +58,7 @@ file(COPY ${CMAKE_BINARY_DIR}/include/lwipopts.h DESTINATION ${CMAKE_INCLUDE_PAT
 file(COPY ${CMAKE_BINARY_DIR}/include/xlwipconfig.h DESTINATION ${CMAKE_INCLUDE_PATH}/)
 endif()
 add_library(lwip211 STATIC ${_sources})
-target_include_directories(lwip211 PUBLIC ${LWIP_INCLUDE_DIRS})
+target_include_directories(lwip211 PUBLIC ${LWIP_INCLUDE_DIRS} "${LWIP_DIR}/src/include/lwip/")
 set_target_properties(lwip211 PROPERTIES LINKER_LANGUAGE C)
 get_headers(${_headers})
 set_target_properties(lwip211 PROPERTIES ADDITIONAL_CLEAN_FILES "${CMAKE_LIBRARY_PATH}/liblwip211.a;${CMAKE_INCLUDE_PATH}/lwipopts.h;${CMAKE_INCLUDE_PATH}/xlwipconfig.h;${clean_headers}")

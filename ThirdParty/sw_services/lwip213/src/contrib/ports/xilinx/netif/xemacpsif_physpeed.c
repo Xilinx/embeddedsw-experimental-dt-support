@@ -164,6 +164,7 @@ extern u32_t phymapemac[32];
 
 #if defined (CONFIG_LINKSPEED_AUTODETECT)
 static u32_t get_IEEE_phy_speed(XEmacPs *xemacpsp, u32_t phy_addr);
+#endif
 static void SetUpSLCRDivisors(UINTPTR mac_baseaddr, s32_t speed);
 static u32_t get_Xilinx_phy_speed(XEmacPs *xemacpsp, u32_t phy_addr);
 static int isgemphy_pcspma(XEmacPs *xemacpsp, u32 phy_addr);
@@ -241,7 +242,6 @@ void detect_phy(XEmacPs *xemacpsp)
 	u16 phy_id;
 	u32_t phy_addr;
 	u32_t emacnum;
-	u16_t phy_id;
 
 	for (phy_addr = 31; phy_addr > 0; phy_addr--) {
 		XEmacPs_PhyRead(xemacpsp, phy_addr, PHY_DETECT_REG,
