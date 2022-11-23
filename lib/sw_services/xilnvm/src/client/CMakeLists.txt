@@ -1,6 +1,0 @@
-collect (PROJECT_LIB_HEADERS xnvm_efuseclient.h)
-collect (PROJECT_LIB_SOURCES xnvm_efuseclient.c)
-collect (PROJECT_LIB_HEADERS xnvm_bbramclient.h)
-collect (PROJECT_LIB_SOURCES xnvm_bbramclient.c)
-collect (PROJECT_LIB_HEADERS xnvm_ipi.h)
-collect (PROJECT_LIB_SOURCES xnvm_ipi.c)

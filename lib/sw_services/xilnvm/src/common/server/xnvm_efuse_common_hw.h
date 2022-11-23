@@ -191,7 +191,11 @@ extern "C" {
 #define XNVM_EFUSE_PD_ENABLE				(0x01U << 0U)
 
 /**< PS Ref clock definition in Hz */
+#ifdef SDT
+#define XNVM_PS_REF_CLK_FREQ                    (33333000U)
+#else
 #define XNVM_PS_REF_CLK_FREQ			(XPAR_PSU_PSS_REF_CLK_FREQ_HZ)
+#endif
 
 /**< Number of Rows per Page */
 #define XNVM_NUM_OF_ROWS_PER_PAGE			(256U)

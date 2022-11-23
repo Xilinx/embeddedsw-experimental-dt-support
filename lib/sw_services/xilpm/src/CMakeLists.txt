@@ -11,6 +11,7 @@ include_directories(${CMAKE_BINARY_DIR}/include)
 
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
 add_subdirectory(versal)
+add_subdirectory(versal_common)
 else()
 add_subdirectory(zynqmp/client)
 endif()

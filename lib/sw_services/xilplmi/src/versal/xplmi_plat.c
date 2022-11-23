@@ -41,7 +41,11 @@
 #include "xcfupmc.h"
 #include "xplmi_gic_interrupts.h"
 #include "xplmi_plat.h"
+#ifndef SDT
 #include "microblaze_sleep.h"
+#else
+#include "sleep.h"
+#endif
 #include "xplmi_err_common.h"
 #include "xplmi_generic.h"
 

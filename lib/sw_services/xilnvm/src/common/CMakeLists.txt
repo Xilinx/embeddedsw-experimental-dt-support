@@ -1,1 +1,11 @@
-collect (PROJECT_LIB_HEADERS xnvm_defs.h)
+collect (PROJECT_LIB_HEADERS xnvm_common_defs.h)
+collect (PROJECT_LIB_HEADERS xnvm_efuse_error.h)
+collect (PROJECT_LIB_HEADERS xnvm_temp.h)
+collect (PROJECT_LIB_SOURCES xnvm_utils.c)
+collect (PROJECT_LIB_HEADERS xnvm_utils.h)
+if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze"))
+add_subdirectory(server)
+else()
+add_subdirectory(client)
+endif()

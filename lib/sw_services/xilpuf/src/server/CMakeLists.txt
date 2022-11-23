@@ -1,6 +1,8 @@
 collect (PROJECT_LIB_HEADERS xpuf.h)
 collect (PROJECT_LIB_HEADERS xpuf_hw.h)
 collect (PROJECT_LIB_SOURCES xpuf.c)
+collect (PROJECT_LIB_SOURCES xpuf_plat.c)
+collect (PROJECT_LIB_HEADERS xpuf_plat.h)
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblazeel") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze"))

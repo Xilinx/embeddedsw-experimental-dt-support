@@ -684,6 +684,7 @@ static inline void XPlmi_OutByte64(u64 Addr, u8 Data)
 #elif defined(XPAR_XIPIPSU_1_BASEADDR) && (XPAR_XIPIPSU_1_BASEADDR == XPLMI_IPI_BASEADDR)
 #define XPLMI_IPI_DEVICE_ID		XPAR_XIPIPSU_1_BASEADDR
 #endif
+#endif
 
 /*
  * Definition for QSPI to be included
