@@ -10,10 +10,15 @@ if ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexr5")
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/libxilsecure_r5.a ${CMAKE_BINARY_DIR}/libxilsecure.a)
 endif()
 
-if (${NON_YOCTO})
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/libxilsecure_pmc.a ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a)
-    #execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a) ${CMAKE_LIBRARY_PATH}/libxilsecure_pmc.a)
-    file(COPY ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a DESTINATION ${CMAKE_LIBRARY_PATH} FOLLOW_SYMLINK_CHAIN)
-
+if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblazeel") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
+   ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze"))
+    if (${NON_YOCTO})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/libxilsecure_pmc.a ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a)
+	file(COPY ${CMAKE_BINARY_DIR}/libxilsecure_pmc.a DESTINATION ${CMAKE_LIBRARY_PATH} FOLLOW_SYMLINK_CHAIN)
+    else()
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/libxilsecure_pmc.a ${CMAKE_BINARY_DIR}/libxilsecure.a)
+    endif()
 endif()
 
