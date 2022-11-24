@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.15)
 project(lib)
 
 foreach(lib ${LIB_LIST})
-	add_subdirectory("${CMAKE_LIBRARY_PATH}/../libsrc/${lib}/src" ${CMAKE_CURRENT_BINARY_DIR}/${lib})
+    set (lib_path "${CMAKE_LIBRARY_PATH}/../libsrc/${lib}/src")
+    if(EXISTS ${lib_path})
+        add_subdirectory("${lib_path}" ${CMAKE_CURRENT_BINARY_DIR}/${lib})
+    endif()
 endforeach()
 
