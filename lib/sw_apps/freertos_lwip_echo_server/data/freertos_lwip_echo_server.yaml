@@ -16,8 +16,14 @@ properties:
     description: Interrupt property of the controller
 
 depends_libs:
-    lwip211: {}
-    xiltimer: {}
+    lwip211:
+        lwip_api_mode: SOCKET_API
+        lwip_dhcp_does_arp_check: ON
+        lwip_dhcp: ON
+        lwip_ipv6_enable: OFF
+        lwip_pbuf_pool_size: 2048
+    xiltimer:
+        XILTIMER_en_interval_timer: ON
 
 supported_processors:
   - psu_cortexa53
