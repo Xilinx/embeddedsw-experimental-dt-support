@@ -29,6 +29,9 @@
 /***************************** Include Files *********************************/
 #include "xiltimer.h"
 #include "xpm_counter.h"
+#ifdef SDT
+#include "xcortexr5_config.h"
+#endif
 
 #if defined (ARMR52)
 #define LPD_RST_TIMESTAMP  0xEB5E035CU
