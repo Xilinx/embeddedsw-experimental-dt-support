@@ -22,18 +22,7 @@ supported_processors:
 supported_os:
   - standalone
 
-depends:
-    - emaclite
-    - axiethernet
-    - emacps
-    - tmrctr
-    - ttcps
-
 depends_libs:
-    - lwip211
-    - xiltimer
-
-lib_config:
     lwip211:
         - lwip_api_mode: RAW_API
         - lwip_dhcp_does_arp_check: ON
@@ -47,8 +36,9 @@ lib_config:
         - lwip_n_tx_descriptors: 512
         - lwip_tcp_snd_buf: 512
         - lwip_tcp_wnd: 512
+    xiltimer: {}
 
-required:
+depends:
     emaclite:
         - reg
         - interrupts
