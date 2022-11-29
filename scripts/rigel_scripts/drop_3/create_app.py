@@ -90,7 +90,7 @@ def create_app(args):
     # Create the cmake build dir for app and run cmake inside it.
     app_work_dir = os.path.join(obj.appdir, f"build")
     utils.mkdir(app_work_dir)
-    utils.runcmd(f"cmake {app_src_dir} {obj.cmake_paths_append} -DOS_ESW=ON", cwd=app_work_dir)
+    utils.runcmd(f"cmake {app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=app_work_dir)
 
     # Add domain path entry in the app configuration file.
     data = {"domain_path": obj.domain_path}

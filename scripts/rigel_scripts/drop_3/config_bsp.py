@@ -110,7 +110,7 @@ def configure_bsp(args):
 
         # configure the lib build area with new params
         build_lib = os.path.join(obj.libsrc_folder, f"build_configs/xillib")
-        utils.runcmd(f"cmake . {obj.cmake_paths_append} -DOS_ESW=ON {cmake_cmd_append}", cwd=build_lib)
+        utils.runcmd(f"cmake . {obj.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd=build_lib)
 
         # Update the lib config file
         utils.update_yaml(obj.domain_config_file, "domain", "lib_config", obj.bsp_lib_config)

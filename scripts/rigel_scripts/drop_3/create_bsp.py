@@ -239,7 +239,7 @@ def create_domain(args):
 
     # Copy cmake file that contains cmake utility APIs to a common location.
     utils.copy_file(
-        f"{bspsrc}/common.cmake",
+        f"{obj.repo}/cmake/Findcommon.cmake",
         os.path.join(obj.domain_dir, "Findcommon.cmake"),
         silent_discard=False,
     )

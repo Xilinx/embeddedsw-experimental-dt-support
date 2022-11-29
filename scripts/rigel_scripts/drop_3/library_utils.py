@@ -273,13 +273,13 @@ class Library(Repo):
 
                 # Run cmake configuration with all the default cache entries
                 utils.runcmd(
-                    f'cmake . {self.cmake_paths_append} -DOS_ESW=ON -DLIB_LIST="{cmake_lib_list}" -LH > cmake_lib_configs.txt',
+                    f'cmake . {self.cmake_paths_append} -DNON_YOCTO=ON -DLIB_LIST="{cmake_lib_list}" -LH > cmake_lib_configs.txt',
                     cwd = build_lib
                 )
                 # Get the default cmake entries into yaml configuration file
                 lib_config = self.get_default_lib_params(build_lib, lib_list)
                 # Re-run cmake with modified lib entries
-                utils.runcmd(f"cmake . {self.cmake_paths_append} -DOS_ESW=ON {cmake_cmd_append}", cwd = build_lib)
+                utils.runcmd(f"cmake . {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd = build_lib)
 
                 # Add the modified lib param values in yaml configuration dict
                 if schema.get("depends_libs", {}):

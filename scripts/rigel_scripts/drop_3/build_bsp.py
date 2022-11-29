@@ -55,7 +55,7 @@ class BSP:
             self.libsrc_folder, "build_configs/xilstandalone"
         )
         utils.mkdir(build_xilstandalone)
-        utils.runcmd(f"cmake {bspsrc} -DOS_ESW=ON {self.cmake_paths_append}", cwd=build_xilstandalone)
+        utils.runcmd(f"cmake {bspsrc} -DNON_YOCTO=ON {self.cmake_paths_append}", cwd=build_xilstandalone)
         utils.runcmd("make -j22", cwd=build_xilstandalone)
         utils.runcmd("make install", cwd=build_xilstandalone)
 
@@ -68,7 +68,7 @@ class BSP:
             self.libsrc_folder, "build_configs/xilfreertos"
         )
         utils.mkdir(build_xilfreertos)
-        utils.runcmd(f"cmake {bspsrc} -DOS_ESW=ON {self.cmake_paths_append}", cwd=build_xilfreertos)
+        utils.runcmd(f"cmake {bspsrc} -DNON_YOCTO=ON {self.cmake_paths_append}", cwd=build_xilfreertos)
         utils.runcmd("make -j22", cwd=build_xilfreertos)
         utils.runcmd("make install", cwd=build_xilfreertos)
 
@@ -78,7 +78,7 @@ class BSP:
         """
         build_libxil = os.path.join(self.libsrc_folder, "build_configs/libxil")
         utils.mkdir(build_libxil)
-        utils.runcmd(f"cmake {self.libsrc_folder} -DOS_ESW=ON {self.cmake_paths_append}", cwd=build_libxil)
+        utils.runcmd(f"cmake {self.libsrc_folder} -DNON_YOCTO=ON {self.cmake_paths_append}", cwd=build_libxil)
         utils.runcmd("make -j22", cwd=build_libxil)
         utils.runcmd("make install", cwd=build_libxil)
 
@@ -99,10 +99,10 @@ def generate_bsp(args):
     """
     obj = BSP(args)
     obj.gen_xilstandalone()
-    if obj.os == "freertos":
-        obj.gen_xilfreertos()
     obj.gen_libxil()
     obj.build_lib()
+    if obj.os == "freertos":
+        obj.gen_xilfreertos()
 
 
 if __name__ == "__main__":
