@@ -31,6 +31,7 @@
 #include "netif/xadapter.h"
 #include "platform_config.h"
 #include "xil_printf.h"
+#include "task.h"
 
 #if LWIP_IPV6==1
 #include "lwip/ip.h"

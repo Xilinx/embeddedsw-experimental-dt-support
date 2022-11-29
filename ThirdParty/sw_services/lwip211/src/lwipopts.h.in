@@ -12,7 +12,7 @@
 /* always use lightweight prot mechanism for critical regions */
 #define SYS_LIGHTWEIGHT_PROT 1
 
-#cmakedefine NO_SYS			@NO_SYS@
+#cmakedefine01 NO_SYS			@NO_SYS@
 #cmakedefine01 LWIP_SOCKET 		@LWIP_SOCKET@
 #cmakedefine01 LWIP_COMPAT_SOCKETS	@LWIP_COMPAT_SOCKETS@
 #cmakedefine01 LWIP_NETCONN		@LWIP_NETCONN@

@@ -29,6 +29,21 @@ depends:
     - tmrctr
     - ttcps
 
+depends_libs:
+    - lwip211
+    - xiltimer
+
+lib_config:
+    lwip211:
+        - lwip_api_mode: RAW_API
+        - lwip_dhcp_does_arp_check: ON
+        - lwip_dhcp: ON
+        - lwip_ipv6_enable: OFF
+        - lwip_pbuf_pool_size: 16384
+        - lwip_n_tx_descriptors: 512
+        - lwip_memp_n_pbuf: 1024
+        - lwip_mem_size: 524288
+
 required:
     emaclite:
         - reg

@@ -797,9 +797,15 @@ XStatus init_dma(struct xemac_s *xemac)
 				   (UINTPTR)bdtxterminate);
 	}
 #if !NO_SYS
+#ifndef SDT
 	xPortInstallInterruptHandler(xtopologyp->scugic_emac_intr,
 						( Xil_InterruptHandler ) XEmacPs_IntrHandler,
 						(void *)&xemacpsif->emacps);
+#else
+	xPortInstallInterruptHandler(xemacpsif->emacps.Config.IntrId,
+						( Xil_InterruptHandler ) XEmacPs_IntrHandler,
+						(void *)&xemacpsif->emacps);
+#endif
 #else
 #ifndef SDT
 	/*

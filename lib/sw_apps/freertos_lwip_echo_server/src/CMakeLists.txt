@@ -20,10 +20,14 @@ SET(SOURCES echo.c;main.c;iic_phyreset.c;)
 linker_gen("${CMAKE_SOURCE_DIR}/linker_files/")
 add_executable(freertos_lwip_echo_server.elf ${SOURCES})
 target_link_libraries(freertos_lwip_echo_server.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
-target_include_directories(freertos_lwip_echo_server.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
 if (${NON_YOCTO})
-   set (INCLUDE_DIRS
-       "${CMAKE_INCLUDE_PATH}/include/"
-       "${CMAKE_BINARY_DIR}/include")
-  target_include_directories(freertos_lwip_echo_server.elf PUBLIC ${INCLUDE_DIRS})
+    set(INCLUDE_DIRS
+        "${CMAKE_INCLUDE_PATH}/"
+        "${CMAKE_INCLUDE_PATH}/include/"
+        "${CMAKE_BINARY_DIR}/include")
+    message("include dirs")
+    message("${INCLUDE_DIRS}")
+    target_include_directories(freertos_lwip_echo_server.elf PUBLIC ${INCLUDE_DIRS})
+else()
+    target_include_directories(freertos_lwip_echo_server.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
 endif()

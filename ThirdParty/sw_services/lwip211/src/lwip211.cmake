@@ -101,7 +101,7 @@ option(lwip_sys_debug "Debug sys arch layer" OFF)
 option(lwip_pbuf_debug "Debug pbuf layer" OFF)
 
 if("${lwip_api_mode}" STREQUAL RAW_API)
-    set(NO_SYS 1)
+    set(NO_SYS " ")
 endif()
 
 if(${lwip_no_sys_no_timers})
