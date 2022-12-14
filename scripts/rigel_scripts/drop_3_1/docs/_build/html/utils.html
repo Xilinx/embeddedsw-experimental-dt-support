@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils module &mdash; Build Tool 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Build Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">utils module</a><ul>
+<li><a class="reference internal" href="#utils.add_newline"><code class="docutils literal notranslate"><span class="pre">add_newline()</span></code></a></li>
+<li><a class="reference internal" href="#utils.copy_directory"><code class="docutils literal notranslate"><span class="pre">copy_directory()</span></code></a></li>
+<li><a class="reference internal" href="#utils.copy_file"><code class="docutils literal notranslate"><span class="pre">copy_file()</span></code></a></li>
+<li><a class="reference internal" href="#utils.delete_keys_from_dict"><code class="docutils literal notranslate"><span class="pre">delete_keys_from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#utils.fetch_yaml_data"><code class="docutils literal notranslate"><span class="pre">fetch_yaml_data()</span></code></a></li>
+<li><a class="reference internal" href="#utils.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
+<li><a class="reference internal" href="#utils.find_files"><code class="docutils literal notranslate"><span class="pre">find_files()</span></code></a></li>
+<li><a class="reference internal" href="#utils.get_abs_path"><code class="docutils literal notranslate"><span class="pre">get_abs_path()</span></code></a></li>
+<li><a class="reference internal" href="#utils.get_base_name"><code class="docutils literal notranslate"><span class="pre">get_base_name()</span></code></a></li>
+<li><a class="reference internal" href="#utils.get_dir_path"><code class="docutils literal notranslate"><span class="pre">get_dir_path()</span></code></a></li>
+<li><a class="reference internal" href="#utils.get_original_path"><code class="docutils literal notranslate"><span class="pre">get_original_path()</span></code></a></li>
+<li><a class="reference internal" href="#utils.is_dir"><code class="docutils literal notranslate"><span class="pre">is_dir()</span></code></a></li>
+<li><a class="reference internal" href="#utils.is_file"><code class="docutils literal notranslate"><span class="pre">is_file()</span></code></a></li>
+<li><a class="reference internal" href="#utils.load_yaml"><code class="docutils literal notranslate"><span class="pre">load_yaml()</span></code></a></li>
+<li><a class="reference internal" href="#utils.mkdir"><code class="docutils literal notranslate"><span class="pre">mkdir()</span></code></a></li>
+<li><a class="reference internal" href="#utils.remove"><code class="docutils literal notranslate"><span class="pre">remove()</span></code></a></li>
+<li><a class="reference internal" href="#utils.remove_line"><code class="docutils literal notranslate"><span class="pre">remove_line()</span></code></a></li>
+<li><a class="reference internal" href="#utils.replace_line"><code class="docutils literal notranslate"><span class="pre">replace_line()</span></code></a></li>
+<li><a class="reference internal" href="#utils.reset"><code class="docutils literal notranslate"><span class="pre">reset()</span></code></a></li>
+<li><a class="reference internal" href="#utils.runcmd"><code class="docutils literal notranslate"><span class="pre">runcmd()</span></code></a></li>
+<li><a class="reference internal" href="#utils.update_yaml"><code class="docutils literal notranslate"><span class="pre">update_yaml()</span></code></a></li>
+<li><a class="reference internal" href="#utils.validate_if_exist"><code class="docutils literal notranslate"><span class="pre">validate_if_exist()</span></code></a></li>
+<li><a class="reference internal" href="#utils.validate_if_not_exist"><code class="docutils literal notranslate"><span class="pre">validate_if_not_exist()</span></code></a></li>
+<li><a class="reference internal" href="#utils.write_yaml"><code class="docutils literal notranslate"><span class="pre">write_yaml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Build Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">utils module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-utils">
+<span id="utils-module"></span><h1>utils module<a class="headerlink" href="#module-utils" title="Permalink to this heading"></a></h1>
+<p>This module acts as a supporting module for all the other modules. It 
+contains APIs for small use cases to avoid rewriting of code for those 
+generic requirements. It doesnt have any main() function and running 
+this module independently is not intended.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.add_newline">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">add_newline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">File</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.add_newline" title="Permalink to this definition"></a></dt>
+<dd><p>Add a new line at the end of the file.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">File: file path which needs to be modified.</div>
+<div class="line">newline: new line that needs to be added.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.copy_directory">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">copy_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symlinks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.copy_directory" title="Permalink to this definition"></a></dt>
+<dd><p>copies the directory from source to destination.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">src: source directory path</div>
+<div class="line">dest: destination directory path</div>
+<div class="line">symlinks: maintain the symlink while copying</div>
+<div class="line">ignore: provide list to ignore files/sub-dirs if any</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.copy_file">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">copy_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow_symlinks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent_discard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.copy_file" title="Permalink to this definition"></a></dt>
+<dd><p>copies the file from source to destination.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">src: source file path</div>
+<div class="line">dest: destination file path</div>
+<div class="line">follow_symlinks: maintain the symlink while copying</div>
+<div class="line">silent_discard: Dont raise exception if the source file doesnt exist </div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.delete_keys_from_dict">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">delete_keys_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#utils.delete_keys_from_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Delete keys from the dict. It can detect the key even inside the 
+hierarchical dict.</p>
+<dl>
+<dt>Args: </dt><dd><div class="line-block">
+<div class="line">dictionary : The dictionary to be processed</div>
+<div class="line">keys : The key name that needs to be searched and popped out</div>
+</div>
+</dd>
+<dt>Returns:</dt><dd><p>modified_dict : The new dict modified after popping the key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.fetch_yaml_data">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">fetch_yaml_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#utils.fetch_yaml_data" title="Permalink to this definition"></a></dt>
+<dd><p>Reads the data from a yaml configuration file, raises assertion if file
+doesn’t exist.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">config_file: The yaml configuration file path</div>
+<div class="line">dir_type: Being used for raising a meaningful assertion.</div>
+</div>
+</dd>
+<dt>Returns:</dt><dd><p>data: The read data from yaml file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.find_file">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">find_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.find_file" title="Permalink to this definition"></a></dt>
+<dd><p>This api find the file in sub-directories and returns absolute path of 
+file, if file exists</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">search_file: The regex pattern to be searched in file names</div>
+<div class="line">search_path: The directory that needs to be searched</div>
+</div>
+</dd>
+<dt>Returns:</dt><dd><p>string: Path of the first file that matches the pattern</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.find_files">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">find_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.find_files" title="Permalink to this definition"></a></dt>
+<dd><p>This api find the files matching regex directories and returns absolute
+path of files, if file exists</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">search_pattern: The regex pattern to be searched in file names</div>
+<div class="line">search_path: The directory that needs to be searched</div>
+</div>
+</dd>
+<dt>Returns:</dt><dd><p>string: All the file paths that matches the pattern in the searched path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.get_abs_path">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_abs_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.get_abs_path" title="Permalink to this definition"></a></dt>
+<dd><p>This api takes file path and returns it’s absolute path</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fpath: Path to get the absolute path from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>string: Absolute location of the passed path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.get_base_name">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_base_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.get_base_name" title="Permalink to this definition"></a></dt>
+<dd><p>This api takes rel path or full path and returns base name</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fpath: Path to get the base name from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>string: Base name of the path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.get_dir_path">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_dir_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.get_dir_path" title="Permalink to this definition"></a></dt>
+<dd><p>This api takes file path and returns it’s directory path</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fpath: Path to get the directory path from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>string: Full Directory path of the passed path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.get_original_path">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_original_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.get_original_path" title="Permalink to this definition"></a></dt>
+<dd><p>This api takes file path and returns it’s original path. It is equivalent
+to readlink</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fpath: Path to get the original path from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>string: original location of the passed path (after resolving softlink if any)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.is_dir">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">is_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent_discard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#utils.is_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if directory exists.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dirpath: Directory Path.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError (Exception): Raises exception if directory not found.</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True, if directory is found Or False, if directory is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.is_file">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">is_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent_discard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#utils.is_file" title="Permalink to this definition"></a></dt>
+<dd><p>Return True if the file exists Else returns False and raises Not Found Error Message.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filepath: File Path.</p>
+</dd>
+<dt>Raises:</dt><dd><p>FileNotFoundError: Raises exception if file not found.</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True, if file is found Or False, if file is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.load_yaml">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">load_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#utils.load_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Read yaml file data and returns data in a dict format.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filepath: Path of the yaml file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Return Python dict if the file reading is successful.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.mkdir">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">mkdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folderpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent_discard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.mkdir" title="Permalink to this definition"></a></dt>
+<dd><p>Create the folder structure, raises Error Message on demand.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>folderpath: Path of the folder structure.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.remove">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent_discard</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.remove" title="Permalink to this definition"></a></dt>
+<dd><p>Removes any file or folder recursively, if it exists else reports error message based on user demand.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>path: Directory or file path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.remove_line">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">remove_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">File</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.remove_line" title="Permalink to this definition"></a></dt>
+<dd><p>Remove the lines that match the passed pattern</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">File: file path which needs to be modified.</div>
+<div class="line">match_string: the string that needs to be searched in the line.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.replace_line">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">replace_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">File</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.replace_line" title="Permalink to this definition"></a></dt>
+<dd><p>Replace an existing line that matches the passed string with a new line</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">File: file path which needs to be modified.</div>
+<div class="line">search_string: the string that needs to be searched in the line.</div>
+<div class="line">add_line: New line that needs to be put in.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.reset">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Delete the passed path and then recreate it.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>path: Path that needs to be reset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.runcmd">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">runcmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#utils.runcmd" title="Permalink to this definition"></a></dt>
+<dd><p>Run the shell commands.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">cmd: shell command that needs to be called</div>
+<div class="line">logfile: file to save the command output if required</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.update_yaml">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">update_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'add'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.update_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Update the already created yaml file. Supports the add and remove option
+to add any new data or remove the existing data in the yaml. Raises assertion
+if the yaml doesnt exist.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">filepath: the yaml path</div>
+<div class="line">dir_type: to raise a meaningful assertion</div>
+<div class="line">key: Key that needs to be manipulated.</div>
+<div class="line">data: The new data that needs to be updated in yaml in ‘add’ use case.</div>
+<div class="line">action: ‘add’/’remove’</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.validate_if_exist">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">validate_if_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.validate_if_exist" title="Permalink to this definition"></a></dt>
+<dd><p>Raise valid assertion when a file already exists</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">config_file : File Path that needs to be checked</div>
+<div class="line">dir_type, dir_name: Being used for raising a meaningful assertion.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.validate_if_not_exist">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">validate_if_not_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.validate_if_not_exist" title="Permalink to this definition"></a></dt>
+<dd><p>Raise valid assertion when a file doesnt exist</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">config_file : File Path that needs to be checked</div>
+<div class="line">dir_type, dir_name: Being used for raising a meaningful assertion.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.write_yaml">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">write_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utils.write_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Write the data into a yaml file format</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">filepath: the yaml file path</div>
+<div class="line">data: the data</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Onkar Harsh / Appana Durga Kedareswara Rao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
