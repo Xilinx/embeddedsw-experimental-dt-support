@@ -10,8 +10,6 @@ maintainers:
 description: Xilinx Versal Platform Loader Library.
 
 supported_processors:
-  - psu_pmc
-  - psu_psm
   - psv_pmc
   - psv_psm
 

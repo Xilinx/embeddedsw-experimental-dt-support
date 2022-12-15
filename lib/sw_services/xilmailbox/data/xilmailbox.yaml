@@ -7,7 +7,7 @@ title: Bindings for xilmailbox library application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
-description: Xilinx Versal Platform Loader Library.
+description: Xilinx IPI Mailbox Library.
 
 properties:
   reg:
@@ -29,9 +29,6 @@ supported_os:
   - freertos10_xilinx
 
 depends:
-    - ipipsu
-
-required:
     ipipsu:
         - reg
         - xlnx,ipi-bitmask

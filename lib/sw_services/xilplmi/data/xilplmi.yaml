@@ -7,6 +7,8 @@ title: Bindings for xilplmi library
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+description: Xilinx Versal Platform Loader and Manager Interface Library.
+
 supported_processors:
   - psv_pmc
 

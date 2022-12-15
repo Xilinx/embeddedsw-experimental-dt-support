@@ -13,6 +13,7 @@ description: |-
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5
+  - psu_pmu
   - psv_cortexa72
   - psv_cortexr5
 

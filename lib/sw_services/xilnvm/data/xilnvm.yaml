@@ -10,10 +10,9 @@ maintainers:
 description: Xilinx NVM Library provides interface to accessing eFUSE and BBRAM of Versal.
 
 supported_processors:
-  - psu_pmc
-  - psu_psm
+  - psv_cortexa72
+  - psv_cortexr5
   - psv_pmc
-  - psv_psm
 
 supported_os:
   - standalone
