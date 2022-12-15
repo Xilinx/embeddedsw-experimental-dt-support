@@ -19,7 +19,7 @@ class BSP:
 
     def __init__(self, args):
         self.domain_path = utils.get_abs_path(args.get("domain_path"))
-        self.domain_config_file = os.path.join(self.domain_path, ".domain.yaml")
+        self.domain_config_file = os.path.join(self.domain_path, "bsp.yaml")
         utils.validate_if_not_exist(
             self.domain_config_file, "domain", utils.get_base_name(self.domain_path)
         )

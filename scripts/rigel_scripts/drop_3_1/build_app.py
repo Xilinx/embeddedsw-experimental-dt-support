@@ -39,7 +39,7 @@ if __name__ == "__main__":
         app_build_dir = os.path.join(app_dir, "build")
 
     # Read the config file that maintains app specific data
-    app_config_file = os.path.join(app_build_dir, ".app.yaml")
+    app_config_file = os.path.join(app_build_dir, "app.yaml")
     utils.validate_if_not_exist(app_config_file, "app", app_build_dir)
     args["domain_path"] = utils.fetch_yaml_data(app_config_file, "app")["domain_path"]
 

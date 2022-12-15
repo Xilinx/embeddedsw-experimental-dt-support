@@ -28,7 +28,7 @@ class Library(Repo):
         self.proc = proc
         self.os = bsp_os
         self.sdt = sdt
-        self.domain_config_file = os.path.join(self.domain_path, ".domain.yaml")
+        self.domain_config_file = os.path.join(self.domain_path, "bsp.yaml")
         self.cmake_paths_append = cmake_paths_append
         self.libsrc_folder = libsrc_folder
         self.bsp_lib_config = utils.fetch_yaml_data(self.domain_config_file, "domain")[
@@ -243,7 +243,7 @@ class Library(Repo):
                     f"lopper -O {dstdir} {self.sdt} -- bmcmake_metadata_xlnx {self.proc} {srcdir} hwcmake_metadata {self.repo}"
                 )
             # If the passed template/lib has any lib dependency, add those dependencies.
-            if schema.get("depends_libs", {}):
+            if schema.get("depends_libs", {}) and is_app:
                 for name, props in schema["depends_libs"].items():
                     cmake_lib_list += f"{name};"
                     lib_list += [name]

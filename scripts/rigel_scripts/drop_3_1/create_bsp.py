@@ -37,7 +37,7 @@ class Domain(Repo):
         self.include_folder = os.path.join(self.domain_dir, "include")
         self.lib_folder = os.path.join(self.domain_dir, "lib")
         self.libsrc_folder = os.path.join(self.domain_dir, "libsrc")
-        self.domain_config_file = os.path.join(self.domain_dir, ".domain.yaml")
+        self.domain_config_file = os.path.join(self.domain_dir, "bsp.yaml")
         utils.mkdir(self.domain_dir)
         self._validate_inputs()
 
@@ -83,7 +83,7 @@ class Domain(Repo):
                 )
             avail_cpu_data = utils.fetch_yaml_data(cpu_list_file, "cpulist")
             if self.proc not in avail_cpu_data.keys():
-                utils.remove(self.proc_dir)
+                utils.remove(self.domain_dir)
                 print(
                     f"[ERROR]: Please pass a valid processor name. Valid Processor Names for the given SDT are: {list(avail_cpu_data.keys())}"
                 )

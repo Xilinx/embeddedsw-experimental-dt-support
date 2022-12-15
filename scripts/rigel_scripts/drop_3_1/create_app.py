@@ -48,7 +48,7 @@ class App(BSP, Repo):
         utils.mkdir(self.app_src_dir)
         # App directory needs to have its own yaml configuration
         # (for compiler flags, linker flags etc.)
-        self.app_config_file = os.path.join(self.app_build_dir, ".app.yaml")
+        self.app_config_file = os.path.join(self.app_build_dir, "app.yaml")
 
 
 def create_app(args):

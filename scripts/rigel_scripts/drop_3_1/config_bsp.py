@@ -62,7 +62,7 @@ def configure_bsp(args):
         lib_build_dir = os.path.join(base_lib_build_dir, obj.rmlib)
 
         # Run make clean to remove the respective headers and .a from lib and include folder.
-        utils.runcmd("make clean", cwd=base_lib_build_dir)
+        utils.runcmd(f"make -C {obj.rmlib} clean >/dev/null", cwd=base_lib_build_dir)
         # Remove library src folder from libsrc
         utils.remove(lib_path)
         # Remove cmake build folder from cmake build area.
