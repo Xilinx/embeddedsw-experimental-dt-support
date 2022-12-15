@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>build_bsp module &mdash; Build Tool 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Build Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">build_bsp module</a><ul>
+<li><a class="reference internal" href="#build_bsp.BSP"><code class="docutils literal notranslate"><span class="pre">BSP</span></code></a><ul>
+<li><a class="reference internal" href="#build_bsp.BSP.build_lib"><code class="docutils literal notranslate"><span class="pre">BSP.build_lib()</span></code></a></li>
+<li><a class="reference internal" href="#build_bsp.BSP.gen_libxil"><code class="docutils literal notranslate"><span class="pre">BSP.gen_libxil()</span></code></a></li>
+<li><a class="reference internal" href="#build_bsp.BSP.gen_xilfreertos"><code class="docutils literal notranslate"><span class="pre">BSP.gen_xilfreertos()</span></code></a></li>
+<li><a class="reference internal" href="#build_bsp.BSP.gen_xilstandalone"><code class="docutils literal notranslate"><span class="pre">BSP.gen_xilstandalone()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#build_bsp.generate_bsp"><code class="docutils literal notranslate"><span class="pre">generate_bsp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Build Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">build_bsp module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/build_bsp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-build_bsp">
+<span id="build-bsp-module"></span><h1>build_bsp module<a class="headerlink" href="#module-build_bsp" title="Permalink to this heading"></a></h1>
+<p>This module builds archive files (.a) for the created bsp. These archive files
+include os, driver and library related archives.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="build_bsp.BSP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">build_bsp.</span></span><span class="sig-name descname"><span class="pre">BSP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#build_bsp.BSP" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class contains attributes and functions to build the created bsp.
+It takes the domain path as input, reads the domain configuration file
+present in the path to get the required inputs, calls make command 
+inside all the cmake build area and builds the archive (.a) files for 
+baremetal.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="build_bsp.BSP.build_lib">
+<span class="sig-name descname"><span class="pre">build_lib</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#build_bsp.BSP.build_lib" title="Permalink to this definition"></a></dt>
+<dd><p>Compiles all the library source files added in the bsp and generates 
+corresponding .a file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="build_bsp.BSP.gen_libxil">
+<span class="sig-name descname"><span class="pre">gen_libxil</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#build_bsp.BSP.gen_libxil" title="Permalink to this definition"></a></dt>
+<dd><p>Compiles all the driver source files and generates libxil.a</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="build_bsp.BSP.gen_xilfreertos">
+<span class="sig-name descname"><span class="pre">gen_xilfreertos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#build_bsp.BSP.gen_xilfreertos" title="Permalink to this definition"></a></dt>
+<dd><p>Compiles the files of freertos bsp folder and generates xilfreertos.a</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="build_bsp.BSP.gen_xilstandalone">
+<span class="sig-name descname"><span class="pre">gen_xilstandalone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#build_bsp.BSP.gen_xilstandalone" title="Permalink to this definition"></a></dt>
+<dd><p>Compiles the files of standalone bsp folder and generates xilstandalone.a</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="build_bsp.generate_bsp">
+<span class="sig-prename descclassname"><span class="pre">build_bsp.</span></span><span class="sig-name descname"><span class="pre">generate_bsp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#build_bsp.generate_bsp" title="Permalink to this definition"></a></dt>
+<dd><p>Function to compile the created bsp for the user input domain path.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Onkar Harsh / Appana Durga Kedareswara Rao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

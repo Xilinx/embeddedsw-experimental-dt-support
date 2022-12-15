@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>validate_bsp module &mdash; Build Tool 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Build Tool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">validate_bsp module</a><ul>
+<li><a class="reference internal" href="#validate_bsp.Validation"><code class="docutils literal notranslate"><span class="pre">Validation</span></code></a><ul>
+<li><a class="reference internal" href="#validate_bsp.Validation.get_valid_template_list"><code class="docutils literal notranslate"><span class="pre">Validation.get_valid_template_list()</span></code></a></li>
+<li><a class="reference internal" href="#validate_bsp.Validation.validate_template_for_bsp"><code class="docutils literal notranslate"><span class="pre">Validation.validate_template_for_bsp()</span></code></a></li>
+<li><a class="reference internal" href="#validate_bsp.Validation.validate_template_name"><code class="docutils literal notranslate"><span class="pre">Validation.validate_template_name()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Build Tool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">validate_bsp module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/validate_bsp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-validate_bsp">
+<span id="validate-bsp-module"></span><h1>validate_bsp module<a class="headerlink" href="#module-validate_bsp" title="Permalink to this heading"></a></h1>
+<p>This module facilitates the validation of a created BSP with respect to a
+template application.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="validate_bsp.Validation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">validate_bsp.</span></span><span class="sig-name descname"><span class="pre">Validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#validate_bsp.Validation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="build_bsp.html#build_bsp.BSP" title="build_bsp.BSP"><code class="xref py py-class docutils literal notranslate"><span class="pre">BSP</span></code></a>, <a class="reference internal" href="repo.html#repo.Repo" title="repo.Repo"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repo</span></code></a></p>
+<p>This class contains attributes and functions to validate the given bsp 
+w.r.t. the user input template application. This inherits BSP class to
+inherit all the domain specific data and Repo class to get the 
+embeddedsw related paths.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="validate_bsp.Validation.get_valid_template_list">
+<span class="sig-name descname"><span class="pre">get_valid_template_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#validate_bsp.Validation.get_valid_template_list" title="Permalink to this definition"></a></dt>
+<dd><p>This function provides the list of templates that can built using the
+passed bsp.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="validate_bsp.Validation.validate_template_for_bsp">
+<span class="sig-name descname"><span class="pre">validate_template_for_bsp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#validate_bsp.Validation.validate_template_for_bsp" title="Permalink to this definition"></a></dt>
+<dd><p>This fucntion validates the library dependency of the passed template
+within the bsp. If the required libs are not available in the bsp, it
+throws the suitable assertion.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="validate_bsp.Validation.validate_template_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_template_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domaindir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proc_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsp_os</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#validate_bsp.Validation.validate_template_name" title="Permalink to this definition"></a></dt>
+<dd><p>This function verifies the template name passed by the user. It checks
+if the name is valid for the given os and proc combination. If not,
+it raises the suitable assertion. This is being used during domain
+creation as well (when domain needs to be created for a particular
+template). Hence, a static function in nature.</p>
+<dl>
+<dt>Args:</dt><dd><div class="line-block">
+<div class="line">domaindir (str): domain path that contains all the domain specific data</div>
+<div class="line">proc_data (dict): App specific data read during initialization</div>
+<div class="line">bsp_os (str): os used during domain creation</div>
+<div class="line">app (str): template name to be validated</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Onkar Harsh / Appana Durga Kedareswara Rao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
