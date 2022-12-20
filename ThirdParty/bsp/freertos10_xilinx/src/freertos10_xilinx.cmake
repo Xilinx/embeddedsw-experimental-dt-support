@@ -5,140 +5,140 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos10_xilinxExample.cmake * NO_POLICY_S
 
 find_package(common)
 #kernel behavior settings
-set(max_api_call_interrupt_priority 18 CACHE STRING "The maximum interrupt \
+set(freertos_max_api_call_interrupt_priority 18 CACHE STRING "The maximum interrupt \
 priority from which interrupt safe FreeRTOS API calls can be made.")
-option(use_preemption "The maximum interrupt priority from which interrupt \
+option(freertos_use_preemption "The maximum interrupt priority from which interrupt \
 safe FreeRTOS API calls can be made." ON)
-set(tick_rate 100 CACHE STRING "Number of RTOS ticks per sec")
-option(idle_yield "Set to true if the Idle task should yield if another \
+set(freertos_tick_rate 100 CACHE STRING "Number of RTOS ticks per sec")
+option(freertos_idle_yield "Set to true if the Idle task should yield if another \
 idle priority task is able to run, or false if the idle task should \
 always use its entire time slice unless it is preempted." ON)
-set(max_priorities 8 CACHE STRING "The number of task priorities that \
+set(freertos_max_priorities 8 CACHE STRING "The number of task priorities that \
 will be available.  Priorities can be assigned from \
-zero to (max_priorities - 1")
-set(minimal_stack_size 200 CACHE STRING "The size of the stack allocated \
+zero to (freertos_max_priorities - 1")
+set(freertos_minimal_stack_size 200 CACHE STRING "The size of the stack allocated \
 to the Idle task. Also used by standard demo and test tasks found in \
 the main FreeRTOS download.")
-set(total_heap_size 65536 CACHE STRING "Sets the amount of RAM reserved \
+set(freertos_total_heap_size 65536 CACHE STRING "Sets the amount of RAM reserved \
 for use by FreeRTOS - used when tasks, queues, semaphores and \
 event groups are created.")
-set(max_task_name 10 CACHE STRING "The maximum number of characters \
+set(freertos_max_task_name 10 CACHE STRING "The maximum number of characters \
 that can be in the name of a task.")
-option(use_timeslicing "When true equal priority ready tasks will share \
+option(freertos_use_timeslicing "When true equal priority ready tasks will share \
 CPU time with a context switch on each tick interrupt." ON)
-option(use_port_optimized_task_selection "When true task selection will \
+option(freertos_use_port_optimized_task_selection "When true task selection will \
 be faster at the cost of limiting the maximum number \
 of unique priorities to 32." ON)
 
 
 #kernel feature settings
-option(stream_buffer "Set to true to include stream buffer functionality, \
+option(freertos_stream_buffer "Set to true to include stream buffer functionality, \
 or false to exclude stream buffer functionality." OFF)
-option(message_buffer "Set to true to include message buffer functionality, \
+option(freertos_message_buffer "Set to true to include message buffer functionality, \
 or false to exclude message buffer functionality." OFF)
-option(support_static_allocation "Set to true to allocate memory statically, \
+option(freertos_support_static_allocation "Set to true to allocate memory statically, \
 or false to allocate memory dynamically." OFF)
-option(use_freertos_asserts "Defines configASSERT() to assist \
+option(freertos_use_freertos_asserts "Defines configASSERT() to assist \
 development and debugging.  The application can override the \
 default implementation of \
 vApplicationAssert( char *pcFile, uint32_t ulLine )" ON)
-option(use_mutexes "Set to true to include mutex functionality, \
+option(freertos_use_mutexes "Set to true to include mutex functionality, \
 or false to exclude mutex functionality." ON)
-option(use_getmutex_holder "Set to true to use mutex \
+option(freertos_use_getmutex_holder "Set to true to use mutex \
 xSemaphoreGetMutexHolder API, or false to exclude it." ON)
-option(use_recursive_mutexes "Set to true to include recursive mutex \
+option(freertos_use_recursive_mutexes "Set to true to include recursive mutex \
 functionality, or false to exclude recursive mutex functionality." ON)
-option(use_counting_semaphores "Set to true to include counting semaphore \
+option(freertos_use_counting_semaphores "Set to true to include counting semaphore \
 functionality, or false to exclude recursive mutex functionality." ON)
-set(queue_registry_size 10 CACHE STRING "The maximum number of queues \
+set(freertos_queue_registry_size 10 CACHE STRING "The maximum number of queues \
 that can be registered at any one time. Only registered queues can be viewed \
 in the Eclipse/GDB kernel aware debugger plug-in.")
-option(use_trace_facility "Set to true to include the legacy trace \
+option(freertos_use_trace_facility "Set to true to include the legacy trace \
 functionality, and a few other features.  \
 traceMACROS are the preferred method of tracing now." ON)
-option(use_newlib_reent "When true each task will have its own Newlib \
+option(freertos_use_newlib_reent "When true each task will have its own Newlib \
 reent structure." OFF)
-option(use_queue_sets "Set to true to include queue set functionality." ON)
-option(use_task_notifications "Set to true to include direct to \
+option(freertos_use_queue_sets "Set to true to include queue set functionality." ON)
+option(freertos_use_task_notifications "Set to true to include direct to \
 task notification functionality." ON)
-set(check_for_stack_overflow 2 CACHE STRING "Set to 0 for no overflow checking. \ 
+set(freertos_check_for_stack_overflow 2 CACHE STRING "Set to 0 for no overflow checking. \ 
 Set to 1 to include basic run time task stack checking.  \
 Set to 2 to include more comprehensive run time task stack checking.")
-set_property(CACHE check_for_stack_overflow PROPERTY STRINGS 0x0 0x1 0x2)
-option(use_stats_formatting_functions "Set to 1 to include the vTaskList() \
+set_property(CACHE freertos_check_for_stack_overflow PROPERTY STRINGS 0x0 0x1 0x2)
+option(freertos_use_stats_formatting_functions "Set to 1 to include the vTaskList() \
 and vTaskGetRunTimeStats() functions, which format run-time data \
 into human readable text." ON)
-set(num_thread_local_storage_pointers 0x0 CACHE STRING "Sets the number \
+set(freertos_num_thread_local_storage_pointers 0x0 CACHE STRING "Sets the number \
 of pointers each task has to store thread local values.")
-set(use_task_fpu_support 0x1 CACHE STRING "Set to 1 to create tasks \
+set(freertos_use_task_fpu_support 0x1 CACHE STRING "Set to 1 to create tasks \
 without FPU context, set to 2 to have tasks with FPU context by default.")
-set_property(CACHE use_task_fpu_support PROPERTY STRINGS 0x0 0x1 0x2)
-set(generate_runtime_stats 0x0 CACHE STRING "Set to 1 generate \
+set_property(CACHE freertos_use_task_fpu_support PROPERTY STRINGS 0x0 0x1 0x2)
+set(freertos_generate_runtime_stats 0x0 CACHE STRING "Set to 1 generate \
 runtime stats for tasks.")
-set_property(CACHE generate_runtime_stats PROPERTY STRINGS 0x0 0x1)
+set_property(CACHE freertos_generate_runtime_stats PROPERTY STRINGS 0x0 0x1)
 
 #hook function settings
-option(use_idle_hook "Set to true for the kernel to call \
+option(freertos_use_idle_hook "Set to true for the kernel to call \
 vApplicationIdleHook() on each iteration of the idle task.  \
 The application must provide an implementation of vApplicationIdleHook()." OFF)
-option(use_tick_hook "Set to true for the kernel to call \
+option(freertos_use_tick_hook "Set to true for the kernel to call \
 vApplicationTickHook() during each tick interrupt.  
 The application must provide an implementation of vApplicationTickHook()." OFF)
-option(use_malloc_failed_hook "Only used if a FreeRTOS memory manager \
+option(freertos_use_malloc_failed_hook "Only used if a FreeRTOS memory manager \
 (heap_n.c) is included in the project.  Set to true for the kernel to call \
 vApplicationMallocFailedHookHook() if there is insufficient FreeRTOS \
 heap available for a task, queue or semaphore to be created.  \
 The application can override the default implementation of \
 vApplicationMallocFailedHook()." ON)
-option(use_daemon_task_startup_hook "Set true for kernel to call \
+option(freertos_use_daemon_task_startup_hook "Set true for kernel to call \
 vApplicationDaemonTaskStartupHook on first iteration of RTOS daemon task. \
 The application must provide an implementation of 
 vApplicationDaemonTaskStartupHook()." OFF)
 
 #software timer settings
-option(use_timers "Set to true to include software timer functionality, \
+option(freertos_use_timers "Set to true to include software timer functionality, \
 or false to exclude software timer functionality" ON)
-set(timer_task_prio_val configMAX_PRIORITIES-1)
-set(timer_task_priority ${timer_task_prio_val} CACHE STRING "The priority \
+set(freertos_timer_task_prio_val configMAX_PRIORITIES-1)
+set(freertos_timer_task_priority ${freertos_timer_task_prio_val} CACHE STRING "The priority \
 at which the software timer service/daemon task will execute.")
-set(timer_command_queue_length 10 CACHE STRING "The number of commands \
+set(freertos_timer_command_queue_length 10 CACHE STRING "The number of commands \
 the timer command queue can hold at any one time.")
-set(timer_task_stack_depth_val configMINIMAL_STACK_SIZE)
-set(timer_task_stack_depth ${timer_task_stack_depth_val} CACHE STRING "The \
+set(freertos_timer_task_stack_depth_val configMINIMAL_STACK_SIZE)
+set(freertos_timer_task_stack_depth ${freertos_timer_task_stack_depth_val} CACHE STRING "The \
 size of the stack allocated to the timer service/daemon task.")
 
 
 #tick setup settings
-set(timer_select psu_ttc_0 CACHE STRING "Applicable only for R5. \
+set(freertos_timer_select psu_ttc_0 CACHE STRING "Applicable only for R5. \
 Selects the ttc module from which a counter will be used as the \
 freertos tick source.")
-set_property(CACHE timer_select PROPERTY STRINGS 
+set_property(CACHE freertos_timer_select PROPERTY STRINGS 
             ${TTCPS_NUM_DRIVER_INSTANCES})
-set(timer_select_counter 0x0 CACHE STRING "Applicable only for R5. \
+set(freertos_timer_select_counter 0x0 CACHE STRING "Applicable only for R5. \
 Selects the ttc counter number inside the selected ttc module \
 to be used as the freertos tick source.")
-set_property(CACHE timer_select_counter PROPERTY STRINGS 0x0 0x1 0x2 0x3)
+set_property(CACHE freertos_timer_select_counter PROPERTY STRINGS 0x0 0x1 0x2 0x3)
 
 #enable stm trace event settings
 #option(enable_timer_tick_trace "Enable tracing of timer tick events" OFF)
 #set(stm_channel 0x0 CACHE STRING "STM channel to use for trace. Valid channels are 0-65535.")
 
 
-set(configMAX_API_CALL_INTERRUPT_PRIORITY ${max_api_call_interrupt_priority})
-set(configTICK_RATE_HZ ${tick_rate})
-set(configMAX_PRIORITIES ${max_priorities})
-math(EXPR minimal_stack_size "((${minimal_stack_size} + 3) & 4294967292)")
-set(configMINIMAL_STACK_SIZE ${minimal_stack_size})
-set(configTOTAL_HEAP_SIZE ${total_heap_size})
-set(configMAX_TASK_NAME_LEN ${max_task_name})
-set(configQUEUE_REGISTRY_SIZE ${queue_registry_size})
-set(configCHECK_FOR_STACK_OVERFLOW ${check_for_stack_overflow})
+set(configMAX_API_CALL_INTERRUPT_PRIORITY ${freertos_max_api_call_interrupt_priority})
+set(configTICK_RATE_HZ ${freertos_tick_rate})
+set(configMAX_PRIORITIES ${freertos_max_priorities})
+math(EXPR freertos_minimal_stack_size "((${freertos_minimal_stack_size} + 3) & 4294967292)")
+set(configMINIMAL_STACK_SIZE ${freertos_minimal_stack_size})
+set(configTOTAL_HEAP_SIZE ${freertos_total_heap_size})
+set(configMAX_TASK_NAME_LEN ${freertos_max_task_name})
+set(configQUEUE_REGISTRY_SIZE ${freertos_queue_registry_size})
+set(configCHECK_FOR_STACK_OVERFLOW ${freertos_check_for_stack_overflow})
 set(configNUM_THREAD_LOCAL_STORAGE_POINTERS 
-                          ${num_thread_local_storage_pointers})
-set(configUSE_TASK_FPU_SUPPORT ${use_task_fpu_support})
-set(configTIMER_TASK_PRIORITY ${timer_task_priority})
-set(configGENERATE_RUN_TIME_STATS ${generate_runtime_stats})
-if("${generate_runtime_stats}" EQUAL 1)
+                          ${freertos_num_thread_local_storage_pointers})
+set(configUSE_TASK_FPU_SUPPORT ${freertos_use_task_fpu_support})
+set(configTIMER_TASK_PRIORITY ${freertos_timer_task_priority})
+set(configGENERATE_RUN_TIME_STATS ${freertos_generate_runtime_stats})
+if("${freertos_generate_runtime_stats}" EQUAL 1)
     if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze")
         set(PRINT_GEN_STATS_LINE1 "#ifndef __ASSEMBLER__\n")
         set(PRINT_GEN_STATS_LINE2 
@@ -176,8 +176,8 @@ else()
                 "#define portGET_RUN_TIME_COUNTER_VALUE()")
 endif()
 		
-set(configTIMER_QUEUE_LENGTH ${timer_command_queue_length})
-set(configTIMER_TASK_STACK_DEPTH ${timer_task_stack_depth})
+set(configTIMER_QUEUE_LENGTH ${freertos_timer_command_queue_length})
+set(configTIMER_TASK_STACK_DEPTH ${freertos_timer_task_stack_depth})
 #set(FREERTOS_STM_CHAN ${stm_channel})
 set(configUNIQUE_INTERRUPT_PRIORITIES "")
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53") OR 
@@ -229,71 +229,71 @@ endif()
 set(configMESSAGE_BUFFER_LENGTH_TYPE uint32_t)
 set(configSTACK_DEPTH_TYPE uint32_t)
 
-if (${use_preemption})
+if (${freertos_use_preemption})
     set(configUSE_PREEMPTION " ")
 endif()
-if (${idle_yield})
+if (${freertos_idle_yield})
     set(configIDLE_SHOULD_YIELD " ")
 endif()
-if (${use_timeslicing})
+if (${freertos_use_timeslicing})
     set(configUSE_TIME_SLICING " ")
 endif()
-if (${use_port_optimized_task_selection})
+if (${freertos_use_port_optimized_task_selection})
     set(configUSE_PORT_OPTIMIZED_TASK_SELECTION " ")
 endif()
-if (${stream_buffer})
+if (${freertos_stream_buffer})
     set(configSTREAM_BUFFER " ")
 endif()
-if (${message_buffer})
+if (${freertos_message_buffer})
     set(configMESSAGE_BUFFER " ")
 endif()
-if (${support_static_allocation})
+if (${freertos_support_static_allocation})
     set(configSUPPORT_STATIC_ALLOCATION " ")
 endif()
-if (${use_freertos_asserts})
+if (${freertos_use_freertos_asserts})
     set(FREERTOS_ASSERTS "#define configASSERT( x ) \
 if( ( x ) == 0 ) vApplicationAssert( __FILE__, __LINE__ )")	
 endif()
-if (${use_mutexes}) 
+if (${freertos_use_mutexes}) 
     set(configUSE_MUTEXES " ")
 endif()
-if (${use_getmutex_holder}) 
+if (${freertos_use_getmutex_holder}) 
     set(INCLUDE_xSemaphoreGetMutexHolder " ")
 endif()
-if (${use_recursive_mutexes}) 
+if (${freertos_use_recursive_mutexes}) 
     set(configUSE_RECURSIVE_MUTEXES " ")
 endif()
-if (${use_counting_semaphores}) 
+if (${freertos_use_counting_semaphores}) 
     set(configUSE_COUNTING_SEMAPHORES " ")
 endif()
-if (${use_trace_facility}) 
+if (${freertos_use_trace_facility}) 
     set(configUSE_TRACE_FACILITY " ")
 endif()
-if (${use_newlib_reent}) 
+if (${freertos_use_newlib_reent}) 
     set(configUSE_NEWLIB_REENTRANT " ")
 endif()
-if (${use_queue_sets}) 
+if (${freertos_use_queue_sets}) 
     set(configUSE_QUEUE_SETS " ")
 endif()
-if (${use_task_notifications}) 
+if (${freertos_use_task_notifications}) 
     set(configUSE_TASK_NOTIFICATIONS " ")
 endif()
-if (${use_stats_formatting_functions}) 
+if (${freertos_use_stats_formatting_functions}) 
     set(configUSE_STATS_FORMATTING_FUNCTION " ")
 endif()
-if (${use_idle_hook}) 
+if (${freertos_use_idle_hook}) 
     set(configUSE_IDLE_HOOK " ")
 endif()
-if (${use_tick_hook}) 
+if (${freertos_use_tick_hook}) 
     set(configUSE_TICK_HOOK " ")
 endif()
-if (${use_malloc_failed_hook}) 
+if (${freertos_use_malloc_failed_hook}) 
     set(configUSE_MALLOC_FAILED_HOOK " ")
 endif()
-if (${use_daemon_task_startup_hook}) 
+if (${freertos_use_daemon_task_startup_hook}) 
     set(configUSE_DAEMON_TASK_STARTUP_HOOK " ")
 endif()
-if (${use_timers}) 
+if (${freertos_use_timers}) 
     set(configUSE_TIMERS " ")
 endif()
 #if (${enable_timer_tick_trace})
@@ -303,13 +303,13 @@ endif()
 list(LENGTH TTCPS_NUM_DRIVER_INSTANCES CONFIG_TTCPS)
 if (${CONFIG_TTCPS})
     set(index 0)
-    LIST_INDEX(${index} ${timer_select} "${TTCPS_NUM_DRIVER_INSTANCES}")
+    LIST_INDEX(${index} ${freertos_timer_select} "${TTCPS_NUM_DRIVER_INSTANCES}")
     list(GET TOTAL_TTCPS_PROP_LIST ${index} reg)
     set(reg1 ${${reg}})
     set(index1 0)
     list(GET reg1 ${index1} reg2)
     set(configTIMER_BASEADDR ${reg2})
-    set(configTIMER_SELECT_CNTR ${timer_select_counter})
+    set(configTIMER_SELECT_CNTR ${freertos_timer_select_counter})
 else()
     message(FATAL_ERROR "A53, R5 or A72 FreeRTOS need a TTC in the system \
     without it cannot work")
