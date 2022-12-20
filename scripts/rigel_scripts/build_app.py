@@ -44,7 +44,11 @@ if __name__ == "__main__":
     args["domain_path"] = utils.fetch_yaml_data(app_config_file, "app")["domain_path"]
 
     # Build the bsp first before building application
-    generate_bsp(args)
+    libxil_a_path = os.path.join(args["domain_path"], 'lib', 'libxil.a')
+    libxilstandalone_a_path = os.path.join(args["domain_path"], 'lib', 'libxilstandalone.a')
+
+    if not utils.is_file(libxil_a_path) or not utils.is_file(libxilstandalone_a_path):
+        generate_bsp(args)
 
     # Run make inside cmake configured build area.
     utils.runcmd("make -j22", cwd=app_build_dir)
