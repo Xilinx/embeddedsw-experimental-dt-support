@@ -1,6 +1,15 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
+####    START OF USER SETTINGS    ####
+# Below settings can be customized
+set(USER_CC_FLAGS
+	""
+)
+set(USER_LINKER_FLAGS
+	""
+)
+####    END OF USER SETTINGS    ####
 include(${CMAKE_CURRENT_SOURCE_DIR}/Lwip_tcp_perf_clientExample.cmake)
 project(lwip_tcp_perf_client)
 
@@ -17,6 +26,8 @@ collector_list (_deps PROJECT_LIB_DEPS)
 
 SET(SOURCES si5324.c;sfp.c;main.c;i2c_access.c;platform.c;iic_phyreset.c;tcp_perf_client.c)
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
+string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 add_executable(lwip_tcp_perf_client.elf ${SOURCES})
 target_link_libraries(lwip_tcp_perf_client.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 target_include_directories(lwip_tcp_perf_client.elf PUBLIC "${CMAKE_BINARY_DIR}/include")

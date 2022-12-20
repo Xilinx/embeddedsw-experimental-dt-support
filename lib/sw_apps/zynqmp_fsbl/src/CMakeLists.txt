@@ -1,6 +1,15 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
+####    START OF USER SETTINGS    ####
+# Below settings can be customized
+set(USER_CC_FLAGS
+	""
+)
+set(USER_LINKER_FLAGS
+	""
+)
+####    END OF USER SETTINGS    ####
 include_directories(${CMAKE_BINARY_DIR}/include)
 project(zynqmp_fsbl)
 
@@ -42,6 +51,8 @@ if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
 else()
     set(S_SOURCES xfsbl_exit.S xfsbl_translation_table_a53_32.S)
 endif()
+string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 add_executable(zynqmp_fsbl.elf ${S_SOURCES} ${SOURCES})
 
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53")

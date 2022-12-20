@@ -4,6 +4,16 @@ cmake_minimum_required(VERSION 3.14.7)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Lwip_echo_serverExample.cmake)
 project(lwip_echo_server)
 
+####    START OF USER SETTINGS    ####
+# Below settings can be customized
+set(USER_CC_FLAGS
+	""
+)
+set(USER_LINKER_FLAGS
+	""
+)
+####    END OF USER SETTINGS    ####
+
 find_package(common)
 include(${CMAKE_SOURCE_DIR}/lwip_echo_server.cmake NO_POLICY_SCOPE)
 enable_language(C ASM)
@@ -17,6 +27,8 @@ collector_list (_deps PROJECT_LIB_DEPS)
 
 SET(SOURCES si5324.c;echo.c;sfp.c;main.c;i2c_access.c;platform.c;iic_phyreset.c;)
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
+string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 add_executable(lwip_echo_server.elf ${SOURCES})
 target_link_libraries(lwip_echo_server.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 target_include_directories(lwip_echo_server.elf PUBLIC "${CMAKE_BINARY_DIR}/include")

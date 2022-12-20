@@ -1,6 +1,15 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
+####    START OF USER SETTINGS    ####
+# Below settings can be customized
+set(USER_CC_FLAGS
+	""
+)
+set(USER_LINKER_FLAGS
+	""
+)
+####    END OF USER SETTINGS    ####
 include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos_lwip_tcp_perf_clientExample.cmake)
 project(freertos_lwip_tcp_perf_client)
 
@@ -19,6 +28,8 @@ collector_list (_deps PROJECT_LIB_DEPS)
 SET(SOURCES freertos_tcp_perf_client.c;main.c;iic_phyreset.c;)
 file(COPY freertos_tcp_perf_client.h DESTINATION ${CMAKE_BINARY_DIR}/include)
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
+string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 add_executable(freertos_lwip_tcp_perf_client.elf ${SOURCES})
 target_link_libraries(freertos_lwip_tcp_perf_client.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 if (${NON_YOCTO})

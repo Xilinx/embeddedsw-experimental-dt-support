@@ -1,6 +1,15 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
+####    START OF USER SETTINGS    ####
+# Below settings can be customized
+set(USER_CC_FLAGS
+	""
+)
+set(USER_LINKER_FLAGS
+	""
+)
+####    END OF USER SETTINGS    ####
 include_directories(${CMAKE_BINARY_DIR}/include)
 project(pmufw)
 
@@ -28,8 +37,8 @@ collector_list (_deps PROJECT_LIB_DEPS)
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${D}${libdir})
 file(GLOB SOURCES "*.c")
-#set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
-#set_source_files_properties(xpfw_start.S PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
+string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 add_executable(pmufw.elf xpfw_start.S ${SOURCES})
 target_link_libraries(pmufw.elf -Wl,--no-relax -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v9.2 -mxl-soft-mul -Os -flto -ffat-lto-objects -Wl,--gc-sections -nostartfiles -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)
 

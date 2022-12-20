@@ -1,6 +1,15 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
+####    START OF USER SETTINGS    ####
+# Below settings can be customized
+set(USER_CC_FLAGS
+	""
+)
+set(USER_LINKER_FLAGS
+	""
+)
+####    END OF USER SETTINGS    ####
 include_directories(${CMAKE_BINARY_DIR}/include)
 project(versal_plm)
 
@@ -50,6 +59,8 @@ endif()
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
+string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 add_executable(versal_plm.elf ${_sources})
 #target_link_libraries(versal_plm.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)
 target_link_libraries(versal_plm.elf -Wl,-Map=versal_plm.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/versal/lscript.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)
