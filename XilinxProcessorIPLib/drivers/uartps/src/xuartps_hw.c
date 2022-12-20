@@ -26,9 +26,6 @@
 
 /***************************** Include Files ********************************/
 #include "xuartps_hw.h"
-#ifdef SDT
-#include "xuartps_config.h"
-#endif
 
 /************************** Constant Definitions ****************************/
 

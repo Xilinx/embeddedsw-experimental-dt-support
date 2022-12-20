@@ -33,9 +33,6 @@
 /***************************** Include Files *********************************/
 
 #include "xuartlite_l.h"
-#ifdef SDT
-#include "xuartlite_config.h"
-#endif
 
 /************************** Constant Definitions *****************************/
 

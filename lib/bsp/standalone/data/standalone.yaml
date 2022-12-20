@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+%YAML 1.2
+---
+title: Bindings for standalone
+
+maintainers:
+  - Mubin Sayyed <mubin.usman.sayyed@xilinx.com>
+
+depends:
+    uartlite:
+        - reg
+    uartns550:
+        - reg
+    uartps:
+        - reg
+    uartpsv:
+        - reg
+...
+

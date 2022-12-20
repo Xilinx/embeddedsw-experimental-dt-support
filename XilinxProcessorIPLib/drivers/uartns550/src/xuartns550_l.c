@@ -39,9 +39,6 @@
 /***************************** Include Files *********************************/
 
 #include "xuartns550_l.h"
-#ifdef SDT
-#include "xuartns550_config.h"
-#endif
 
 /************************** Constant Definitions *****************************/
 

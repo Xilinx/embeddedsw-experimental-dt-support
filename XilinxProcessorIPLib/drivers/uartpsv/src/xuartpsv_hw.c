@@ -24,9 +24,6 @@
 
 /***************************** Include Files *********************************/
 #include "xuartpsv_hw.h"
-#ifdef SDT
-#include "xuartpsv_config.h"
-#endif
 
 /************************** Constant Definitions *****************************/
 
