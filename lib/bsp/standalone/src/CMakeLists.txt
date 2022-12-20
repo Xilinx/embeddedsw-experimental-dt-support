@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14.7)
 message(${CMAKE_CURRENT_SOURCE_DIR})
 project(xilstandalone)
 
-set(Mem_DIR "${CMAKE_SOURCE_DIR}")
+set(Mem_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package(common)
 find_package(Mem)
@@ -19,14 +19,14 @@ foreach(val RANGE ${mem_len})
    list(APPEND defs "#define ${MEM} ${VAL}\n")
 endforeach()
 list(APPEND defs "\n#endif")
-file(WRITE ${CMAKE_SOURCE_DIR}/common/xmem_config.h ${defs})
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/common/xmem_config.h ${defs})
 #include(${CMAKE_CURRENT_SOURCE_DIR}/../data/xilstandalone.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/xilstandalone.cmake NO_POLICY_SCOPE)
 collector_create (PROJECT_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}")
 collector_create (PROJECT_LIB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 #Bring the headers into the project
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include_directories(${CMAKE_BINARY_DIR}/include)
 
 enable_language(C ASM)
 add_subdirectory(common)
@@ -41,7 +41,7 @@ endif()
 
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
-file(COPY ${_headers} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include)
+file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 
 #Compile it as a static library
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR 

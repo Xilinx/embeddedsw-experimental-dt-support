@@ -38,18 +38,18 @@ if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblazeel") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze"))
-collect (PROJECT_LIB_SOURCES ${CMAKE_SOURCE_DIR}/xmicroblaze_g.c)
+   collect (PROJECT_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../xmicroblaze_g.c)
 endif()
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53-32") OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53") OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64") OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72"))
-collect (PROJECT_LIB_SOURCES ${CMAKE_SOURCE_DIR}/xarmv8_g.c)
+	collect (PROJECT_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../xarmv8_g.c)
 endif()
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexr5") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm"))
-collect (PROJECT_LIB_SOURCES ${CMAKE_SOURCE_DIR}/xcortexr5_g.c)
+   collect (PROJECT_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../xcortexr5_g.c)
 endif()
 
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa9")
-collect (PROJECT_LIB_SOURCES ${CMAKE_SOURCE_DIR}/xcortexa9_g.c)
+	collect (PROJECT_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../xcortexa9_g.c)
 endif()
 
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
