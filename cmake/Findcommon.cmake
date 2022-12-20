@@ -104,7 +104,6 @@ function (linker_gen path)
 	if (NOT "${CUSTOM_LINKER_FILE}" STREQUAL "None")
 	    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CUSTOM_LINKER_FILE} ${CMAKE_SOURCE_DIR}/)
 	endif()
-	file (REMOVE_RECURSE ${path})
 endfunction(linker_gen)
 
 function(gen_exheader path drvname addr prefix)
