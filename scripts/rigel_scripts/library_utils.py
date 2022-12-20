@@ -34,6 +34,12 @@ class Library(Repo):
         self.bsp_lib_config = utils.fetch_yaml_data(self.domain_config_file, "domain")[
             "lib_config"
         ]
+        self.bsp_lib_config.update(utils.fetch_yaml_data(self.domain_config_file, "domain")[
+            "os_config"
+        ])
+        self.bsp_lib_config.update(utils.fetch_yaml_data(self.domain_config_file, "domain")[
+            "proc_config"
+        ])
 
     def validate_lib_name(self, lib):
         """
@@ -140,13 +146,16 @@ class Library(Repo):
         default_lib_config = {}
         for line_index in range(0, len(line_entries)):
             lib_config_entry = {}
+            permission = "read_write"
             for lib in lib_list:
                 if lib not in default_lib_config.keys():
                     default_lib_config[lib] = {}
                 # lwip param names are starting with lwip in cmake file but
                 # lib name is lwip211.
                 prefix = "lwip" if lib == "lwip211" else lib
-                if re.search(f"^{prefix}", line_entries[line_index], re.I):
+                proc_prefix = "proc" if lib == self.proc else lib
+                if (re.search(f"^{prefix}", line_entries[line_index], re.I) or
+                   re.search(f"^{proc_prefix}", line_entries[line_index], re.I)):
                     param_name = line_entries[line_index].split(":")[0]
                     # In cmake there are just two types of params: option and string.
                     param_type = line_entries[line_index].split(":")[1].split("=")[0]
@@ -166,6 +175,10 @@ class Library(Repo):
                             # Every entry from command line will come as string
                             param_opts = ["True", "False"]
                         elif param_type == "STRING":
+                            # read only params
+                            read_only_param = ["proc_archiver", "proc_assembler", "proc_compiler", "proc_compiler_flags"]
+                            if param_name in read_only_param:
+                                permission = "readonly"
                             # Showing it as integer (legacy entry)
                             if param_value.isdigit():
                                 param_type = "integer"
@@ -190,6 +203,7 @@ class Library(Repo):
                     lib_config_entry = {
                         param_name: {
                             "name": param_name,
+                            "permission": permission,
                             "type": param_type,
                             "value": param_value,
                             "default": param_value,
@@ -236,14 +250,10 @@ class Library(Repo):
         yaml_file = os.path.join(comp_dir, f"data/{comp_name}.yaml")
         schema = utils.load_yaml(yaml_file)
         lib_config = {}
+
         if schema:
-            # If the passed library has some driver dependency, generate that metadata
-            if schema.get("depends") and not is_app:
-                utils.runcmd(
-                    f"lopper -O {dstdir} {self.sdt} -- bmcmake_metadata_xlnx {self.proc} {srcdir} hwcmake_metadata {self.repo}"
-                )
             # If the passed template/lib has any lib dependency, add those dependencies.
-            if schema.get("depends_libs", {}) and is_app:
+            if schema.get("depends_libs", {}):
                 for name, props in schema["depends_libs"].items():
                     cmake_lib_list += f"{name};"
                     lib_list += [name]
@@ -252,41 +262,35 @@ class Library(Repo):
                         # If the template needs specific config param of the lib.
                         for key, value in props.items():
                             cmake_cmd_append += f" -D{key}={value}"
-                    lib_yaml_file = os.path.join(libdir, "data", f"{name}.yaml")
-                    if utils.is_file(lib_yaml_file):
-                        lib_schema = utils.load_yaml(lib_yaml_file)
-                        # If the library (on which comp is depending) has some
-                        # driver dependency, generate that metadata.
-                        if lib_schema.get("depends"):
-                            utils.runcmd(
-                                f"lopper -O {dstdir} {self.sdt} -- bmcmake_metadata_xlnx {self.proc} {srcdir} hwcmake_metadata {self.repo}"
-                            )
 
-            if cmake_lib_list:
-                # Create a cmake build directory for library compilation.
-                build_lib = os.path.join(self.libsrc_folder, f"build_configs/xillib")
-                utils.mkdir(build_lib)
-                utils.copy_file(
-                    os.path.join(self.esw_lib_dir, "CMakeLists.txt"),
-                    f"{build_lib}{os.path.sep}",
-                )
+        return lib_list, cmake_cmd_append
 
+    def config_lib(self, comp_name, lib_list, cmake_cmd_append, is_app=False):
+            comp_dir = self.get_comp_dir(comp_name, is_app)
+            yaml_file = os.path.join(comp_dir, f"data/{comp_name}.yaml")
+            schema = utils.load_yaml(yaml_file)
+            lib_config = {}
+            if lib_list:
                 # Run cmake configuration with all the default cache entries
+                build_metadata = os.path.join(self.libsrc_folder, "build_configs/gen_bsp")
                 utils.runcmd(
-                    f'cmake . {self.cmake_paths_append} -DNON_YOCTO=ON -DLIB_LIST="{cmake_lib_list}" -LH > cmake_lib_configs.txt',
-                    cwd = build_lib
+                    f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
+                    cwd = build_metadata
                 )
+            
                 # Get the default cmake entries into yaml configuration file
-                lib_config = self.get_default_lib_params(build_lib, lib_list)
-                # Re-run cmake with modified lib entries
-                utils.runcmd(f"cmake . {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd = build_lib)
+                lib_config = self.get_default_lib_params(build_metadata, lib_list)
+                if is_app:
+                    # Re-run cmake with modified lib entries
+                    utils.runcmd(f"cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd = build_metadata)
+                    # Add the modified lib param values in yaml configuration dict
+                    if schema.get("depends_libs", {}):
+                        for name, props in schema["depends_libs"].items():
+                            if props:
+                                for key, value in props.items():
+                                    lib_config[name][key]["value"] = str(value)
 
-                # Add the modified lib param values in yaml configuration dict
-                if schema.get("depends_libs", {}):
-                    for name, props in schema["depends_libs"].items():
-                        if props:
-                            for key, value in props.items():
-                                lib_config[name][key]["value"] = str(value)
-
+                if lib_config.__contains__("freertos10_xilinx"):
+                    lib_config.pop("freertos10_xilinx")
                 # Update the yaml config file with new entries.
                 utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)

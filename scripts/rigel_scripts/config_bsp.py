@@ -52,17 +52,32 @@ def configure_bsp(args):
             """)
             sys.exit(1)
         obj.validate_lib_name(obj.addlib)
-        obj.add_lib(obj.addlib)
+        cmake_file = os.path.join(obj.domain_path, "CMakeLists.txt")
+        build_folder = os.path.join(obj.libsrc_folder, "build_configs")
+        libcmake_file = os.path.join(build_folder, f"{obj.addlib}.cmake")
+        srcdir = os.path.join(obj.get_comp_dir(obj.addlib, is_app=False), "src")
+        dstdir = os.path.join(obj.libsrc_folder, f"{obj.addlib}/src")
+        cmd = f"lopper -O {dstdir} -f {obj.sdt} --  bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo}"
+        with open(libcmake_file, 'w') as fd:
+            fd.write(f"execute_process(COMMAND {cmd})")
+            fd.write("\n"f"add_subdirectory({dstdir})\n")
+
+        utils.add_newline(cmake_file, f"\ninclude (${{CMAKE_BINARY_DIR}}/../{obj.addlib}.cmake)")
+        lib_list, cmake_cmd_append = obj.add_lib(obj.addlib)
+        obj.config_lib(obj.addlib, lib_list, cmake_cmd_append)
 
     # If user wants to remove a library from the bsp
     if obj.rmlib:
         obj.validate_lib_in_bsp(obj.rmlib)
         lib_path = os.path.join(obj.libsrc_folder, obj.rmlib)
-        base_lib_build_dir = os.path.join(obj.libsrc_folder, "build_configs", "xillib")
+        base_lib_build_dir = os.path.join(obj.libsrc_folder, "build_configs", "gen_bsp", "libsrc")
         lib_build_dir = os.path.join(base_lib_build_dir, obj.rmlib)
 
+        cmake_file = os.path.join(obj.domain_path, "CMakeLists.txt")
+        utils.remove_line(cmake_file, obj.rmlib)
+
         # Run make clean to remove the respective headers and .a from lib and include folder.
-        utils.runcmd(f"make -C {obj.rmlib} clean >/dev/null", cwd=base_lib_build_dir)
+        utils.runcmd(f"make -C {os.path.join(obj.rmlib, 'src')} clean", cwd=base_lib_build_dir)
         # Remove library src folder from libsrc
         utils.remove(lib_path)
         # Remove cmake build folder from cmake build area.
@@ -109,10 +124,18 @@ def configure_bsp(args):
             cmake_cmd_append += f" -D{key}={value}"
 
         # configure the lib build area with new params
-        build_lib = os.path.join(obj.libsrc_folder, f"build_configs/xillib")
-        utils.runcmd(f"cmake . {obj.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd=build_lib)
+        build_metadata = os.path.join(obj.libsrc_folder, "build_configs/gen_bsp")
+        utils.runcmd(f"cmake {obj.domain_path} {obj.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd=build_metadata)
 
         # Update the lib config file
+        if obj.proc in obj.bsp_lib_config.keys():
+            proc_config = obj.bsp_lib_config.pop(obj.proc)
+            proc_config = {obj.proc:proc_config}
+            utils.update_yaml(obj.domain_config_file, "domain", "proc_config", proc_config, action="add")
+        if obj.os in obj.bsp_lib_config.keys(): 
+            os_config = obj.bsp_lib_config.pop(obj.os)
+            os_config = {obj.os:os_config}
+            utils.update_yaml(obj.domain_config_file, "domain", "os_config", os_config, action="add")
         utils.update_yaml(obj.domain_config_file, "domain", "lib_config", obj.bsp_lib_config)
 
 

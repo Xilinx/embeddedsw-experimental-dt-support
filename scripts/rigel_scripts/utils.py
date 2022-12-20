@@ -7,6 +7,7 @@ this module independently is not intended.
 
 import os
 import sys
+import re
 import glob
 import fileinput
 import shutil
@@ -432,3 +433,16 @@ def find_files(search_pattern, search_path):
 
     return glob.glob(f"{search_path}/{search_pattern}")
 
+def check_if_line_in_file(
+    file_name: str, line_to_search: str) -> bool:
+    """Check if line exist in file or not"""
+    with open(file_name, "r") as read_obj:
+        file_data = read_obj.readlines()
+        for data in file_data:
+            if line_to_search in data:
+                return True
+    return False
+
+def write_into_file(out_file, content):
+    with open(out_file, 'w') as f:
+        f.write(content)

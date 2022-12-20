@@ -208,6 +208,30 @@ class Domain(Repo):
         return compiler_flags
 
 
+def cmake_add_target(comp_name, output_dir, sdt, cmd, output):
+    cmake_cmd = f"""
+add_custom_target(
+	{comp_name} ALL
+	COMMAND lopper -O {output_dir} {sdt} -- {cmd}
+	BYPRODUCTS {output}
+)
+"""
+    return cmake_cmd
+
+def cmake_drv_custom_target(proc, src_dir, libsrc_folder, sdt, cmake_drv_list):
+    srcdir = f"{src_dir}/XilinxProcessorIPLib/drivers/${{drv}}/src"
+    cmake_cmd = f"""
+set(DRIVER_TARGETS {cmake_drv_list})
+foreach(drv ${{DRIVER_TARGETS}})
+execute_process(COMMAND ${{CMAKE_COMMAND}} -E copy_directory {srcdir} ${{CMAKE_LIBRARY_PATH}}/../libsrc/${{drv}}/src)
+add_custom_target(
+    ${{drv}} ALL
+    COMMAND lopper -O {libsrc_folder}/${{drv}}/src {sdt} -- baremetalconfig_xlnx {proc} {srcdir}
+    BYPRODUCTS x${{drv}}_g.c)
+endforeach()
+"""
+    return cmake_cmd
+
 def create_domain(args):
     """
     Function that uses the above Domain class to create the baremetal domain.
@@ -230,15 +254,25 @@ def create_domain(args):
             -DCMAKE_MODULE_PATH={obj.domain_dir} \
             -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file}"
 
+    # Create top level CMakeLists.txt inside domain dir
+    cmake_file = os.path.join(obj.domain_dir, "CMakeLists.txt")
+
     # Copy the standalone bsp src file.
     os_srcdir = os.path.join(obj.get_comp_dir("standalone"), "src")
     bspsrc = os.path.join(obj.libsrc_folder, "standalone/src")
     utils.copy_directory(os_srcdir, bspsrc)
+    
+    cmake_header = """
+cmake_minimum_required(VERSION 3.15)
+project(bsp)
+    """
+    cmake_file_cmds = cmake_header
 
-    # Generate standalone bsp related metadata as per sdt.
-    utils.runcmd(
-        f"lopper -O {bspsrc} {obj.sdt} -- baremetal_bspconfig_xlnx {obj.proc} {os_srcdir}"
-    )
+    cmd = f"baremetal_bspconfig_xlnx {obj.proc} {os_srcdir}"
+    cmake_file_cmds += cmake_add_target("xilstandalone_config", bspsrc, obj.sdt, cmd, "MemConfig.cmake")
+    bspcomsrc = os.path.join(obj.libsrc_folder, "standalone/src/common")
+    cmd = f"bmcmake_metadata_xlnx {obj.proc} {os_srcdir} hwcmake_metadata {obj.repo}"
+    cmake_file_cmds += cmake_add_target("xilstandalone_meta", bspcomsrc, obj.sdt, cmd, "StandaloneExample.cmake")
 
     # Copy cmake file that contains cmake utility APIs to a common location.
     utils.copy_file(
@@ -267,25 +301,10 @@ def create_domain(args):
         drvlist = drv_names.split()
         obj.drvlist = drvlist
 
-    # Create a build directory for cmake to generate all _g.c files.
-    build_metadata = os.path.join(obj.libsrc_folder, "build_configs/metadata")
-    utils.mkdir(build_metadata)
-
-    # Run cmake configure and build to generate _g.c files.
-    utils.runcmd(
-        f"cmake {obj.libsrc_folder} -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file} -DSDT={obj.sdt} {cmake_paths_append}",
-        cwd = build_metadata
-    )
-    utils.runcmd("make -f CMakeFiles/Makefile2 -j22 >/dev/null", cwd = build_metadata)
-
-    # Copy the actual drivers cmake file in the libsrc folder.
-    # This is to compile all the available driver sources.
-    libxil_cmake = os.path.join(obj.esw_drivers_dir, "CMakeLists.txt")
-    utils.copy_file(libxil_cmake, f"{obj.libsrc_folder}/")
-
-    # Remove the metadata files that are no longer needed.
-    utils.remove(drv_list_file)
-    utils.remove(os.path.join(obj.libsrc_folder, "libxil.conf"))
+    cmake_drv_list = ';'.join(obj.drvlist)
+    cmake_file_cmds += cmake_drv_custom_target(obj.proc, obj.repo, obj.libsrc_folder, obj.sdt, cmake_drv_list)
+    cmd = f"baremetal_xparameters_xlnx {obj.proc} {obj.repo}"
+    cmake_file_cmds += cmake_add_target("xparam", obj.include_folder, obj.sdt, cmd, "xparameters.h")
 
     """ 
     Create a dictionary that will contain the current status of the domain.
@@ -295,8 +314,10 @@ def create_domain(args):
     data = {
         "sdt": utils.get_rel_path(obj.sdt, obj.domain_dir),
         "os": obj.os,
+        "os_config": {},
         "toolchain_file": utils.get_rel_path(obj.toolchain_file, obj.domain_dir),
         "proc": obj.proc,
+        "proc_config": {},
         "template": obj.app,
         "compiler_flags": obj.compiler_flags,
         "include_folder": utils.get_rel_path(obj.include_folder, obj.domain_dir),
@@ -311,6 +332,8 @@ def create_domain(args):
 
     # If domain has to be created for a certain template, few libraries need
     # to be added in the bsp.
+    lib_list = []
+    cmake_cmd_append = ""
     lib_obj = Library(
         obj.domain_dir, obj.proc, obj.os, obj.sdt, cmake_paths_append, obj.libsrc_folder
     )
@@ -318,31 +341,97 @@ def create_domain(args):
         if obj.app:
             # If template app is passed, read the app's yaml file and add
             # lib accordingly.
-            lib_obj.add_lib(obj.app, is_app=True)
+            lib_list, cmake_cmd_append = lib_obj.add_lib(obj.app, is_app=True)
         else:
             # If no app is passed and bsp is created for freertos os, add
             # xiltimer by default.
-            lib_obj.add_lib("xiltimer", is_app=False)
+            lib_list, cmake_cmd_append = lib_obj.add_lib("xiltimer", is_app=False)
         # Copy the freertos source code to libsrc folder
         os_srcdir = os.path.join(obj.get_comp_dir("freertos"), "src")
         bspsrc = os.path.join(obj.libsrc_folder, "freertos10_xilinx/src")
         utils.copy_directory(os_srcdir, bspsrc)
-        # Generate metadata for freertos os.
-        utils.runcmd(
-            f"lopper -O {bspsrc} {obj.sdt} -- bmcmake_metadata_xlnx {obj.proc} {os_srcdir} hwcmake_metadata {obj.repo}"
-        )
 
     elif obj.app:
         # If template app is passed, read the app's yaml file and add
         # lib accordingly.
-        lib_obj.add_lib(obj.app, is_app=True)
+        lib_list, cmake_cmd_append = lib_obj.add_lib(obj.app, is_app=True)
+
+
+    cmake_lib_list = ""
+    if lib_list:
+        for lib in lib_list:
+            cmake_lib_list += f"{lib};"
+
+    cmake_file_cmds += f"\nset(lib_list {cmake_lib_list})\n"
+    if obj.os == "freertos":
+        lib_list.append("freertos10_xilinx")
+
+    if lib_list:
+        for lib in lib_list:
+            srcdir = os.path.join(obj.get_comp_dir(lib, is_app=False), "src")
+            dstdir = os.path.join(obj.libsrc_folder, f"{lib}/src")
+            cmd = f"bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo}"
+            outfile = lib + str("Example.cmake")
+            cmake_file_cmds += cmake_add_target(lib, dstdir, obj.sdt, cmd, outfile)
+
+    cmake_file_cmds += f"\nadd_library(bsp INTERFACE)"
+    cmake_file_cmds += f"\nadd_dependencies(bsp xilstandalone_config xilstandalone_meta xparam {cmake_lib_list} {cmake_drv_list})"
+    utils.write_into_file(cmake_file, cmake_file_cmds)
+
+    # Create a build directory for cmake to generate all _g.c files.
+    build_metadata = os.path.join(obj.libsrc_folder, "build_configs/metadata")
+    utils.mkdir(build_metadata)
+
+    # Run cmake configure and build to generate _g.c files.
+    utils.runcmd(
+        f"cmake {obj.domain_dir} -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file} -DSDT={obj.sdt} {cmake_paths_append}",
+        cwd = build_metadata
+    )
+
+    utils.runcmd("make -f CMakeFiles/Makefile2 -j22 >/dev/null", cwd = build_metadata)
+
+    # Create new CMakeLists.txt
+    cmake_file_cmds = cmake_header
+    cmake_file_cmds += f"\nadd_subdirectory({obj.libsrc_folder}/standalone/src)\n"
+    if lib_list:
+        for lib in lib_list:
+            dstdir = os.path.join(obj.libsrc_folder, f"{lib}/src")
+            cmake_file_cmds += f"\nadd_subdirectory({dstdir})\n"
+    utils.write_into_file(cmake_file, cmake_file_cmds)
+
+    build_metadata = os.path.join(obj.libsrc_folder, "build_configs/gen_bsp")
+    utils.mkdir(build_metadata)
+    if obj.app:
+        lib_obj.config_lib(obj.app, lib_list, cmake_cmd_append, is_app=True)
+
+    # Run cmake configuration with all the default cache entries
+    utils.runcmd(
+            f'cmake {obj.domain_dir} {cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
+            cwd = build_metadata
+    )
+    if obj.os == "freertos":
+        os_config = lib_obj.get_default_lib_params(build_metadata, ["freertos"])
+    else:
+        os_config = lib_obj.get_default_lib_params(build_metadata, ["standalone"])
+    proc_config = lib_obj.get_default_lib_params(build_metadata,[obj.proc])
+
+    utils.update_yaml(obj.domain_config_file, "domain", "os_config", os_config)
+    utils.update_yaml(obj.domain_config_file, "domain", "proc_config", proc_config)
+    # Copy the actual drivers cmake file in the libsrc folder.
+    # This is to compile all the available driver sources.
+    libxil_cmake = os.path.join(obj.esw_drivers_dir, "CMakeLists.txt")
+    utils.copy_file(libxil_cmake, f"{obj.libsrc_folder}/")
+
+    # Remove the metadata files that are no longer needed.
+    utils.remove(drv_list_file)
+    utils.remove(os.path.join(obj.libsrc_folder, "libxil.conf"))
+
+    utils.remove(os.path.join(obj.domain_dir, "*.dtb"), pattern=True)
+    utils.remove(os.path.join(obj.domain_dir, "*.pp"), pattern=True)
 
     # Success prints if everything went well till this point
     if utils.is_file(obj.domain_config_file):
         print(f"Successfully created Domain at {obj.domain_dir}")
-
-    utils.remove(os.path.join(obj.domain_dir, "*.dtb"), pattern=True)
-    utils.remove(os.path.join(obj.domain_dir, "*.pp"), pattern=True)
 
 
 if __name__ == "__main__":
