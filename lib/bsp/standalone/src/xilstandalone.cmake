@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/common/StandaloneExample.cmake NO_POLICY_SCOPE)
-set(standalone_description CACHE STRING "Below are software config parameters for the standalone library")
-SET_PROPERTY(CACHE standalone_description PROPERTY STRINGS "Below are the software config for the standalone bsp")
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
         OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53")
         OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53-32")
@@ -88,12 +86,12 @@ endif()
 
 # Processor CMake Cache entires
 cmake_path(GET CMAKE_C_COMPILER_AR FILENAME compiler_ar)
-set(PROC_CONFIG.archiver ${compiler_ar} CACHE STRING "Archiver")
+set(proc_archiver ${compiler_ar} CACHE STRING "Archiver")
 cmake_path(GET CMAKE_ASM_COMPILER FILENAME asm_compiler)
-set(PROC_CONFIG.assembler ${asm_compiler} CACHE STRING "Assembler") 
+set(proc_assembler ${asm_compiler} CACHE STRING "Assembler") 
 cmake_path(GET CMAKE_C_COMPILER FILENAME compiler)
-set(PROC_CONFIG.compiler ${compiler} CACHE STRING "Compiler")
-set(PROC_CONFIG.compiler_flags ${CMAKE_C_FLAGS} CACHE STRING "Compiler Flags")
-set(PROC_CONFIG.extra_compiler_flags "" CACHE STRING "Extra Compiler Flags")
+set(proc_compiler ${compiler} CACHE STRING "Compiler")
+set(proc_compiler_flags ${CMAKE_C_FLAGS} CACHE STRING "Compiler Flags")
+set(proc_extra_compiler_flags "" CACHE STRING "Extra Compiler Flags")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bspconfig.h.in ${CMAKE_BINARY_DIR}/include/bspconfig.h)

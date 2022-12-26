@@ -42,6 +42,9 @@ endif()
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
+if (${NON_YOCTO})
+file(COPY ${CMAKE_BINARY_DIR}/include/bspconfig.h DESTINATION ${CMAKE_INCLUDE_PATH}/)
+endif()
 
 #Compile it as a static library
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR 
