@@ -1,7 +1,6 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
-message(${CMAKE_CURRENT_SOURCE_DIR})
 project(xilstandalone)
 
 set(Mem_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -51,13 +50,9 @@ if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblazeel") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze"))
-message("cmake flags")
-message("${CMAKE_C_FLAGS}")
 string(REPLACE "-Os -flto -ffat-lto-objects" "" CUSTOM_FLAGS ${CMAKE_C_FLAGS})
 # Split the flags into a cmake list (; separated)
 separate_arguments(CUSTOM_FLAGS UNIX_COMMAND ${CUSTOM_FLAGS})
-message("custom flags")
-message("${CUSTOM_FLGAS}")
 # Custom command to build your one file.
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "FreeRTOS")
 add_custom_command(
