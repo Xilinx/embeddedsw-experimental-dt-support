@@ -384,7 +384,7 @@ project(bsp)
 
     # Run cmake configure and build to generate _g.c files.
     utils.runcmd(
-        f"cmake {obj.domain_dir} -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file} -DSDT={obj.sdt} {cmake_paths_append}",
+        f"cmake {obj.domain_dir} -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file} {cmake_paths_append}",
         cwd = build_metadata
     )
 

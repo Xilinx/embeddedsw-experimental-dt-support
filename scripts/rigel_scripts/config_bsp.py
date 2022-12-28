@@ -62,6 +62,9 @@ def configure_bsp(args):
             fd.write(f"execute_process(COMMAND {cmd})")
             fd.write("\n"f"add_subdirectory({dstdir})\n")
 
+        libsrc_exist = utils.check_if_line_in_file(cmake_file, f"add_subdirectory({obj.libsrc_folder})")
+        if libsrc_exist:
+            utils.remove_line(cmake_file, f"add_subdirectory({obj.libsrc_folder})")
         utils.add_newline(cmake_file, f"\ninclude (${{CMAKE_BINARY_DIR}}/../{obj.addlib}.cmake)")
         lib_list, cmake_cmd_append = obj.add_lib(obj.addlib)
         obj.config_lib(obj.addlib, lib_list, cmake_cmd_append)

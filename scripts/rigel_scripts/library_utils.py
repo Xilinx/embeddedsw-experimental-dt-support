@@ -253,7 +253,7 @@ class Library(Repo):
 
         if schema:
             # If the passed template/lib has any lib dependency, add those dependencies.
-            if schema.get("depends_libs", {}):
+            if schema.get("depends_libs", {}) and is_app:
                 for name, props in schema["depends_libs"].items():
                     cmake_lib_list += f"{name};"
                     lib_list += [name]
