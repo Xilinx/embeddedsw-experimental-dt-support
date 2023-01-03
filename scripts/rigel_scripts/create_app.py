@@ -20,26 +20,21 @@ class App(BSP, Repo):
     """
 
     def __init__(self, args):
-        self.template = args.get("template")
         BSP.__init__(self, args)
         Repo.__init__(self)
         self._build_dir_struct(args)
+        self.app_name = args.get("name")
+        self.template = args.get("template")
 
     def _build_dir_struct(self, args):
         """
         Creates the directory structure for Apps.
         """
-        if args["ws_dir"] == '.' and not args.get('build_dir'):
-            print("[WARNING]: The app Workspace is taken as current working directory. To avoid this, please use -w option")
         self.app_dir = utils.get_abs_path(args["ws_dir"])
         if args.get('src_dir'):
             self.app_src_dir = utils.get_abs_path(args["src_dir"])
         else:
             self.app_src_dir = os.path.join(self.app_dir, "src")
-        if args.get('build_dir'):
-            self.app_build_dir = utils.get_abs_path(args["build_dir"])
-        else:
-            self.app_build_dir = os.path.join(self.app_dir, "build")
 
         # Validate the passed template w.r.t the passed domain path
         if os.environ.get("OSF"):
@@ -64,6 +59,14 @@ def create_app(args):
     esw_app_dir = obj.get_comp_dir(obj.template, is_app=True)
     srcdir = os.path.join(esw_app_dir, "src")
     utils.copy_directory(srcdir, obj.app_src_dir)
+
+    if obj.app_name:
+        src_cmake = os.path.join(obj.app_src_dir, "CMakeLists.txt")
+        utils.replace_line(
+            src_cmake,
+            f'APP_NAME {obj.template}',
+            f'set(APP_NAME {obj.app_name})',
+        )
 
     # Checks if the app depends on any driver, if yest, generates the corresponding metadata
     app_yaml_file = os.path.join(esw_app_dir, "data", f"{obj.template}.yaml")
@@ -94,17 +97,13 @@ def create_app(args):
             f"lopper -O {obj.app_src_dir} {obj.sdt} -- baremetal_gentestapp_xlnx {obj.proc} {obj.repo}"
         )
 
-    # Create the cmake build dir for app and run cmake inside it.
-    utils.mkdir(obj.app_build_dir)
-    utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=obj.app_build_dir)
-
     # Add domain path entry in the app configuration file.
     data = {"domain_path": obj.domain_path}
     utils.write_yaml(obj.app_config_file, data)
 
     # Success prints if everything went well till this point.
     if utils.is_file(obj.app_config_file):
-        print(f"Successfully Created Application sources at {obj.app_src_dir} and cmake configuration at {obj.app_build_dir}")
+        print(f"Successfully Created Application sources at {obj.app_src_dir}")
 
 
 if __name__ == "__main__":
@@ -128,7 +127,7 @@ if __name__ == "__main__":
         "-s", "--src_dir", action="store", help="App source directory (Default: <Current Work Directory>/src)"
     )
     parser.add_argument(
-        "-b", "--build_dir", action="store", help="App build directory (Default: <Current Work Directory>/build)"
+        "-n", "--name", action="store", help="App name"
     )
     required_argument.add_argument(
         "-t",
@@ -138,6 +137,7 @@ if __name__ == "__main__":
         help=textwrap.dedent(
             """\
         Specify template app name. Available names are:
+            - empty_application
             - hello_world
             - memory_tests
             - peripheral_tests
@@ -147,6 +147,15 @@ if __name__ == "__main__":
             - freertos_hello_world
             - versal_plm
             - versal_psmfw
+            - freertos_lwip_echo_server
+            - freertos_lwip_tcp_perf_client
+            - freertos_lwip_tcp_perf_server
+            - freertos_lwip_udp_perf_client
+            - freertos_lwip_udp_perf_server
+            - lwip_tcp_perf_client
+            - lwip_tcp_perf_server
+            - lwip_udp_perf_client
+            - lwip_udp_perf_server
         """
         ),
     )
