@@ -1,12 +1,12 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos_lwip_tcp_perf_serverExample.cmake)
 set(APP_NAME freertos_lwip_tcp_perf_server)
 project(${APP_NAME})
 
-include(${CMAKE_SOURCE_DIR}/../data/freertos_lwip_tcp_perf_server.cmake NO_POLICY_SCOPE)
+find_package(common)
+include(${CMAKE_SOURCE_DIR}/freertos_lwip_tcp_perf_server.cmake NO_POLICY_SCOPE)
 enable_language(C ASM)
 collect(PROJECT_LIB_DEPS xilstandalone)
 collect(PROJECT_LIB_DEPS xil)

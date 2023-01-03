@@ -5,6 +5,10 @@
 #ifndef __PLATFORM_CONFIG_H_
 #define __PLATFORM_CONFIG_H_
 
+#include "FreeRTOS.h"
+#include "lwip/sys.h"
+#include "task.h"
+
 #cmakedefine PLATFORM_EMAC_BASEADDR @PLATFORM_EMAC_BASEADDR@
 
 #endif

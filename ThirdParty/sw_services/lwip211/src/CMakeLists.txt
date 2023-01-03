@@ -13,7 +13,6 @@ set(LWIP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lwip-2.1.1)
 set(LWIP_INCLUDE_DIRS
     "${LWIP_DIR}/src"
     "${LWIP_DIR}/src/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/contrib/ports/xilinx/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/ports/xilinx/include/arch"
     "${CMAKE_CURRENT_SOURCE_DIR}/contrib/ports/xilinx/include/netif"
 )
@@ -38,19 +37,22 @@ foreach(x IN LISTS TOTAL_AXIETHERNET_PROP_LIST)
     endif()
 endforeach()
 add_subdirectory(contrib/ports/xilinx/)
-collect (PROJECT_LIB_SOURCES xtopology_g.c)
-
-collector_list (_sources PROJECT_LIB_SOURCES)
-collector_list (_headers PROJECT_LIB_HEADERS)
+include(${CMAKE_CURRENT_SOURCE_DIR}/lwip211.cmake NO_POLICY_SCOPE)
 
 list(APPEND TOTAL_MAC_INSTANCES ${EMACPS_NUM_DRIVER_INSTANCES})
 list(APPEND TOTAL_MAC_INSTANCES ${AXIETHERNET_NUM_DRIVER_INSTANCES})
 list(APPEND TOTAL_MAC_INSTANCES ${EMACLITE_NUM_DRIVER_INSTANCES})
 SET(MAC_INSTANCES "${TOTAL_MAC_INSTANCES}" CACHE STRING "MAC Instances")
 SET_PROPERTY(CACHE MAC_INSTANCES PROPERTY STRINGS "${TOTAL_MAC_INSTANCES}")
+list(LENGTH TOTAL_MAC_INSTANCES _len)
+if(${_len} EQUAL 0)
+	message(FATAL_ERROR "This library requires an Ethernet MAC IP instance in the hardware.")
+endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/lwip211.cmake NO_POLICY_SCOPE)
+collect (PROJECT_LIB_SOURCES xtopology_g.c)
 
+collector_list (_sources PROJECT_LIB_SOURCES)
+collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 file(COPY ${LWIP_INCLUDE_DIRS} DESTINATION ${CMAKE_BINARY_DIR}/include)
 if (${NON_YOCTO})

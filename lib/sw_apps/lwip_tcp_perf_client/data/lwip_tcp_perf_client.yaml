@@ -24,16 +24,16 @@ supported_os:
 
 depends_libs:
     lwip211:
-        lwip_api_mode: RAW_API
-        lwip_dhcp_does_arp_check: ON
-        lwip_dhcp: ON
-        lwip_ipv6_enable: OFF
-        lwip_pbuf_pool_size: 16384
-        lwip_mem_size: 524288
-        lwip_memp_n_pbuf: 1024
-        lwip_memp_n_tcp_seg: 1024
-        lwip_temac_n_rx_descriptors: 512
-        lwip_temac_n_tx_descriptors: 512
+        lwip211_api_mode: RAW_API
+        lwip211_dhcp_does_arp_check: ON
+        lwip211_dhcp: ON
+        lwip211_ipv6_enable: OFF
+        lwip211_pbuf_pool_size: 16384
+        lwip211_mem_size: 524288
+        lwip211_memp_n_pbuf: 1024
+        lwip211_memp_n_tcp_seg: 1024
+        lwip211_temac_n_rx_descriptors: 512
+        lwip211_temac_n_tx_descriptors: 512
     xiltimer:
         XILTIMER_en_interval_timer: ON
 

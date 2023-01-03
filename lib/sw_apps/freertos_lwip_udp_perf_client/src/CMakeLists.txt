@@ -1,12 +1,12 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos_lwip_udp_perf_clientExample.cmake)
 set(APP_NAME freertos_lwip_udp_perf_client)
 project(${APP_NAME})
 
-include(${CMAKE_SOURCE_DIR}/../data/freertos_lwip_udp_perf_client.cmake NO_POLICY_SCOPE)
+find_package(common)
+include(${CMAKE_SOURCE_DIR}/freertos_lwip_udp_perf_client.cmake NO_POLICY_SCOPE)
 enable_language(C ASM)
 collect(PROJECT_LIB_DEPS xilstandalone)
 collect(PROJECT_LIB_DEPS xil)

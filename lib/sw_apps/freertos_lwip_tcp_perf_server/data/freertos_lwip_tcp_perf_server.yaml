@@ -24,6 +24,21 @@ supported_processors:
 supported_os:
     - freertos10_xilinx
 
+depends_libs:
+    lwip211:
+        lwip211_api_mode: SOCKET_API
+        lwip211_dhcp_does_arp_check: ON
+        lwip211_dhcp: ON
+        lwip211_ipv6_enable: OFF
+        lwip211_pbuf_pool_size: 16384
+        lwip211_mem_size: 524288
+        lwip211_memp_n_pbuf: 1024
+        lwip211_memp_n_tcp_seg: 1024
+        lwip211_temac_n_rx_descriptors: 512
+        lwip211_temac_n_tx_descriptors: 512
+    xiltimer:
+        XILTIMER_en_interval_timer: ON
+
 depends:
     emaclite:
         - reg

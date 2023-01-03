@@ -36,6 +36,7 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "xil_printf.h"
+#include "platform_config.h"
 
 /* used as indices into kLabel[] */
 enum {
