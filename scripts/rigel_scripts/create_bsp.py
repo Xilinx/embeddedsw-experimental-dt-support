@@ -161,14 +161,17 @@ class Domain(Repo):
             utils.add_newline(toolchain_file_copy, "set( CMAKE_SYSTEM_NAME FreeRTOS)")
 
         # Do the gic pruning in the sdt for APU/RPU.
-        if utils.is_file(lops_file):
-            utils.runcmd(
-                f"lopper -f --enhanced -O {self.domain_dir} -i {lops_file} {self.sdt} {out_dts_path}"
-            )
+        if self.sdt != out_dts_path:
+            if utils.is_file(lops_file):
+                utils.runcmd(
+                    f"lopper -f --enhanced -O {self.domain_dir} -i {lops_file} {self.sdt} {out_dts_path}"
+                )
+            else:
+                utils.runcmd(
+                    f"lopper -f --enhanced -O {self.domain_dir} {self.sdt} {out_dts_path}"
+                )
         else:
-            utils.runcmd(
-                f"lopper -f --enhanced -O {self.domain_dir} {self.sdt} {out_dts_path}"
-            )
+            out_dts_path = self.sdt
 
         self.compiler_flags = self.apps_cflags_update(
             toolchain_file_copy, self.app, self.proc

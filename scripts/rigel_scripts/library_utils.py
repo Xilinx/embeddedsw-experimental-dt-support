@@ -31,15 +31,11 @@ class Library(Repo):
         self.domain_config_file = os.path.join(self.domain_path, "bsp.yaml")
         self.cmake_paths_append = cmake_paths_append
         self.libsrc_folder = libsrc_folder
-        self.bsp_lib_config = utils.fetch_yaml_data(self.domain_config_file, "domain")[
-            "lib_config"
-        ]
-        self.bsp_lib_config.update(utils.fetch_yaml_data(self.domain_config_file, "domain")[
-            "os_config"
-        ])
-        self.bsp_lib_config.update(utils.fetch_yaml_data(self.domain_config_file, "domain")[
-            "proc_config"
-        ])
+        self.domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
+        self.bsp_lib_config = self.domain_data["lib_config"]
+        self.bsp_lib_config.update(self.domain_data["os_config"])
+        self.bsp_lib_config.update(self.domain_data["proc_config"])
+        self.lib_list = list(self.domain_data["lib_config"].keys()) + [self.proc, self.os]
 
     def validate_lib_name(self, lib):
         """
@@ -218,6 +214,19 @@ class Library(Repo):
 
         return default_lib_config
 
+    def validate_drv_for_lib(self, comp_name, drvlist):
+        comp_dir = self.get_comp_dir(comp_name, is_app=False)
+        yaml_file = os.path.join(comp_dir, "data", f"{comp_name}.yaml")
+        schema = utils.load_yaml(yaml_file)
+        if schema.get("depends"):
+            dep_drvlist = list(schema.get("depends").keys())
+            valid_lib = [drv for drv in dep_drvlist if drv in drvlist]
+            if valid_lib:
+                return True
+            else:
+                return False
+        return True
+
     def add_lib(self, comp_name, is_app=False):
         """
         Adds library to the bsp. Creates metadata if needed for the library, 
@@ -254,7 +263,10 @@ class Library(Repo):
         if schema:
             # If the passed template/lib has any lib dependency, add those dependencies.
             if schema.get("depends_libs", {}) and is_app:
+                drvlist = utils.fetch_yaml_data(self.domain_config_file, "domain")["drvlist"]
                 for name, props in schema["depends_libs"].items():
+                    if not self.validate_drv_for_lib(name, drvlist):
+                        continue
                     cmake_lib_list += f"{name};"
                     lib_list += [name]
                     libdir, srcdir, dstdir = self.copy_lib_src(name)
@@ -285,7 +297,10 @@ class Library(Repo):
                     utils.runcmd(f"cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd = build_metadata)
                     # Add the modified lib param values in yaml configuration dict
                     if schema.get("depends_libs", {}):
+                        drvlist = utils.fetch_yaml_data(self.domain_config_file, "domain")["drvlist"]
                         for name, props in schema["depends_libs"].items():
+                            if not self.validate_drv_for_lib(name, drvlist):
+                                continue
                             if props:
                                 for key, value in props.items():
                                     lib_config[name][key]["value"] = str(value)
@@ -294,3 +309,21 @@ class Library(Repo):
                     lib_config.pop("freertos10_xilinx")
                 # Update the yaml config file with new entries.
                 utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)
+
+    def gen_lib_cmake(self, lib):
+            cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
+            build_folder = os.path.join(self.libsrc_folder, "build_configs")
+            libcmake_file = os.path.join(build_folder, f"{lib}.cmake")
+            srcdir = os.path.join(self.get_comp_dir(lib, is_app=False), "src")
+            dstdir = os.path.join(self.libsrc_folder, f"{lib}/src")
+            cmd = f"lopper -O {dstdir} -f {self.sdt} --  bmcmake_metadata_xlnx {self.proc} {srcdir} hwcmake_metadata {self.repo}"
+            cmake_cmd = f"""
+            execute_process(COMMAND {cmd})
+            add_subdirectory({dstdir})
+            """
+            utils.write_into_file(libcmake_file,cmake_cmd)
+
+            libsrc_exist = utils.check_if_line_in_file(cmake_file, f"add_subdirectory({self.libsrc_folder})")
+            if libsrc_exist:
+                utils.remove_line(cmake_file, f"add_subdirectory({self.libsrc_folder})")
+            utils.add_newline(cmake_file, f"\ninclude (${{CMAKE_BINARY_DIR}}/../{lib}.cmake)")

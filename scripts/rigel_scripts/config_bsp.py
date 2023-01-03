@@ -52,20 +52,7 @@ def configure_bsp(args):
             """)
             sys.exit(1)
         obj.validate_lib_name(obj.addlib)
-        cmake_file = os.path.join(obj.domain_path, "CMakeLists.txt")
-        build_folder = os.path.join(obj.libsrc_folder, "build_configs")
-        libcmake_file = os.path.join(build_folder, f"{obj.addlib}.cmake")
-        srcdir = os.path.join(obj.get_comp_dir(obj.addlib, is_app=False), "src")
-        dstdir = os.path.join(obj.libsrc_folder, f"{obj.addlib}/src")
-        cmd = f"lopper -O {dstdir} -f {obj.sdt} --  bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo}"
-        with open(libcmake_file, 'w') as fd:
-            fd.write(f"execute_process(COMMAND {cmd})")
-            fd.write("\n"f"add_subdirectory({dstdir})\n")
-
-        libsrc_exist = utils.check_if_line_in_file(cmake_file, f"add_subdirectory({obj.libsrc_folder})")
-        if libsrc_exist:
-            utils.remove_line(cmake_file, f"add_subdirectory({obj.libsrc_folder})")
-        utils.add_newline(cmake_file, f"\ninclude (${{CMAKE_BINARY_DIR}}/../{obj.addlib}.cmake)")
+        obj.gen_lib_cmake(obj.addlib)
         lib_list, cmake_cmd_append = obj.add_lib(obj.addlib)
         obj.config_lib(obj.addlib, lib_list, cmake_cmd_append)
 
@@ -98,7 +85,7 @@ def configure_bsp(args):
 
         # Validate the command line inputs provided
         usage_print = """
-            [Usage]: Please Pass Library Name followed by param:value.
+            [ERROR]: Please Pass Library Name followed by param:value.
             e.g. -set_property xilffs XILFFS_read_only:ON XILFFS_use_lfn:1 
             Wrong inputs passed with set_property.
         """

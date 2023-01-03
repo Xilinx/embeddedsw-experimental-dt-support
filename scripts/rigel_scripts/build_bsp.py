@@ -45,6 +45,7 @@ class BSP:
 
         self.drvlist = domain_data["drvlist"]
         self.lib_config = domain_data["lib_config"]
+        self.template = domain_data["template"]
 
     def build_bsp(self):
         cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
