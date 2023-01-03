@@ -11,7 +11,8 @@ set(USER_LINKER_FLAGS
 )
 ####    END OF USER SETTINGS    ####
 include_directories(${CMAKE_BINARY_DIR}/include)
-project(versal_psmfw)
+set(APP_NAME versal_psmfw)
+project(${APP_NAME})
 
 find_package(common)
 enable_language(C ASM)
@@ -35,5 +36,5 @@ collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
-add_executable(versal_psmfw.elf ${_sources})
-target_link_libraries(versal_psmfw.elf -Wl,-Map=versal_plm.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/versal/lscript.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)
+add_executable(${APP_NAME}.elf ${_sources})
+target_link_libraries(${APP_NAME}.elf -Wl,-Map=versal_plm.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/versal/lscript.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)

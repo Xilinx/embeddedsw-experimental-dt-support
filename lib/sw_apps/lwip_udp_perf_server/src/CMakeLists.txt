@@ -11,7 +11,8 @@ set(USER_LINKER_FLAGS
 )
 ####    END OF USER SETTINGS    ####
 include(${CMAKE_CURRENT_SOURCE_DIR}/Lwip_udp_perf_serverExample.cmake)
-project(lwip_udp_perf_server)
+set(APP_NAME lwip_udp_perf_server)
+project(${APP_NAME})
 
 find_package(common)
 include(${CMAKE_SOURCE_DIR}/lwip_udp_perf_server.cmake NO_POLICY_SCOPE)
@@ -28,12 +29,12 @@ SET(SOURCES si5324.c;sfp.c;main.c;i2c_access.c;platform.c;iic_phyreset.c;udp_per
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
-add_executable(lwip_udp_perf_server.elf ${SOURCES})
-target_link_libraries(lwip_udp_perf_server.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
-target_include_directories(lwip_udp_perf_server.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
+add_executable(${APP_NAME}.elf ${SOURCES})
+target_link_libraries(${APP_NAME}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+target_include_directories(${APP_NAME}.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
 if (${NON_YOCTO})
    set (INCLUDE_DIRS
        "${CMAKE_INCLUDE_PATH}/include/"
        "${CMAKE_BINARY_DIR}/include")
-  target_include_directories(lwip_udp_perf_server.elf PUBLIC ${INCLUDE_DIRS})
+  target_include_directories(${APP_NAME}.elf PUBLIC ${INCLUDE_DIRS})
 endif()

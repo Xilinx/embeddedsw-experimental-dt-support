@@ -11,7 +11,8 @@ set(USER_LINKER_FLAGS
 )
 ####    END OF USER SETTINGS    ####
 include(${CMAKE_SOURCE_DIR}/Empty_applicationExample.cmake)
-project(executable)
+set(APP_NAME empty_application)
+project(${APP_NAME})
 
 find_package(common)
 enable_language(C ASM)
@@ -27,6 +28,6 @@ linker_gen("${CMAKE_SOURCE_DIR}/linker_files/")
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
 if(NOT "${SOURCES}" STREQUAL "")
-add_executable(executable.elf ${SOURCES})
-target_link_libraries(executable.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+add_executable(${APP_NAME}.elf ${SOURCES})
+target_link_libraries(${APP_NAME}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 endif()

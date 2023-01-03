@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
-title: Bindings for freertos lwip perf server
+title: freertos lwip perf server
 
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>

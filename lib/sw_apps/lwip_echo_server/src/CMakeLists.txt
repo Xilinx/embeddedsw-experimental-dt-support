@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Lwip_echo_serverExample.cmake)
-project(lwip_echo_server)
+set(APP_NAME lwip_echo_server)
+project(${APP_NAME})
 
 ####    START OF USER SETTINGS    ####
 # Below settings can be customized
@@ -29,12 +30,12 @@ SET(SOURCES si5324.c;echo.c;sfp.c;main.c;i2c_access.c;platform.c;iic_phyreset.c;
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
-add_executable(lwip_echo_server.elf ${SOURCES})
-target_link_libraries(lwip_echo_server.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
-target_include_directories(lwip_echo_server.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
+add_executable(${APP_NAME}.elf ${SOURCES})
+target_link_libraries(${APP_NAME}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+target_include_directories(${APP_NAME}.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
 if (${NON_YOCTO})
    set (INCLUDE_DIRS
        "${CMAKE_INCLUDE_PATH}/include/"
        "${CMAKE_BINARY_DIR}/include")
-  target_include_directories(lwip_echo_server.elf PUBLIC ${INCLUDE_DIRS})
+  target_include_directories(${APP_NAME}.elf PUBLIC ${INCLUDE_DIRS})
 endif()

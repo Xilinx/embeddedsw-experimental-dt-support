@@ -11,7 +11,8 @@ set(USER_LINKER_FLAGS
 )
 ####    END OF USER SETTINGS    ####
 include(${CMAKE_CURRENT_SOURCE_DIR}/Memory_testsExample.cmake)
-project(memory_test)
+set(APP_NAME memory_tests)
+project(${APP_NAME})
 
 find_package(common)
 enable_language(C ASM)
@@ -60,5 +61,5 @@ set(CMAKE_INFILE_PATH "${CMAKE_SOURCE_DIR}/linker_files/")
 linker_gen(${CMAKE_INFILE_PATH})
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
-add_executable(memory_test.elf ${SOURCES})
-target_link_libraries(memory_test.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+add_executable(${APP_NAME}.elf ${SOURCES})
+target_link_libraries(${APP_NAME}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)

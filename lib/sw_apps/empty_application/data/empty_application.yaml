@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
-title: Bindings for empty application
+title: empty application
 
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>

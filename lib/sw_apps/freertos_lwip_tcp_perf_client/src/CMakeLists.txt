@@ -11,7 +11,8 @@ set(USER_LINKER_FLAGS
 )
 ####    END OF USER SETTINGS    ####
 include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos_lwip_tcp_perf_clientExample.cmake)
-project(freertos_lwip_tcp_perf_client)
+set(APP_NAME freertos_lwip_tcp_perf_client)
+project(${APP_NAME})
 
 find_package(common)
 include(${CMAKE_SOURCE_DIR}/freertos_lwip_tcp_perf_client.cmake NO_POLICY_SCOPE)
@@ -30,14 +31,14 @@ file(COPY freertos_tcp_perf_client.h DESTINATION ${CMAKE_BINARY_DIR}/include)
 linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
-add_executable(freertos_lwip_tcp_perf_client.elf ${SOURCES})
-target_link_libraries(freertos_lwip_tcp_perf_client.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+add_executable(${APP_NAME}.elf ${SOURCES})
+target_link_libraries(${APP_NAME}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 if (${NON_YOCTO})
     set(INCLUDE_DIRS
         "${CMAKE_INCLUDE_PATH}/"
         "${CMAKE_INCLUDE_PATH}/include/"
         "${CMAKE_BINARY_DIR}/include")
-    target_include_directories(freertos_lwip_tcp_perf_client.elf PUBLIC ${INCLUDE_DIRS})
+    target_include_directories(${APP_NAME}.elf PUBLIC ${INCLUDE_DIRS})
 else()
-    target_include_directories(freertos_lwip_tcp_perf_client.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
+    target_include_directories(${APP_NAME}.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
 endif()

@@ -3,7 +3,8 @@
 cmake_minimum_required(VERSION 3.14.7)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Freertos_lwip_udp_perf_clientExample.cmake)
-project(freertos_lwip_udp_perf_client)
+set(APP_NAME freertos_lwip_udp_perf_client)
+project(${APP_NAME})
 
 include(${CMAKE_SOURCE_DIR}/../data/freertos_lwip_udp_perf_client.cmake NO_POLICY_SCOPE)
 enable_language(C ASM)
@@ -17,7 +18,13 @@ collect(PROJECT_LIB_DEPS c)
 collector_list (_deps PROJECT_LIB_DEPS)
 
 SET(SOURCES udp_perf_client.c;main.c;iic_phyreset.c;)
-linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/../../../../scripts/linker_files/")
-add_executable(freertos_lwip_udp_perf_client.elf ${SOURCES})
-target_link_libraries(freertos_lwip_udp_perf_client.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
-target_include_directories(freertos_lwip_udp_perf_client.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
+linker_gen("${CMAKE_CURRENT_SOURCE_DIR}/linker_files/")
+add_executable(${APP_NAME}.elf ${SOURCES})
+target_link_libraries(${APP_NAME}.elf -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
+target_include_directories(${APP_NAME}.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
+if (${NON_YOCTO})
+   set (INCLUDE_DIRS
+       "${CMAKE_INCLUDE_PATH}/include/"
+       "${CMAKE_BINARY_DIR}/include")
+  target_include_directories(${APP_NAME}.elf PUBLIC ${INCLUDE_DIRS})
+endif()

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 %YAML 1.2
 ---
-title: Bindings for lwip udp perf server
+title: lwip udp perf server
 
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
