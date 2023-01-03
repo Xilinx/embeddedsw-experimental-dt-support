@@ -17,6 +17,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/core)
 
 collect (PROJECT_LIB_SOURCES xiltimer.c)
 collect (PROJECT_LIB_HEADERS xiltimer.h)
+collect (PROJECT_LIB_HEADERS sleep.h)
 collector_list (_sources PROJECT_LIB_SOURCES)
 collector_list (_headers PROJECT_LIB_HEADERS)
 file(COPY ${_headers} DESTINATION ${CMAKE_BINARY_DIR}/include)
