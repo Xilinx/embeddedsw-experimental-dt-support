@@ -23,7 +23,7 @@ collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
 collector_list (_deps PROJECT_LIB_DEPS)
 
-file(GLOB SOURCES "*.c")
+aux_source_directory(${CMAKE_SOURCE_DIR} SOURCES)
 linker_gen("${CMAKE_SOURCE_DIR}/linker_files/")
 string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
