@@ -19,8 +19,9 @@ class RegenBSP(BSP, Library):
 
     def __init__(self, args):
         self.domain_path = utils.get_abs_path(args.get("domain_path"))
-        self.sdt = utils.get_abs_path(args["sdt"])
         BSP.__init__(self, args)
+        if args.get('sdt'):
+            self.sdt = utils.get_abs_path(args["sdt"])
         Library.__init__(
             self,
             self.domain_path,
@@ -36,7 +37,8 @@ class RegenBSP(BSP, Library):
             'ws_dir':self.domain_path,
             'proc':self.proc,
             'os':self.os,
-            'template':self.template
+            'template':self.template,
+            'sdt':self.sdt
         })
 
         # Remove existing folder structure
@@ -125,12 +127,11 @@ if __name__ == "__main__":
         help="Domain directory Path",
         required=True,
     )
-    required_argument.add_argument(
+    parser.add_argument(
         "-s",
         "--sdt",
         action="store",
-        help="Specify the System device-tree path (till system-top.dts file)",
-        required=True,
+        help="Specify the System device-tree path (till system-top.dts file)"
     )
     args = vars(parser.parse_args())
     regenerate_bsp(args)
