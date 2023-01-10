@@ -9,6 +9,9 @@ maintainers:
 
 description: Let's say 'Hello World' in C.
 
+depends_libs:
+    xiltimer: {}
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5

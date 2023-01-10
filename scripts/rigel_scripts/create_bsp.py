@@ -358,6 +358,9 @@ project(bsp)
         # If template app is passed, read the app's yaml file and add
         # lib accordingly.
         lib_list, cmake_cmd_append = lib_obj.add_lib(obj.app, is_app=True)
+    else:
+        # If no app is passed and bsp is created add xiltimer by default.
+        lib_list, cmake_cmd_append = lib_obj.add_lib("xiltimer", is_app=False)
 
 
     cmake_lib_list = ""
