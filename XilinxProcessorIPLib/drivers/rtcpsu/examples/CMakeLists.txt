@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: MIT 
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 cmake_minimum_required(VERSION 3.14.7)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/RtcpsuExample.cmake)
 project(rtcpsu)
 
+find_package(common)
 enable_language(C ASM)
 collect(PROJECT_LIB_DEPS xilstandalone)
 collect(PROJECT_LIB_DEPS xil)

@@ -1,11 +1,11 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/common.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/XilmailboxExample.cmake)
 project(xilmailbox)
 
-include(${CMAKE_SOURCE_DIR}/../data/xilmailbox.cmake NO_POLICY_SCOPE)
+find_package(common)
+include(${CMAKE_SOURCE_DIR}/../src/xilmailbox.cmake NO_POLICY_SCOPE)
 enable_language(C ASM)
 collect(PROJECT_LIB_DEPS xilstandalone)
 collect(PROJECT_LIB_DEPS xil)
