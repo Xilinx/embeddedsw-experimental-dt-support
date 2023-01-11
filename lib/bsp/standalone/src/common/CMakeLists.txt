@@ -33,7 +33,9 @@ collect (PROJECT_LIB_HEADERS xstatus.h)
 collect (PROJECT_LIB_SOURCES outbyte.c)
 collect (PROJECT_LIB_SOURCES inbyte.c)
 collect (PROJECT_LIB_HEADERS xmem_config.h)
-#collect (PROJECT_LIB_HEADERS sleep.h)
+if (NOT ${NON_YOCTO})
+collect (PROJECT_LIB_HEADERS sleep.h)
+endif()
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblazeel") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "plm_microblaze") OR
