@@ -409,6 +409,10 @@ project(bsp)
     utils.mkdir(build_metadata)
     if obj.app:
         lib_obj.config_lib(obj.app, lib_list, cmake_cmd_append, is_app=True)
+    else:
+        # If no app is passed and bsp is created xiltimer got added default
+        # Update config entries for the same.
+        lib_obj.config_lib("xiltimer", lib_list, cmake_cmd_append, is_app=False)
 
     # Run cmake configuration with all the default cache entries
     utils.runcmd(
