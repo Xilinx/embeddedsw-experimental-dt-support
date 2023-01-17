@@ -221,7 +221,11 @@ class Library(Repo):
         if schema.get("depends"):
             dep_drvlist = list(schema.get("depends").keys())
             valid_lib = [drv for drv in dep_drvlist if drv in drvlist]
-            if valid_lib:
+            """
+            Since sleep related implementation is part of xiltimer library
+            it needs to be pulled irrespective of the hardware dependency.
+            """
+            if valid_lib or re.search("xiltimer", comp_name):
                 return True
             else:
                 return False
