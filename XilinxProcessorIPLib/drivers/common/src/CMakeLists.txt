@@ -14,12 +14,14 @@ endif()
 find_package(INTC QUIET)
 list(APPEND defs "#ifndef XCOMMON_DRV_CONFIG_H_\n")
 list(APPEND defs "#define XCOMMON_DRV_CONFIG_H_\n\n")
-if (DRIVER_INSTANCES)
+if ((EXISTS "${INTC_DIR}/INTCConfig.cmake") AND
+    DRIVER_INSTANCES)
     list(APPEND defs "#define AXI_INTC\n")
 endif()
 
 find_package(SCUGIC QUIET)
-if (DRIVER_INSTANCES)
+if ((EXISTS "${SCUGIC_DIR}/SCUGICConfig.cmake") AND
+     DRIVER_INSTANCES)
     list(APPEND defs "#define XPAR_SCUGIC\n")
 endif()
 list(APPEND defs "\n#endif")
