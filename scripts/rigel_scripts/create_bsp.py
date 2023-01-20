@@ -255,7 +255,8 @@ def create_domain(args):
     cmake_paths_append = f" -DCMAKE_LIBRARY_PATH={obj.lib_folder} \
             -DCMAKE_INCLUDE_PATH={obj.include_folder} \
             -DCMAKE_MODULE_PATH={obj.domain_dir} \
-            -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file}"
+            -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file} \
+            -DCMAKE_VERBOSE_MAKEFILE=ON"
 
     # Create top level CMakeLists.txt inside domain dir
     cmake_file = os.path.join(obj.domain_dir, "CMakeLists.txt")

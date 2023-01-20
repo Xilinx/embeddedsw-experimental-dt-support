@@ -41,7 +41,8 @@ class BSP:
         self.cmake_paths_append = f" -DCMAKE_LIBRARY_PATH={self.lib_folder} \
             -DCMAKE_INCLUDE_PATH={self.include_folder} \
             -DCMAKE_MODULE_PATH={self.domain_path} \
-            -DCMAKE_TOOLCHAIN_FILE={self.toolchain_file}"
+            -DCMAKE_TOOLCHAIN_FILE={self.toolchain_file} \
+            -DCMAKE_VERBOSE_MAKEFILE=ON"
 
         self.drvlist = domain_data["drvlist"]
         self.lib_config = domain_data["lib_config"]
