@@ -27,7 +27,7 @@ list(APPEND defs "\n\n#endif")
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/xsysmonpsv_supplylist.h ${defs})
 
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/xsysmonpsv_g.c defs)
-string(FIND "${defs}" "XSysMonPsv_Supply_Arr"_index)
+string(FIND "${defs}" "XSysMonPsv_Supply_Arr" _index)
 if ((${_index} EQUAL -1) AND
     ("${DRIVER_OPTPROP_0_LIST}" STREQUAL ""))
     list(APPEND defs ";\\")
