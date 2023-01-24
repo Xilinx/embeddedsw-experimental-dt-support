@@ -7,6 +7,8 @@ title: hello world
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 description: Let's say 'Hello World' in C.
 
 depends_libs:

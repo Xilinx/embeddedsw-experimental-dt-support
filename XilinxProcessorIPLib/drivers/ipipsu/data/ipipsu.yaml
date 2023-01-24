@@ -8,6 +8,8 @@ maintainers:
   - Shubhrajyoti Datta <shubhrajyoti.datta@xilinx.com>
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

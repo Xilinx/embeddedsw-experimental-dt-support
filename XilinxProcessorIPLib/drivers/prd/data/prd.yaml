@@ -8,6 +8,8 @@ maintainers:
   - Nava kishore Manne <nava.manne@xilinx.com>
   - Sai Krishna Potthuri <lakshmi.sai.krishna.potthuri@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

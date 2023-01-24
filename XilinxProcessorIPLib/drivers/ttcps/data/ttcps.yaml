@@ -6,6 +6,8 @@ title: Bindings for TTCPS controller
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

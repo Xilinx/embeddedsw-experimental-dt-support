@@ -7,6 +7,8 @@ title: Bindings for DFX AXI Shutdown Manager
 maintainers:
   - Nava kishore Manne <nava.manne@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

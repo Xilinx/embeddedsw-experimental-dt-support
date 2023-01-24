@@ -7,6 +7,10 @@ title: Bindings for xilskey library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: library
+
+version: 7.3
+
 description: Xilinx Secure Key Library supports programming efuse and bbram.
 
 supported_processors:

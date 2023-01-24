@@ -7,6 +7,8 @@ title: Bindings for axis switch controller
 maintainers:
   - Naga Sureshkumar Relli <nagasure@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     OneOf:

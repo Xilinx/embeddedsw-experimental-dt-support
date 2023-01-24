@@ -7,6 +7,10 @@ title: Bindings for xilmailbox library application
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: library
+
+version: 1.7
+
 description: Xilinx IPI Mailbox Library.
 
 properties:

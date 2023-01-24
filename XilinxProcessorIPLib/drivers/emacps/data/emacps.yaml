@@ -7,6 +7,8 @@ title: Bindings for GEM controller
 maintainers:
   - Harini Katakam <harini.katakam@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     OneOf:

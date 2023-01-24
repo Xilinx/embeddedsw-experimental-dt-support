@@ -7,6 +7,10 @@ title: Bindings for standalone
 maintainers:
   - Mubin Sayyed <mubin.usman.sayyed@xilinx.com>
 
+type: os
+
+version: 8.1
+
 depends:
     uartlite:
         - reg

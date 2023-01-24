@@ -7,6 +7,8 @@ title: peripheral test
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 description: Simple test routines for all peripherals in the hardware.
 
 depends_libs:

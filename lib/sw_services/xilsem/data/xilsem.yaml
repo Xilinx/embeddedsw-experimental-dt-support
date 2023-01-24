@@ -7,6 +7,10 @@ title: Bindings for xilsem library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: library
+
+version: 1.6
+
 description: Xilinx Versal Soft Error Mitigation Library.
 
 supported_processors:

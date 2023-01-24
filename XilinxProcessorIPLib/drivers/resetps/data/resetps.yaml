@@ -7,6 +7,8 @@ title: Bindings for resetps controller available in the zynqMP
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

@@ -7,6 +7,8 @@ title: Versal PSMFW
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 description: Processing System Management Unit Firmware for versal.
 
 depends_libs:

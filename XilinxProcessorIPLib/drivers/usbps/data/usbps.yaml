@@ -7,6 +7,8 @@ title: Bindings for USBPSU controller
 maintainers:
   - Anurag Kumar Vulisha <anurag.kumar.vulisha@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     OneOf:

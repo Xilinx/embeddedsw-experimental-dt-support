@@ -7,6 +7,10 @@ title: Bindings for xilloader library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: library
+
+version: 1.8
+
 description: Xilinx Versal Platform Loader Library.
 
 supported_processors:

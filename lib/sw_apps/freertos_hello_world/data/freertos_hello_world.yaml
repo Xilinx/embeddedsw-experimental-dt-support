@@ -7,6 +7,8 @@ title: freertos hello world
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 description: FreeRTOS Hello World application.
 
 supported_processors:

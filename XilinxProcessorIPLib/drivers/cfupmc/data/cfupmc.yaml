@@ -7,6 +7,8 @@ title: Bindings for CFU PMC controller
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: driver
+
 config:
     - XCfupmc_Config 
 

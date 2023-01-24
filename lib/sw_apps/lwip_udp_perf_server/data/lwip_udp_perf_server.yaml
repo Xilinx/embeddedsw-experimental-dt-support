@@ -7,6 +7,8 @@ title: lwip udp perf server
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 properties:
   reg:
     description: Physical base address and size of the controller register map

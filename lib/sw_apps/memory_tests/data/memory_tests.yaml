@@ -7,6 +7,8 @@ title: memory test
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 description: This application tests Memory Regions present in the hardware.
 
 supported_processors:

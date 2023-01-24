@@ -7,6 +7,10 @@ title: Bindings for xilpuf library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: library
+
+version: 2.1
+
 description: Xilinx PUF Library provides interface for registration and regeneration.
 
 supported_processors:

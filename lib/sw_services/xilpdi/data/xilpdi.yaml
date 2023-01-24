@@ -7,6 +7,10 @@ title: Bindings for xilffs library.
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: library
+
+version: 1.7
+
 description: Xilinx Programmable Device Image (PDI) Library.
 
 supported_processors:

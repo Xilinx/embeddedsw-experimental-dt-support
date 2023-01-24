@@ -7,6 +7,8 @@ title: Bindings for MAILBOX controller
 maintainers:
   - Shubhrajyoti Datta <shubhraj@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

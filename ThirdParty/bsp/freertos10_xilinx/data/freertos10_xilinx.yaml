@@ -7,6 +7,10 @@ title: Bindings for freertos bsp
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: os
+
+version: 1.14
+
 properties:
   reg:
     description: Physical base address and size of the controller register map

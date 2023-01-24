@@ -7,6 +7,8 @@ title: Bindings for CORESIGHT controller
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     OneOf:

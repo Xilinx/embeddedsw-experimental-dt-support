@@ -8,6 +8,8 @@ maintainers:
   - Arjun V <arjunv@xilinx.com>
   - Bharat Kumar Gogada <bharatku@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     items:

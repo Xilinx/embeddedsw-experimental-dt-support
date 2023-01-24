@@ -7,6 +7,8 @@ title: Bindings for scuwdt driver
 maintainers:
   - Mubin Usman Sayyed <mubin.usman.sayyed@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     OneOf:

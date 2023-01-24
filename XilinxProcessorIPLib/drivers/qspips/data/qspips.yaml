@@ -7,6 +7,8 @@ title: Bindings for QSPIPS controller
 maintainers:
   - Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>
 
+type: driver
+
 properties:
   compatible:
     OneOf:

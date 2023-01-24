@@ -7,6 +7,8 @@ title: ZynqMP PMUFW
 maintainers:
   - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
 
+type: apps
+
 description: Platform Management Unit Firmware for ZynqMP.
 
 supported_processors:
