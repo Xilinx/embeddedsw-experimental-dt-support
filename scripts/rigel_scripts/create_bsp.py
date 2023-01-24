@@ -383,18 +383,22 @@ project(bsp)
 
     cmake_file_cmds += f"\nadd_library(bsp INTERFACE)"
     cmake_file_cmds += f"\nadd_dependencies(bsp xilstandalone_config xilstandalone_meta xparam {cmake_lib_list} {cmake_drv_list})"
+    cmake_file_cmds = cmake_file_cmds.replace('\\', '/')
     utils.write_into_file(cmake_file, cmake_file_cmds)
 
     # Create a build directory for cmake to generate all _g.c files.
     build_metadata = os.path.join(obj.libsrc_folder, "build_configs/metadata")
     utils.mkdir(build_metadata)
 
-    # Run cmake configure and build to generate _g.c files.
+    # Run cmake configure and build to generate _g.c files
+    obj.domain_dir = obj.domain_dir.replace('\\', '/')
+    obj.toolchain_file = obj.toolchain_file.replace('\\', '/')
+    cmake_paths_append = cmake_paths_append.replace('\\', '/')
+    build_metadata = build_metadata.replace('\\', '/')
     utils.runcmd(
         f"cmake {obj.domain_dir} -DCMAKE_TOOLCHAIN_FILE={obj.toolchain_file} {cmake_paths_append}",
         cwd = build_metadata
     )
-
     utils.runcmd("make -f CMakeFiles/Makefile2 -j22 >/dev/null", cwd = build_metadata)
 
     # Create new CMakeLists.txt
@@ -404,6 +408,7 @@ project(bsp)
         for lib in lib_list:
             dstdir = os.path.join(obj.libsrc_folder, f"{lib}/src")
             cmake_file_cmds += f"\nadd_subdirectory({dstdir})\n"
+    cmake_file_cmds = cmake_file_cmds.replace('\\', '/')
     utils.write_into_file(cmake_file, cmake_file_cmds)
 
     build_metadata = os.path.join(obj.libsrc_folder, "build_configs/gen_bsp")
@@ -416,6 +421,8 @@ project(bsp)
         lib_obj.config_lib("xiltimer", lib_list, cmake_cmd_append, is_app=False)
 
     # Run cmake configuration with all the default cache entries
+    cmake_paths_append = cmake_paths_append.replace('\\', '/')
+    build_metadata = build_metadata.replace('\\', '/')
     utils.runcmd(
             f'cmake {obj.domain_dir} {cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
             cwd = build_metadata

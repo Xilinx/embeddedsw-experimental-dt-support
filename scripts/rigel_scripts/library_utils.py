@@ -289,6 +289,9 @@ class Library(Repo):
             if lib_list:
                 # Run cmake configuration with all the default cache entries
                 build_metadata = os.path.join(self.libsrc_folder, "build_configs/gen_bsp")
+                self.cmake_paths_append = self.cmake_paths_append.replace('\\', '/')
+                self.domain_path = self.domain_path.replace('\\', '/')
+                build_metadata = build_metadata.replace('\\', '/')
                 utils.runcmd(
                     f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
                     cwd = build_metadata
@@ -297,6 +300,7 @@ class Library(Repo):
                 # Get the default cmake entries into yaml configuration file
                 lib_config = self.get_default_lib_params(build_metadata, lib_list)
                 if is_app:
+                    cmake_cmd_append = cmake_cmd_append.replace('\\', '/')
                     # Re-run cmake with modified lib entries
                     utils.runcmd(f"cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd = build_metadata)
                     # Add the modified lib param values in yaml configuration dict

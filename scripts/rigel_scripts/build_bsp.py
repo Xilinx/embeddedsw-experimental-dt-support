@@ -50,13 +50,17 @@ class BSP:
 
     def build_bsp(self):
         cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
+        self.libsrc_folder = self.libsrc_folder.replace('\\','/')
         bsp_exist = utils.check_if_line_in_file(cmake_file, f"add_subdirectory({self.libsrc_folder})")
         if not bsp_exist:
             utils.add_newline(cmake_file, f"\nadd_subdirectory({self.libsrc_folder})")
         build_libxil = os.path.join(self.libsrc_folder, "build_configs/gen_bsp")
         utils.mkdir(build_libxil)
+        self.domain_path = self.domain_path.replace('\\','/')
+        self.cmake_paths_append = self.cmake_paths_append.replace('\\','/')
+        build_libxil = build_libxil.replace('\\','/')
         utils.runcmd(f"cmake {self.domain_path} -DNON_YOCTO=ON {self.cmake_paths_append}", cwd=build_libxil)
-        utils.runcmd("make -f CMakeFiles/Makefile2 -j22 >/dev/null", cwd = build_libxil)
+        utils.runcmd("make -f CMakeFiles/Makefile2 -j22 > nul", cwd = build_libxil)
         utils.runcmd("make install", cwd=build_libxil)
 
 def generate_bsp(args):

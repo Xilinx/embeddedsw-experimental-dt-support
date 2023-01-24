@@ -48,7 +48,10 @@ def build_app(args):
     if not utils.is_file(libxil_a_path) or not utils.is_file(libxilstandalone_a_path):
         generate_bsp(args)
 
-    # Run make inside cmake configured build area.
+    # Run make inside cmake configured build area
+    obj.app_src_dir = obj.app_src_dir.replace('\\', '/')
+    obj.cmake_paths_append = obj.cmake_paths_append.replace('\\', '/')
+    obj.app_build_dir = obj.app_build_dir.replace('\\', '/')
     utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=obj.app_build_dir)
     utils.runcmd("make -j22", cwd=obj.app_build_dir)
 
