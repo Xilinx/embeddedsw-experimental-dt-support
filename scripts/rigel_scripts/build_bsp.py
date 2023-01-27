@@ -38,13 +38,17 @@ class BSP:
         self.toolchain_file = os.path.join(
             self.domain_path, domain_data["toolchain_file"]
         )
+        self.specs_file = os.path.join(
+            self.domain_path, domain_data["specs_file"]
+        )
         self.cmake_paths_append = f" -DCMAKE_LIBRARY_PATH={self.lib_folder} \
             -DCMAKE_INCLUDE_PATH={self.include_folder} \
             -DCMAKE_MODULE_PATH={self.domain_path} \
             -DCMAKE_TOOLCHAIN_FILE={self.toolchain_file} \
+            -DCMAKE_SPECS_FILE={self.specs_file} \
             -DCMAKE_VERBOSE_MAKEFILE=ON"
 
-        self.drvlist = domain_data["drvlist"]
+        self.drvlist = list(domain_data["drv_info"].keys())
         self.lib_config = domain_data["lib_config"]
         self.template = domain_data["template"]
 

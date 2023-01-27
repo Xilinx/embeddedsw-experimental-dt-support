@@ -52,7 +52,7 @@ class RegenBSP(BSP, Library):
         # Get the library list in the new bsp
         domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
         lib_list = list(domain_data["lib_config"].keys()) + [self.proc, self.os]
-        drvlist = domain_data["drvlist"]
+        drvlist = list(domain_data["drv_info"].keys())
         add_lib_list = [lib for lib in self.lib_list if lib not in lib_list]
 
         # Check library list against existing lib_list in the previous bsp.yaml 
@@ -60,18 +60,25 @@ class RegenBSP(BSP, Library):
         cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
         build_folder = os.path.join(self.libsrc_folder, "build_configs")
         ignored_lib_list = []
+        changed_version_lib_list = []
         for lib in add_lib_list:
-            if not self.validate_drv_for_lib(lib, drvlist):
+            cur_lib_version = self.lib_info[lib]['version']
+            lib_version_fetched = ''
+            if cur_lib_version in self.repo_schema.get('library').get(lib,{}).keys():
+                lib_version_fetched = cur_lib_version
+            else:
+                changed_version_lib_list += [lib]
+            if not self.validate_drv_for_lib(lib, drvlist, lib_version_fetched):
                 ignored_lib_list.append(lib)
                 continue
-            self.gen_lib_cmake(lib)
-            lib_list, cmake_cmd_append = self.add_lib(lib)
-            self.config_lib(lib, lib_list, cmake_cmd_append)
+            self.gen_lib_cmake(lib, lib_version_fetched)
+            lib_list, cmake_cmd_append = self.add_lib(lib, is_app=False, version=lib_version_fetched)
+            self.config_lib(lib, lib_list, cmake_cmd_append, is_app=False, version=lib_version_fetched)
 
         # Apply the Old software configuraiton
         cmake_cmd_append = ""
         # cmake syntax is using 'ON/OFF' option, 'True/False' is lagacy entry.
-        bool_match = {"True": "ON", "False": "OFF"}
+        bool_match = {"true": "ON", "false": "OFF"}
         for lib in self.lib_list:
             for key, value in self.bsp_lib_config[lib].items():
                 val = value['value']
@@ -79,7 +86,7 @@ class RegenBSP(BSP, Library):
                     val = bool_match[val]
                 cmake_cmd_append += f" -D{key}='{val}'"
 
-        build_metadata = os.path.join(self.libsrc_folder, "build_configs/gen_bsp")
+        build_metadata = os.path.join(self.libsrc_folder, "build_configs", "gen_bsp")
         utils.runcmd(f"cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd=build_metadata)
 
         # Run cmake configuration to get cache entries update bsp yaml with this data
@@ -97,14 +104,17 @@ class RegenBSP(BSP, Library):
         # In case of Re generate BSP with different SDT print differences
         add_drv_list = [drv for drv in drvlist if drv not in self.drvlist]
         del_drv_list = [drv for drv in self.drvlist if drv not in drvlist]
-        if add_drv_list or del_drv_list or ignored_lib_list:
+        if add_drv_list or del_drv_list or ignored_lib_list or changed_version_lib_list:
             print(f"During Regeneration of BSP")
             if add_drv_list:
                 print(f"Drivers {*add_drv_list,} got added")
             if del_drv_list:
                 print(f"Drivers {*del_drv_list,} got deleted")
             if ignored_lib_list:
-                print(f"Libraries {*ignored_lib_list,} ignored due to incompatible with new system device-tree") 
+                print(f"Libraries {*ignored_lib_list,} ignored due to incompatible with new system device-tree")
+            if changed_version_lib_list:
+                print(f"Libraries {*changed_version_lib_list,} changed their versions")
+
 
 def regenerate_bsp(args):
     """

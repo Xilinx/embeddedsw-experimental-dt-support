@@ -50,7 +50,7 @@ class Validation(BSP, Repo):
             app_list_file = os.path.join(self.domain_path, "app_list.yaml")
             if not utils.is_file(app_list_file):
                 utils.runcmd(
-                    f"lopper --werror -f -O {self.domain_path} {self.sdt} -- baremetal_getsupported_comp_xlnx {self.proc} {self.repo}"
+                    f"lopper --werror -f -O {self.domain_path} {self.sdt} -- baremetal_getsupported_comp_xlnx {self.proc} {self.repo_yaml_list}"
                 )
         proc_data = utils.fetch_yaml_data(app_list_file, "app_list")[self.proc]
         return proc_data
@@ -131,7 +131,7 @@ class Validation(BSP, Repo):
                     except KeyError:
                         lib_app_dict[entry] = [app]
 
-        template_possible = lib_app_dict["NA"]
+        template_possible = []
 
         for ele in self.avail_libs:
             confirmed = False

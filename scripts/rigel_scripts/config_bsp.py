@@ -45,39 +45,27 @@ def configure_bsp(args):
 
     # If user wants to add a library to the bsp
     if obj.addlib:
-        if obj.addlib in obj.bsp_lib_config.keys():
-            print(f"""\b
-                {obj.addlib} is already added in the bsp. Nothing to do.
-                Use config_bsp.py if you want to configure the library.
-            """)
-            sys.exit(1)
-        obj.validate_lib_name(obj.addlib)
-        obj.gen_lib_cmake(obj.addlib)
-        lib_list, cmake_cmd_append = obj.add_lib(obj.addlib)
-        obj.config_lib(obj.addlib, lib_list, cmake_cmd_append)
+        lib_name = obj.addlib[0]
+        lib_version = ''
+        if len(obj.addlib) > 1:
+            lib_version = float(obj.addlib[1])
+        if lib_name in obj.bsp_lib_config.keys():
+            if lib_version and lib_version != obj.lib_info[lib_name]['version']:
+                obj.remove_lib(lib_name)
+            else:
+                print(f"""\b
+                    {lib_name} is already added in the bsp. Nothing to do.
+                    Use config_bsp.py if you want to configure the library.
+                """)
+                sys.exit(1)
+        obj.validate_lib_name(lib_name, lib_version)
+        obj.gen_lib_cmake(lib_name, lib_version)
+        lib_list, cmake_cmd_append = obj.add_lib(lib_name, is_app=False, version=lib_version)
+        obj.config_lib(lib_name, lib_list, cmake_cmd_append, is_app=False, version=lib_version)
 
     # If user wants to remove a library from the bsp
     if obj.rmlib:
-        obj.validate_lib_in_bsp(obj.rmlib)
-        lib_path = os.path.join(obj.libsrc_folder, obj.rmlib)
-        base_lib_build_dir = os.path.join(obj.libsrc_folder, "build_configs", "gen_bsp", "libsrc")
-        lib_build_dir = os.path.join(base_lib_build_dir, obj.rmlib)
-
-        cmake_file = os.path.join(obj.domain_path, "CMakeLists.txt")
-        utils.remove_line(cmake_file, obj.rmlib)
-
-        # Run make clean to remove the respective headers and .a from lib and include folder.
-        utils.runcmd(f"make -C {os.path.join(obj.rmlib, 'src')} clean", cwd=base_lib_build_dir)
-        # Remove library src folder from libsrc
-        utils.remove(lib_path)
-        # Remove cmake build folder from cmake build area.
-        utils.remove(lib_build_dir)
-        # Update library config file
-        utils.update_yaml(obj.domain_config_file, "domain", obj.rmlib, None, action="remove")
-        obj.bsp_lib_config.pop(obj.rmlib)
-        # If the library being removed was the only lib in bsp, remove the cmake build dir
-        if not obj.bsp_lib_config:
-            utils.remove(base_lib_build_dir)
+        obj.remove_lib(obj.rmlib)
 
     # If user wants to set library parameters
     if args.get("set_property"):
@@ -86,7 +74,7 @@ def configure_bsp(args):
         # Validate the command line inputs provided
         usage_print = """
             [ERROR]: Please Pass Library Name followed by param:value.
-            e.g. -set_property xilffs XILFFS_read_only:ON XILFFS_use_lfn:1 
+            e.g. -st xilffs XILFFS_read_only:ON XILFFS_use_lfn:1
             Wrong inputs passed with set_property.
         """
         if len(prop_params) < 2:
@@ -143,21 +131,24 @@ if __name__ == "__main__":
         help="Domain directory Path",
         required=True,
     )
-    parser.add_argument(
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         "-al",
         "--addlib",
+        nargs='+',
         action="store",
-        default="",
+        default=[],
         help="Specify libaries that needs to be added if any",
     )
-    parser.add_argument(
+    group.add_argument(
         "-rl",
         "--rmlib",
         action="store",
         default="",
         help="Specify libaries that needs to be removed if any",
     )
-    parser.add_argument(
+    group.add_argument(
         "-st",
         "--set_property",
         nargs="*",

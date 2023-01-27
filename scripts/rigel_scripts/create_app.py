@@ -25,6 +25,7 @@ class App(BSP, Repo):
         self._build_dir_struct(args)
         self.app_name = args.get("name")
         self.template = args.get("template")
+        self.repo_paths_list = self.repo_schema['paths']
 
     def _build_dir_struct(self, args):
         """
@@ -56,7 +57,7 @@ def create_app(args):
     obj = App(args)
 
     # Copy the application src directory from embeddedsw to app src folder.
-    esw_app_dir = obj.get_comp_dir(obj.template, is_app=True)
+    esw_app_dir, _ = obj.get_comp_dir(obj.template)
     srcdir = os.path.join(esw_app_dir, "src")
     utils.copy_directory(srcdir, obj.app_src_dir)
 
@@ -74,7 +75,7 @@ def create_app(args):
         app_schema = utils.load_yaml(app_yaml_file)
         if app_schema.get("depends"):
             utils.runcmd(
-                f"lopper -O {obj.app_src_dir} {obj.sdt} -- bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo}"
+                f"lopper -O {obj.app_src_dir} {obj.sdt} -- bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo_yaml_path}"
             )
 
     # Generates the metadata for linker script
@@ -88,17 +89,22 @@ def create_app(args):
 
     # Copy the static linker files from embeddedsw to the app src dir
     linker_dir = os.path.join(obj.app_src_dir, "linker_files")
-    linker_src = os.path.join(obj.repo, "scripts/linker_files")
+    linker_src = utils.get_high_precedence_path(
+            obj.repo_paths_list, "scripts/linker_files", "Linker file directory"
+        )
     utils.copy_directory(linker_src, linker_dir)
 
     # Generate the CMake file specifically for peripheral app
     if obj.template == "peripheral_tests":
         utils.runcmd(
-            f"lopper -O {obj.app_src_dir} {obj.sdt} -- baremetal_gentestapp_xlnx {obj.proc} {obj.repo}"
+            f"lopper -O {obj.app_src_dir} {obj.sdt} -- baremetal_gentestapp_xlnx {obj.proc} {obj.repo_yaml_path}"
         )
 
     # Add domain path entry in the app configuration file.
-    data = {"domain_path": obj.domain_path}
+    data = {"domain_path": obj.domain_path,
+            "app_src_dir": esw_app_dir,
+            "template": obj.template
+        }
     utils.write_yaml(obj.app_config_file, data)
 
     # Success prints if everything went well till this point.
