@@ -25,7 +25,7 @@ depends_libs:
         lwip211_ipv6_enable: OFF
         lwip211_pbuf_pool_size: 2048
         lwip211_pbuf_pool_size: 16384
-        lwip211_n_tx_descriptors: 512
+        lwip211_temac_n_tx_descriptors: 512
         lwip211_memp_n_pbuf: 1024
         lwip211_mem_size: 524288
     xiltimer:
