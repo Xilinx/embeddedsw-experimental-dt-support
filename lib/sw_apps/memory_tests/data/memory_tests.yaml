@@ -11,6 +11,9 @@ type: apps
 
 description: This application tests Memory Regions present in the hardware.
 
+depends_libs:
+    xiltimer: {}
+
 supported_processors:
   - psu_cortexa53
   - psu_cortexr5
