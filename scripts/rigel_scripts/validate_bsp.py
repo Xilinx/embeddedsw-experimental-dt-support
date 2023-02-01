@@ -19,9 +19,10 @@ class Validation(BSP, Repo):
     """
 
     def __init__(self, args):
-        self.template = args.get("template")
         BSP.__init__(self, args)
         Repo.__init__(self)
+        if args.get("template"):
+            self.template = args.get("template")
         self.proc_data = self._get_template_lib_data(args.get("app_list_yaml"))
         self.app_data = self.proc_data[self.os]
         self.supported_app_list = list(self.app_data.keys())
