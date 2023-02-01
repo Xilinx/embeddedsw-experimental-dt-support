@@ -1218,6 +1218,7 @@
 			xlnx,db-fxbc7x-f0 = <0x0000>;
 			xlnx,mc-config-num = "config17";
 			xlnx,mc-ch1-ddr4-addr-skew-1 = <0>;
+			xlnx,name = "axi_noc_0_MC0_ddrc";
 			xlnx,mc-ch1-ddr4-addr-skew-2 = <0>;
 			xlnx,mc-ch1-ddr4-addr-skew-3 = <0>;
 			xlnx,mc-ch1-ddr4-addr-skew-4 = <0>;
@@ -1318,9 +1319,9 @@
 			xlnx,mc-addr-bit10 = "CA6";
 			xlnx,mc-ip-timeperiod0-for-op = <1250>;
 			xlnx,user-npi-reg-mc-nsu-0-egr = <0x00473610>;
+			xlnx,reg-p0-isw-rate-ctrl = <0x003FFC0F>;
 			xlnx,mc-addr-bit11 = "CA7";
 			xlnx,mc-selfrefresh;
-			xlnx,reg-p0-isw-rate-ctrl = <0x003FFC0F>;
 			xlnx,mc-addr-bit12 = "CA8";
 			xlnx,mc-trtp = <7500>;
 			xlnx,mc-addr-bit13 = "CA9";
@@ -1635,6 +1636,7 @@
 			xlnx,ip-name = "xlconstant";
 			xlnx,edk-iptype = "PERIPHERAL";
 			xlnx,const-width = <1>;
+			xlnx,name = "axi_noc_0_const_0";
 		};
 	};
 };
