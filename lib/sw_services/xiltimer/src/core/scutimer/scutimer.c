@@ -298,6 +298,13 @@ void XTime_GetTime(XTime *Xtime_Global)
 {
 	XTimer *InstancePtr = &TimerInst;
 	XScuTimer *ScuTimerInstPtr = &InstancePtr->ScuTimer_SleepInst;
+	static u8 IsSleepTimerStarted = FALSE;
+
+	if (FALSE == IsSleepTimerStarted) {
+		XTimer_ScutimerInit(InstancePtr, XSLEEPTIMER_DEVICEID,
+				    &InstancePtr->ScuTimer_SleepInst);
+		IsSleepTimerStarted = TRUE;
+	}
 
 	*Xtime_Global = XScuTimer_GetCounterValue(ScuTimerInstPtr);
 }

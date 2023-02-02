@@ -342,6 +342,18 @@ void XTime_GetTime(XTime *Xtime_Global)
 {
 	XTimer *InstancePtr = &TimerInst;
 	XTtcPs *TtcPsInstPtr = &InstancePtr->TtcPs_SleepInst;
+	static u8 IsSleepTimerStarted = FALSE;
+
+	if (FALSE == IsSleepTimerStarted) {
+#ifdef SDT
+		XTimer_TtcInit(XSLEEPTIMER_BASEADDRESS,
+				&InstancePtr->TtcPs_SleepInst);
+#else
+		XTimer_TtcInit(XSLEEPTIMER_DEVICEID,
+				&InstancePtr->TtcPs_SleepInst);
+#endif
+		IsSleepTimerStarted = TRUE;
+	}
 
 	*Xtime_Global = XTtcPs_GetCounterValue(TtcPsInstPtr);
 }/*@}*/

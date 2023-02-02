@@ -325,6 +325,17 @@ void XTime_GetTime(XTime *Xtime_Global)
 {
 	XTimer *InstancePtr = &TimerInst;
 	XTmrCtr *AxiTimerInstPtr = &InstancePtr->AxiTimer_SleepInst;
+	static u8 IsSleepTimerStarted = FALSE;
+
+	if (FALSE == IsSleepTimerStarted) {
+#ifdef SDT
+		XAxiTimer_Init(InstancePtr, XSLEEPTIMER_BASEADDRESS,
+#else
+		XAxiTimer_Init(InstancePtr, XSLEEPTIMER_DEVICEID,
+#endif
+				&InstancePtr->AxiTimer_SleepInst);
+		IsSleepTimerStarted = TRUE;
+	}
 
 	*Xtime_Global = XTmrCtr_GetValue(AxiTimerInstPtr, 0);
 }
