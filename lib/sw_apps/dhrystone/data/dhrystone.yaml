@@ -1,0 +1,25 @@
+# Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+%YAML 1.2
+---
+title: Dhrystone
+
+maintainers:
+  - Appana Durga Kedareswara Rao <appanad.durga.rao@xilinx.com>
+
+type: apps
+
+description: Dhrystone synthetic benchmark program for baremetal environment.
+
+depends_libs:
+    xiltimer: {}
+
+supported_processors:
+  - psu_cortexa53
+  - psu_cortexr5
+  - psv_cortexa72
+  - psv_cortexr5
+
+supported_os:
+  - standalone
+...
