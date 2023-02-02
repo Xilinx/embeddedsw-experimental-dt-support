@@ -33,6 +33,8 @@ supported_os:
 depends:
     tmrctr:
         - reg
+        - clock-frequency
     ttcps:
         - reg
+        - xlnx,clock-freq
 ...
