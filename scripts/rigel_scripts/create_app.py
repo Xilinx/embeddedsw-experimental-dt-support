@@ -162,6 +162,8 @@ if __name__ == "__main__":
             - lwip_tcp_perf_server
             - lwip_udp_perf_client
             - lwip_udp_perf_server
+            - dhrystone
+            - zynqmp_dram_test
         """
         ),
     )

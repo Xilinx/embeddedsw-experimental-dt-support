@@ -544,6 +544,7 @@ if __name__ == "__main__":
         help=textwrap.dedent(
             """\
         Specify template app name. Available names are:
+            - empty_application
             - hello_world
             - memory_tests
             - peripheral_tests
@@ -553,6 +554,17 @@ if __name__ == "__main__":
             - freertos_hello_world
             - versal_plm
             - versal_psmfw
+            - freertos_lwip_echo_server
+            - freertos_lwip_tcp_perf_client
+            - freertos_lwip_tcp_perf_server
+            - freertos_lwip_udp_perf_client
+            - freertos_lwip_udp_perf_server
+            - lwip_tcp_perf_client
+            - lwip_tcp_perf_server
+            - lwip_udp_perf_client
+            - lwip_udp_perf_server
+            - dhrystone
+            - zynqmp_dram_test
         """
         ),
     )

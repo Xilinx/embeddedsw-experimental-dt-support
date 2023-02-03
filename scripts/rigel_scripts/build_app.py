@@ -57,7 +57,11 @@ def build_app(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Use this script to build the cretaed app ",
+        description=f"""\b
+            Use this script to build the created app.
+            It expects either -w <app ws path> or
+            -s <app src dir path> and -b <app build dir path>
+            passed during create_app""",
         usage='use "python %(prog)s --help" for more information',
         formatter_class=argparse.RawTextHelpFormatter,
     )

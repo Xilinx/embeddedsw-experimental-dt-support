@@ -1,6 +1,6 @@
 export XILINX_TOOLCHAIN=/proj/xbuilds/2023.1_daily_latest/installs/lin64/Vitis/2023.1
 export PYTHON_VER="python-3.8.3"
-export CMAKE_VER="3.24.2"
+export CMAKE_VER="cmake-3.24.2"
 
 export XBUILDS_LOPPER_PATH=${XILINX_TOOLCHAIN}/data/lopper
 export XBUILDS_CMAKE_PATH=${XILINX_TOOLCHAIN}/tps/lnx64/${CMAKE_VER}
