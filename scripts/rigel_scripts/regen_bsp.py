@@ -95,7 +95,8 @@ class RegenBSP(BSP, Library):
                 f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
                 cwd = build_metadata
         )
-        lib_config = self.get_default_lib_params(build_metadata, add_lib_list)
+        lib_list = list(domain_data["lib_config"].keys()) + add_lib_list
+        lib_config = self.get_default_lib_params(build_metadata, lib_list)
         utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)
         proc_config = self.get_default_lib_params(build_metadata, [self.proc])
         utils.update_yaml(self.domain_config_file, "domain", "proc_config", proc_config)
