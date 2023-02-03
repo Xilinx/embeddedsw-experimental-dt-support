@@ -23,7 +23,7 @@ class Domain(Repo):
     """
 
     def __init__(self, args):
-        super().__init__()
+        super().__init__(repo_yaml_path=args["repo_info"])
         self.domain_dir = utils.get_abs_path(args["ws_dir"])
         self.proc = args["proc"]
         self.os = args["os"]
@@ -375,7 +375,7 @@ find_package(common)
     lib_list = []
     cmake_cmd_append = ""
     lib_obj = Library(
-        obj.domain_dir, obj.proc, obj.os, obj.sdt, cmake_paths_append, obj.libsrc_folder
+        obj.domain_dir, obj.proc, obj.os, obj.sdt, cmake_paths_append, obj.libsrc_folder, obj.repo_yaml_path
     )
 
     if obj.os == "freertos":
@@ -556,6 +556,14 @@ if __name__ == "__main__":
         """
         ),
     )
+    parser.add_argument(
+        "-r",
+        "--repo_info",
+        action="store",
+        help="Specify the .repo.yaml absolute path to use the set repo info",
+        default='.repo.yaml',
+    )
+
 
     args = vars(parser.parse_args())
     create_domain(args)

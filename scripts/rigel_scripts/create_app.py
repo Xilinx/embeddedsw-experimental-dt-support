@@ -21,7 +21,7 @@ class App(BSP, Repo):
 
     def __init__(self, args):
         BSP.__init__(self, args)
-        Repo.__init__(self)
+        Repo.__init__(self, repo_yaml_path=args['repo_info'])
         self._build_dir_struct(args)
         self.app_name = args.get("name")
         self.template = args.get("template")
@@ -164,6 +164,13 @@ if __name__ == "__main__":
             - lwip_udp_perf_server
         """
         ),
+    )
+    parser.add_argument(
+        "-r",
+        "--repo_info",
+        action="store",
+        help="Specify the .repo.yaml absolute path to use the set repo info",
+        default='.repo.yaml',
     )
 
     args = vars(parser.parse_args())

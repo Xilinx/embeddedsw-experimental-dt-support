@@ -20,9 +20,8 @@ class Validation(BSP, Repo):
 
     def __init__(self, args):
         BSP.__init__(self, args)
-        Repo.__init__(self)
-        if args.get("template"):
-            self.template = args.get("template")
+        Repo.__init__(self, repo_yaml_path=args["repo_info"])
+        self.template = args.get("template", self.template)
         self.proc_data = self._get_template_lib_data(args.get("app_list_yaml"))
         self.app_data = self.proc_data[self.os]
         self.supported_app_list = list(self.app_data.keys())
@@ -50,7 +49,7 @@ class Validation(BSP, Repo):
             app_list_file = os.path.join(self.domain_path, "app_list.yaml")
             if not utils.is_file(app_list_file):
                 utils.runcmd(
-                    f"lopper --werror -f -O {self.domain_path} {self.sdt} -- baremetal_getsupported_comp_xlnx {self.proc} {self.repo_yaml_list}"
+                    f"lopper --werror -f -O {self.domain_path} {self.sdt} -- baremetal_getsupported_comp_xlnx {self.proc} {self.repo_yaml_path}"
                 )
         proc_data = utils.fetch_yaml_data(app_list_file, "app_list")[self.proc]
         return proc_data
@@ -198,6 +197,14 @@ if __name__ == "__main__":
         default=None,
         help="Provide an external app_list.yaml file if created separately",
     )
+    parser.add_argument(
+        "-r",
+        "--repo_info",
+        action="store",
+        help="Specify the .repo.yaml absolute path to use the set repo info",
+        default='.repo.yaml',
+    )
+
     args = vars(parser.parse_args())
     obj = Validation(args)
     if args.get("get_apps"):

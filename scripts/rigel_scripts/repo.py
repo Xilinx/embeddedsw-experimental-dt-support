@@ -20,8 +20,9 @@ class Repo:
     """
 
     def __init__(self, repo_yaml_path=".repo.yaml"):
+        repo_yaml_path = utils.get_abs_path(repo_yaml_path)
         self._validate_repo(repo_yaml_path, os.environ.get("ESW_REPO", ""))
-        self.repo_yaml_path = utils.get_abs_path(repo_yaml_path)
+        self.repo_yaml_path = repo_yaml_path
         self.repo_schema = utils.load_yaml(self.repo_yaml_path)
 
     def _validate_repo(self, repo_yaml_path, shell_esw_repo):

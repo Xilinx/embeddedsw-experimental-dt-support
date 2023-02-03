@@ -28,6 +28,7 @@ class Bsp_config(BSP, Library):
             self.sdt,
             self.cmake_paths_append,
             self.libsrc_folder,
+            args['repo_info']
         )
         self.addlib = args["addlib"]
         self.rmlib = args["rmlib"]
@@ -154,6 +155,13 @@ if __name__ == "__main__":
         nargs="*",
         action="store",
         help="Specify libaries with the params that need to be configured",
+    )
+    parser.add_argument(
+        "-r",
+        "--repo_info",
+        action="store",
+        help="Specify the .repo.yaml absolute path to use the set repo info",
+        default='.repo.yaml',
     )
     args = vars(parser.parse_args())
     configure_bsp(args)

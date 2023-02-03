@@ -21,9 +21,9 @@ class Library(Repo):
     """
 
     def __init__(
-        self, domain_path, proc, bsp_os, sdt, cmake_paths_append, libsrc_folder
+        self, domain_path, proc, bsp_os, sdt, cmake_paths_append, libsrc_folder, repo_info
     ):
-        super().__init__()
+        super().__init__(repo_yaml_path= repo_info)
         self.domain_path = domain_path
         self.proc = proc
         self.os = bsp_os
