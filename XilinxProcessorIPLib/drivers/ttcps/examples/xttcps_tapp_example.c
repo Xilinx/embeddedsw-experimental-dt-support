@@ -133,7 +133,7 @@ int main(void)
 *		a Failure.
 *
 ****************************************************************************/
-int TmrInterruptExample(XTtcPs *TtcPsInst,UINTPTR BaseAddr)
+int TmrInterruptExample(XTtcPs *TtcPsInst, UINTPTR BaseAddr)
 {
 	int Status;
 	u16 CounterNum = 0;
@@ -164,8 +164,6 @@ int TmrInterruptExample(XTtcPs *TtcPsInst,UINTPTR BaseAddr)
 		if (Status != XST_SUCCESS) {
 			return XST_FAILURE;
 		}
-		DeviceID++;
-		TtcTickIntrID++;
 		CounterNum++;
 
 		/*
