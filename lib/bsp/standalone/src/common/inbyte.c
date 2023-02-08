@@ -21,11 +21,19 @@
 * SOFTWARE.
 *
 ******************************************************************************/
+#include "bspconfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 char inbyte(void);
 
 #ifdef __cplusplus
+}
+#endif
+
+#if !defined(STDIN_BASEADDRESS)
+char inbyte(void) {
+    return (0);
 }
 #endif
