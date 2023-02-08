@@ -115,11 +115,13 @@ function (linker_gen path)
 	    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CUSTOM_LINKER_FILE} ${CMAKE_SOURCE_DIR}/)
 	endif()
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${LINKER_FILE_PATH} ${CMAKE_SOURCE_DIR})
-	file (REMOVE_RECURSE ${path})
-	file (MAKE_DIRECTORY ${path})
-	# since move command is not there copy back and delete unneeded files
-	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${LINKER_FILE} ${path})
-	file (REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/${LINKER_FILE})
+	if (${NON_YOCTO})
+	    file (REMOVE_RECURSE ${path})
+	    file (MAKE_DIRECTORY ${path})
+	    # since move command is not there copy back and delete unneeded files
+	    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/${LINKER_FILE} ${path})
+	    file (REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/${LINKER_FILE})
+	endif()
 endfunction(linker_gen)
 
 function(gen_exheader path drvname addr prefix)
