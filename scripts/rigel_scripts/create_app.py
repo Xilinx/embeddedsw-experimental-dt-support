@@ -26,6 +26,7 @@ class App(BSP, Repo):
         self.app_name = args.get("name")
         self.template = args.get("template")
         self.repo_paths_list = self.repo_schema['paths']
+        self.lang = args.get("lang")
 
     def _build_dir_struct(self, args):
         """
@@ -103,7 +104,8 @@ def create_app(args):
     # Add domain path entry in the app configuration file.
     data = {"domain_path": obj.domain_path,
             "app_src_dir": esw_app_dir,
-            "template": obj.template
+            "template": obj.template,
+            "lang": obj.lang
         }
     utils.write_yaml(obj.app_config_file, data)
 
@@ -173,6 +175,13 @@ if __name__ == "__main__":
         action="store",
         help="Specify the .repo.yaml absolute path to use the set repo info",
         default='.repo.yaml',
+    )
+    parser.add_argument(
+        "-l",
+        "--lang",
+        action="store",
+        help="Specify the programming language can be c or c++",
+        default='c',
     )
 
     args = vars(parser.parse_args())
