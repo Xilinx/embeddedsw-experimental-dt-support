@@ -444,6 +444,12 @@ find_package(common)
 
     # Create new CMakeLists.txt
     cmake_file_cmds = cmake_header
+    cmake_file_cmds += """ 
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+    set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
+    set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
+endif()
+    """
     cmake_file_cmds += f"\nadd_subdirectory({obj.libsrc_folder}/standalone/src)\n"
     if lib_list:
         for lib in lib_list:
