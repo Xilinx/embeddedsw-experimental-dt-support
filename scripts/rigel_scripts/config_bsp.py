@@ -100,7 +100,17 @@ def configure_bsp(args):
         # set the cmake options to append lib param values.
         cmake_cmd_append = ""
         for key, value in prop_dict[lib_name].items():
-            cmake_cmd_append += f" -D{key}={value}"
+            if key == "proc_extra_compiler_flags":
+                utils.add_newline(
+                    obj.toolchain_file,
+                    f'set( CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} {value}")',
+                )
+                utils.add_newline(
+                    obj.toolchain_file,
+                    f'set( CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} {value}")',
+                )
+            else:
+                cmake_cmd_append += f" -D{key}={value}"
 
         # configure the lib build area with new params
         build_metadata = os.path.join(obj.libsrc_folder, "build_configs/gen_bsp")
