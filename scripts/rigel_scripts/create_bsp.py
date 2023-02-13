@@ -420,6 +420,10 @@ find_package(common)
             cmd = f"bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo_yaml_path}"
             outfile = f"{lib}Example.cmake"
             cmake_file_cmds += cmake_add_target(lib, dstdir, obj.sdt, cmd, outfile)
+            if ("xilpm" in lib) and ("ZynqMP" in obj.family):
+                dstdir = os.path.join(obj.libsrc_folder, f"{lib}/src/zynqmp/client/common/")
+                cmd = f"generate_config_object pm_cfg_obj.c {obj.proc}"
+                cmake_file_cmds += cmake_add_target("xilpm_cfg_obj", dstdir, obj.sdt, cmd, "pm_cfg_obj.c")
 
     cmake_file_cmds += f"\nadd_library(bsp INTERFACE)"
     cmake_file_cmds = cmake_file_cmds.replace('\\', '/')
