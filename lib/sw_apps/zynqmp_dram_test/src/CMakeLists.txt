@@ -11,7 +11,7 @@ set(USER_LINKER_FLAGS
 )
 ####    END OF USER SETTINGS    ####
 
-set(APP_NAME zynqmp_dramtest)
+set(APP_NAME zynqmp_dram_test)
 project(${APP_NAME})
 
 enable_language(C ASM)
