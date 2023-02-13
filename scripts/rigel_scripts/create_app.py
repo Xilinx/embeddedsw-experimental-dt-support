@@ -109,6 +109,19 @@ def create_app(args):
         }
     utils.write_yaml(obj.app_config_file, data)
 
+    # Run make inside cmake configured build area
+    app_linker_build = os.path.join(obj.app_src_dir, "linker_build")
+    utils.mkdir(app_linker_build)
+    cmake_file = os.path.join(app_linker_build, "CMakeLists.txt")
+    cmake_file_cmds = """
+cmake_minimum_required(VERSION 3.15)
+project(bsp)
+find_package(common)
+    """
+    cmake_file_cmds += f'linker_gen("{obj.app_src_dir}/linker_files/")'
+    utils.write_into_file(cmake_file, cmake_file_cmds)
+    utils.runcmd(f"cmake {app_linker_build} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=app_linker_build)
+    utils.remove(app_linker_build)
     # Success prints if everything went well till this point.
     if utils.is_file(obj.app_config_file):
         print(f"Successfully Created Application sources at {obj.app_src_dir}")
