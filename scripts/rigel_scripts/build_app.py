@@ -36,7 +36,6 @@ class Build_App(BSP, Repo):
         utils.mkdir(self.app_build_dir)
         self.app_config_file = os.path.join(self.app_src_dir, "app.yaml")
         self.domain_path = utils.fetch_yaml_data(self.app_config_file, "domain_path")["domain_path"]
-        self.lang = utils.fetch_yaml_data(self.app_config_file, "lang")["lang"]
         args["domain_path"] = self.domain_path
 
 def build_app(args):
@@ -53,7 +52,7 @@ def build_app(args):
     obj.app_src_dir = obj.app_src_dir.replace('\\', '/')
     obj.cmake_paths_append = obj.cmake_paths_append.replace('\\', '/')
     obj.app_build_dir = obj.app_build_dir.replace('\\', '/')
-    utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON -DCMAKE_LANG={obj.lang}", cwd=obj.app_build_dir)
+    utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=obj.app_build_dir)
     utils.runcmd("make -j22", cwd=obj.app_build_dir)
 
 if __name__ == "__main__":
