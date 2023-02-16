@@ -8,7 +8,7 @@ export XBUILDS_PYTHON_PATH=${XILINX_TOOLCHAIN}/tps/lnx64/${PYTHON_VER}
 
 export LD_LIBRARY_PATH=${XBUILDS_PYTHON_PATH}/lib:${XBUILDS_CMAKE_PATH}/libs/Ubuntu:${LD_LIBRARY_PATH}
 
-export PATH=${XILINX_TOOLCHAIN}/gnu/microblaze/lin/bin:${XILINX_TOOLCHAIN}/gnu/arm/lin/bin:${XILINX_TOOLCHAIN}/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin:${XILINX_TOOLCHAIN}/gnu/aarch32/lin/gcc-arm-none-eabi/bin:${XILINX_TOOLCHAIN}/gnu/aarch64/lin/aarch64-none/bin:${XILINX_TOOLCHAIN}/gnu/armr5/lin/gcc-arm-none-eabi/bin:${XBUILDS_PYTHON_PATH}/bin:${XBUILDS_LOPPER_PATH}/bin:${XBUILDS_CMAKE_PATH}/bin:$PATH
+export PATH=${XILINX_TOOLCHAIN}/bin:${XILINX_TOOLCHAIN}/gnu/microblaze/lin/bin:${XILINX_TOOLCHAIN}/gnu/arm/lin/bin:${XILINX_TOOLCHAIN}/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin:${XILINX_TOOLCHAIN}/gnu/aarch32/lin/gcc-arm-none-eabi/bin:${XILINX_TOOLCHAIN}/gnu/aarch64/lin/aarch64-none/bin:${XILINX_TOOLCHAIN}/gnu/armr5/lin/gcc-arm-none-eabi/bin:${XBUILDS_PYTHON_PATH}/bin:${XBUILDS_LOPPER_PATH}/bin:${XBUILDS_CMAKE_PATH}/bin:$PATH
 
 export PYTHONPATH=${XBUILDS_LOPPER_PATH}:$PYTHONPATH
 export OSF=""
