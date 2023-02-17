@@ -205,11 +205,20 @@ class Domain(Repo):
 
             utils.add_newline(
                 toolchain_file,
-                f'set( CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} {compiler_flags}")',
+                f'set( CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} {compiler_flags} ${{proc_extra_compiler_flags}}")',
             )
             utils.add_newline(
                 toolchain_file,
-                f'set( CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} {compiler_flags}")',
+                f'set( CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} {compiler_flags} ${{proc_extra_compiler_flags}}")',
+            )
+        else:
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} ${{proc_extra_compiler_flags}}")',
+            )
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} ${{proc_extra_compiler_flags}}")',
             )
         return compiler_flags
 
