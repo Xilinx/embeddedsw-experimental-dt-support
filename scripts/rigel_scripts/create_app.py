@@ -93,6 +93,11 @@ def create_app(args):
             obj.repo_paths_list, "scripts/linker_files", "Linker file directory"
         )
     utils.copy_directory(linker_src, linker_dir)
+    # Copy the User Configuration cmake file to the app src dir
+    user_config_cmake = utils.get_high_precedence_path(
+            obj.repo_paths_list, "cmake/UserConfig.cmake", "UserConfig.cmake file"
+        )
+    utils.copy_file(user_config_cmake, obj.app_src_dir)
 
     # Generate the CMake file specifically for peripheral app
     if obj.template == "peripheral_tests":

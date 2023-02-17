@@ -2,16 +2,9 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
 cmake_minimum_required(VERSION 3.14.7)
-####    START OF USER SETTINGS    ####
-# Below settings can be customized
-set(USER_CC_FLAGS
-	""
-)
-set(USER_LINKER_FLAGS
-	""
-)
-####    END OF USER SETTINGS    ####
+
 include_directories(${CMAKE_BINARY_DIR}/include)
+include(${CMAKE_CURRENT_SOURCE_DIR}/UserConfig.cmake)
 set(APP_NAME zynqmp_fsbl)
 project(${APP_NAME})
 
@@ -25,6 +18,7 @@ collect(PROJECT_LIB_DEPS xilsecure)
 collect(PROJECT_LIB_DEPS xilstandalone)
 collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
+list (APPEND _deps ${USER_LINK_LIBRARIES})
 
 set(_lib "xilpm")
 list (APPEND _lib "xil")
@@ -57,13 +51,15 @@ if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa72")
 else()
     set(S_SOURCES xfsbl_exit.S xfsbl_translation_table_a53_32.S)
 endif()
-string(APPEND CMAKE_C_FLAGS ${USER_CC_FLAGS})
-string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINKER_FLAGS})
+string(APPEND CMAKE_C_FLAGS ${USER_COMPILE_OPTIONS})
+string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINK_OPTIONS})
 add_executable(${APP_NAME}.elf ${S_SOURCES} ${SOURCES})
 
 if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa53")
     OR ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64"))
-target_link_libraries(${APP_NAME}.elf -Os -flto -ffat-lto-objects -Wl,--gc-sections -n -T\"${CMAKE_SOURCE_DIR}/lscript_a53.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)
+target_link_libraries(${APP_NAME}.elf -Os -flto -ffat-lto-objects -Wl,--gc-sections -n -T\"${CMAKE_SOURCE_DIR}/lscript_a53.ld\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 else()
-target_link_libraries(${APP_NAME}.elf -Os -flto -ffat-lto-objects -Wl,--gc-sections -n -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -Wl,--start-group ${_deps} -Wl,--end-group)
+target_link_libraries(${APP_NAME}.elf -Os -flto -ffat-lto-objects -Wl,--gc-sections -n -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 endif()
+target_compile_definitions(${APP_NAME}.elf PUBLIC ${USER_COMPILE_DEFINITIONS})
+target_include_directories(${APP_NAME}.elf PUBLIC ${USER_INCLUDE_DIRECTORIES})
