@@ -32,6 +32,9 @@ string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINK_OPTIONS})
 add_executable(${APP_NAME}.elf ${SOURCES})
 target_link_libraries(${APP_NAME}.elf -Wl,-T -Wl,\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${CMAKE_SOURCE_DIR}/\" -L\"${CMAKE_LIBRARY_PATH}/\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group,-l${_deps} -Wl,--end-group)
 target_compile_definitions(${APP_NAME}.elf PUBLIC ${USER_COMPILE_DEFINITIONS})
+add_custom_command(
+	TARGET ${APP_NAME}.elf POST_BUILD
+	COMMAND ${CMAKE_SIZE} --format=berkeley ${APP_NAME}.elf)
 target_include_directories(${APP_NAME}.elf PUBLIC "${CMAKE_BINARY_DIR}/include")
 if (${NON_YOCTO})
    set (INCLUDE_DIRS

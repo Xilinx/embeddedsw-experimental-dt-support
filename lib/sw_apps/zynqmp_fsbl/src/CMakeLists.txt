@@ -63,3 +63,6 @@ target_link_libraries(${APP_NAME}.elf -Os -flto -ffat-lto-objects -Wl,--gc-secti
 endif()
 target_compile_definitions(${APP_NAME}.elf PUBLIC ${USER_COMPILE_DEFINITIONS})
 target_include_directories(${APP_NAME}.elf PUBLIC ${USER_INCLUDE_DIRECTORIES})
+add_custom_command(
+	TARGET ${APP_NAME}.elf POST_BUILD
+	COMMAND ${CMAKE_SIZE} --format=berkeley ${APP_NAME}.elf)
