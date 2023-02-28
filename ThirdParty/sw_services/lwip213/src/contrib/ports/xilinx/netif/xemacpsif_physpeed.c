@@ -832,7 +832,7 @@ static u32_t get_IEEE_phy_speed(XEmacPs *xemacpsp, u32_t phy_addr)
 	} else if (phy_identity == PHY_REALTEK_IDENTIFIER) {
 		RetStatus = get_Realtek_phy_speed(xemacpsp, phy_addr);
 	} else if (phy_identity == PHY_XILINX_PCS_PMA_ID1) {
-		RetStatus = get_Xilinx_pcs_pma_phy_speed(xemacpsp, phy_addr);
+		RetStatus = get_Xilinx_phy_speed(xemacpsp, phy_addr);
 	} else if (phy_identity == PHY_ADI_IDENTIFIER) {
 		RetStatus = get_Adi_phy_speed(xemacpsp, phy_addr);
 	} else if (isgemphy_pcspma(xemacpsp, phy_addr)) {
