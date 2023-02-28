@@ -46,12 +46,12 @@ depends:
         - interrupts
 
 depends_libs:
-    lwip211:
-        lwip211_api_mode: RAW_API
-        lwip211_dhcp_does_arp_check: ON
-        lwip211_dhcp: ON
-        lwip211_ipv6_enable: OFF
-        lwip211_pbuf_pool_size: 2048
+    lwip213:
+        lwip213_api_mode: RAW_API
+        lwip213_dhcp_does_arp_check: ON
+        lwip213_dhcp: ON
+        lwip213_ipv6_enable: OFF
+        lwip213_pbuf_pool_size: 2048
     xiltimer:
         XILTIMER_en_interval_timer: ON
 ...
