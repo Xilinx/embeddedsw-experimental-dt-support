@@ -131,7 +131,7 @@ def mkdir(folderpath: str, silent_discard: bool = True) -> None:
             print("%s Unable to create directory " % folderpath)
             sys.exit(1)
 
-def copy_file(src: str, dest: str, follow_symlinks: bool = False, silent_discard: bool = True) -> None:
+def copy_file(src: str, dest: str, follow_symlinks: bool = False, silent_discard: bool = False) -> None:
     """
     copies the file from source to destination.
 
@@ -142,7 +142,11 @@ def copy_file(src: str, dest: str, follow_symlinks: bool = False, silent_discard
         | silent_discard: Dont raise exception if the source file doesnt exist 
     """
     is_file(src, silent_discard)
-    shutil.copy2(src, dest, follow_symlinks=follow_symlinks)
+    try:
+        shutil.copy2(src, dest, follow_symlinks=follow_symlinks)
+    except Exception as e:
+        assert silent_discard, e
+
 
 def copy_directory(src: str, dst: str, symlinks: bool = False, ignore=None) -> None:
     """
