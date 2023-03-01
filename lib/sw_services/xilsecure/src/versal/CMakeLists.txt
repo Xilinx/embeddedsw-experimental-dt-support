@@ -9,6 +9,4 @@ if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "microblaze") OR
    ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "pmu_microblaze") OR
    (${XILSECURE_Mode}))
    add_subdirectory(server)
-else()
-  add_subdirectory(client)
 endif()
