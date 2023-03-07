@@ -19,8 +19,9 @@ set(USER_COMPILE_DEFINITIONS
 # To set optimizations   -O0 [None] , -O1 [Optimize] , -O2 [Optimize More], -O3 [Optimize Most] or -Os [Optimize Size]
 # To enable profiling -pg [ for gprof ]  or -p [ for prof information ]
 # To enable verbose -v
+# Note: Do not delete the default option below as the code IntelliSense will not function.
 set(USER_COMPILE_OPTIONS
-""
+"-U__clang__"
 )
 
 
