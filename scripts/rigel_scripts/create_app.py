@@ -116,7 +116,8 @@ def create_app(args):
     compile_commands_dir = os.path.join(obj.app_src_dir, "compile_commands")
     utils.mkdir(compile_commands_dir)
     utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=compile_commands_dir)
-    utils.copy_file(f"{compile_commands_dir}/compile_commands.json", obj.app_src_dir)
+    if utils.is_file(f"{compile_commands_dir}/compile_commands.json"):
+        utils.copy_file(f"{compile_commands_dir}/compile_commands.json", obj.app_src_dir)
     utils.remove(compile_commands_dir)
     # Success prints if everything went well till this point.
     if utils.is_file(obj.app_config_file):
