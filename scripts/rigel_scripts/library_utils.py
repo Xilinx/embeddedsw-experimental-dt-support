@@ -288,16 +288,28 @@ class Library(Repo):
         yaml_file = os.path.join(comp_dir, "data", f"{comp_name}.yaml")
         schema = utils.load_yaml(yaml_file)
         lib_config = {}
+        ignore_lib = False
         if lib_list:
             # Run cmake configuration with all the default cache entries
             build_metadata = os.path.join(self.libsrc_folder, "build_configs/gen_bsp")
             self.cmake_paths_append = self.cmake_paths_append.replace('\\', '/')
             self.domain_path = self.domain_path.replace('\\', '/')
             build_metadata = build_metadata.replace('\\', '/')
-            utils.runcmd(
-                f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
-                cwd = build_metadata
-            )
+            try:
+                utils.runcmd(
+                    f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
+                    cwd = build_metadata
+                )
+            except:
+                ignore_lib = True
+                cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
+                utils.remove_line(cmake_file, f"include (${{CMAKE_BINARY_DIR}}/../{comp_name}.cmake)")
+                build_folder = os.path.join(self.libsrc_folder, "build_configs")
+                libcmake_file = os.path.join(build_folder, f"{comp_name}.cmake")
+                lib_path = os.path.join(self.libsrc_folder, comp_name)
+                # Remove library src folder from libsrc
+                utils.remove(lib_path)
+                utils.remove(libcmake_file)
 
             # Get the default cmake entries into yaml configuration file
             lib_config = self.get_default_lib_params(build_metadata, lib_list)
@@ -317,9 +329,10 @@ class Library(Repo):
 
             if lib_config.__contains__("freertos10_xilinx"):
                 lib_config.pop("freertos10_xilinx")
-            # Update the yaml config file with new entries.
-            utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)
-            utils.update_yaml(self.domain_config_file, "domain", "lib_info", self.lib_info)
+            if not ignore_lib:
+                # Update the yaml config file with new entries.
+                utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)
+                utils.update_yaml(self.domain_config_file, "domain", "lib_info", self.lib_info)
 
     def gen_lib_cmake(self, lib, version=''):
         cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
