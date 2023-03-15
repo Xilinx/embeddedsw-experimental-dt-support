@@ -48,21 +48,28 @@ def configure_bsp(args):
     if obj.addlib:
         lib_name = obj.addlib[0]
         lib_version = ''
+        version_update = False
         if len(obj.addlib) > 1:
             lib_version = float(obj.addlib[1])
         if lib_name in obj.bsp_lib_config.keys():
             if lib_version and lib_version != obj.lib_info[lib_name]['version']:
-                obj.remove_lib(lib_name)
+                lib_path = os.path.join(obj.libsrc_folder, lib_name)
+                utils.remove(lib_path)
+                version_update = True
             else:
                 print(f"""\b
                     {lib_name} is already added in the bsp. Nothing to do.
                     Use config_bsp.py if you want to configure the library.
                 """)
                 sys.exit(1)
-        obj.validate_lib_name(lib_name, lib_version)
-        obj.gen_lib_cmake(lib_name, lib_version)
-        lib_list, cmake_cmd_append = obj.add_lib(lib_name, is_app=False, version=lib_version)
-        obj.config_lib(lib_name, lib_list, cmake_cmd_append, is_app=False, version=lib_version)
+        if not version_update:
+            obj.validate_lib_name(lib_name, lib_version)
+            obj.gen_lib_cmake(lib_name, lib_version)
+            lib_list, cmake_cmd_append = obj.add_lib(lib_name, is_app=False, version=lib_version)
+            obj.config_lib(lib_name, lib_list, cmake_cmd_append, is_app=False, version=lib_version)
+        else:
+            obj.copy_lib_src(lib_name, lib_version)
+            utils.update_yaml(obj.domain_config_file, "domain", "lib_info", obj.lib_info)
 
     # If user wants to remove a library from the bsp
     if obj.rmlib:
