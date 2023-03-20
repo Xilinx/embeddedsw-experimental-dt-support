@@ -159,7 +159,7 @@
 		#ranges-address-cells = <0x2>;
 		#ranges-size-cells = <0x2>;
 	};
-	cpus_r5_0: cpus-r5@1 {
+	cpus_r5_0: cpus-r5@0 {
 		compatible = "cpus,cluster";
 		bus-master-id = <&lpd_xppu 0x0> , <&lpd_xppu 0x10>;
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
@@ -276,7 +276,7 @@
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
 	};
-	cpus_r5_1: cpus-r5@2 {
+	cpus_r5_1: cpus-r5@1 {
 		compatible = "cpus,cluster";
 		bus-master-id = <&lpd_xppu 0x0> , <&lpd_xppu 0x10>;
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
@@ -392,7 +392,7 @@
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
 	};
-	cpus_microblaze_1: cpus_microblaze@1 {
+	cpus_microblaze_0: cpus_microblaze@0 {
 		compatible = "cpus,cluster";
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
 			      <0x0 &zynqmp_reset 0x0 0x0>, 

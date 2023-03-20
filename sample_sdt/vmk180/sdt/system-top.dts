@@ -145,7 +145,7 @@
 		#ranges-address-cells = <0x2>;
 		#ranges-size-cells = <0x2>;
 	};
-	cpus_r5_0: cpus-r5@3 {
+	cpus_r5_0: cpus-r5@0 {
 		compatible = "cpus,cluster";
 		bus-master-id = <&lpd_xppu 0x200> , <&lpd_xppu 0x204>;
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
@@ -259,7 +259,7 @@
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
 	};
-	cpus_r5_1: cpus-r5@4 {
+	cpus_r5_1: cpus-r5@1 {
 		compatible = "cpus,cluster";
 		bus-master-id = <&lpd_xppu 0x200> , <&lpd_xppu 0x204>;
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
@@ -371,7 +371,7 @@
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
 	};
-	cpus_microblaze_1: cpus_microblaze@1 {
+	cpus_microblaze_0: cpus_microblaze@0 {
 		compatible = "cpus,cluster";
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
 			      <0x00000000 &axi_noc_0_memory 0x00000000 0x80000000>, 
@@ -484,7 +484,7 @@
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
 	};
-	cpus_microblaze_2: cpus_microblaze@2 {
+	cpus_microblaze_1: cpus_microblaze@1 {
 		compatible = "cpus,cluster";
 		bus-master-id = <&lpd_xppu 0x238> , <&pmc_xppu 0x238> , <&pmc_xppu_npi 0x238>;
 		address-map = <0xf0000000 &amba 0xf0000000 0x10000000>, 
