@@ -113,12 +113,38 @@ def create_app(args):
     utils.write_yaml(obj.app_config_file, data)
 
     # Create a dummy folder to get compile_commands.json
-    compile_commands_dir = os.path.join(obj.app_src_dir, "compile_commands")
+    compile_commands_dir = os.path.join(obj.app_src_dir, ".compile_commands")
     utils.mkdir(compile_commands_dir)
-    utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=compile_commands_dir)
-    if utils.is_file(f"{compile_commands_dir}/compile_commands.json"):
-        utils.copy_file(f"{compile_commands_dir}/compile_commands.json", obj.app_src_dir)
-    utils.remove(compile_commands_dir)
+    utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON > nul", cwd=compile_commands_dir)
+
+    '''
+    compile_commands.json file needs to be kept inside src directory.
+    Silent_discard needs to be true as for Empty Application, this file
+    is not created.
+    '''
+    utils.copy_file(f"{compile_commands_dir}/compile_commands.json", obj.app_src_dir, silent_discard=True)
+
+    '''
+    There are few GCC flags (e.g. -fno-tree-loop-distribute-patterns) that
+    clang server doesnt recognise for Code Intellisense. To get over this
+    "Unknown Argument" Error of clang, a .clangd file with below content is
+    to be kept in parallel to compile_commands.json file.
+    '''
+    clangd_ignore_content = f'''
+CompileFlags:
+    Add: -Wno-unknown-warning-option
+    Remove: [-m*, -f*]
+'''
+    clangd_ignore_file = os.path.join(obj.app_src_dir, ".clangd")
+    utils.write_into_file(clangd_ignore_file, clangd_ignore_content)
+
+    '''
+    The generated compile_commands.json file has the directory path (where it
+    was created originally) in it. That directory needs to be maintained to
+    avoid clang error.
+    '''
+    utils.remove(os.path.join(compile_commands_dir, "*"), pattern=True)
+
     # Success prints if everything went well till this point.
     if utils.is_file(obj.app_config_file):
         print(f"Successfully Created Application sources at {obj.app_src_dir}")

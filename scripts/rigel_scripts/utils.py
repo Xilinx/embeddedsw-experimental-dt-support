@@ -82,33 +82,26 @@ def remove(path: str, silent_discard: bool = True, pattern: bool=False) -> None:
     """Removes any file or folder recursively, if it exists else reports error message based on user demand.
     
     Args:
-        path: Directory or file path.
-    """
-    is_successful = False
-    try:
-        if is_dir(path):
-            os.sync()
-            shutil.rmtree(path)
-            is_successful = True
-        else:
-            if pattern:
-                for f in glob.glob(path):
-                    is_successful = False
-                    os.remove(f)
-                    is_successful = True
-            else:
-                os.remove(path)
-                is_successful = True
-    except OSError as e:
-        pass
-    if not silent_discard:
-        if is_successful:
-            print("%s Removed successfully" % path)
-        else:
-            print("Error: %s" % path, e.strerror)  # FIXME: e doesn't exist here
-            sys.exit(1)
+        path: Directory or file path or a pattern.
+        silent_discard: True if exceptions are to be ignored.
+        pattern: True when the passed path is a pattern.
+    Raises:
+        Exception: Raises exception if any remove action fails.
 
-    #FIXME: Fix this API
+    """
+    try:
+        if pattern:
+            for entry in glob.glob(path):
+                if is_file(entry):
+                    os.remove(entry)
+                elif is_dir(entry):
+                    shutil.rmtree(entry)
+        elif is_file(path):
+            os.remove(path)
+        elif is_dir(path):
+            shutil.rmtree(path)
+    except Exception as e:
+        assert silent_discard, e
     
 
 def mkdir(folderpath: str, silent_discard: bool = True) -> None:
