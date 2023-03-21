@@ -52,7 +52,7 @@ def build_app(args):
     obj.app_src_dir = obj.app_src_dir.replace('\\', '/')
     obj.cmake_paths_append = obj.cmake_paths_append.replace('\\', '/')
     obj.app_build_dir = obj.app_build_dir.replace('\\', '/')
-    utils.runcmd(f"cmake {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON", cwd=obj.app_build_dir)
+    utils.runcmd(f'cmake -G "Unix Makefiles" {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON', cwd=obj.app_build_dir)
     utils.copy_file(f"{obj.app_build_dir}/compile_commands.json", obj.app_src_dir, silent_discard=True)
     utils.runcmd("make -j22", cwd=obj.app_build_dir)
 

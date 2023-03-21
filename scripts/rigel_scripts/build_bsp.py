@@ -63,7 +63,7 @@ class BSP:
         self.domain_path = self.domain_path.replace('\\','/')
         self.cmake_paths_append = self.cmake_paths_append.replace('\\','/')
         build_libxil = build_libxil.replace('\\','/')
-        utils.runcmd(f"cmake {self.domain_path} -DNON_YOCTO=ON {self.cmake_paths_append}", cwd=build_libxil)
+        utils.runcmd(f'cmake -G "Unix Makefiles" {self.domain_path} -DNON_YOCTO=ON {self.cmake_paths_append}', cwd=build_libxil)
         utils.runcmd("make -f CMakeFiles/Makefile2 -j22 > nul", cwd = build_libxil)
         utils.runcmd("make install", cwd=build_libxil)
 

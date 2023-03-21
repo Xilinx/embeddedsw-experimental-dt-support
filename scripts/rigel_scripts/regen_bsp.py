@@ -88,11 +88,11 @@ class RegenBSP(BSP, Library):
                 cmake_cmd_append += f" -D{key}='{val}'"
 
         build_metadata = os.path.join(self.libsrc_folder, "build_configs", "gen_bsp")
-        utils.runcmd(f"cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}", cwd=build_metadata)
+        utils.runcmd(f'cmake -G "Unix Makefiles" {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}', cwd=build_metadata)
 
         # Run cmake configuration to get cache entries update bsp yaml with this data
         utils.runcmd(
-                f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
+                f'cmake -G "Unix Makefiles" {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
                 cwd = build_metadata
         )
         lib_list = list(domain_data["lib_config"].keys()) + add_lib_list

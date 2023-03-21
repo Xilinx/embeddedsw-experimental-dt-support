@@ -449,7 +449,7 @@ find_package(common)
     cmake_paths_append = cmake_paths_append.replace('\\', '/')
     build_metadata = build_metadata.replace('\\', '/')
     utils.runcmd(
-        f"cmake {obj.domain_dir} {cmake_paths_append}",
+        f'cmake -G "Unix Makefiles" {obj.domain_dir} {cmake_paths_append}',
         cwd = build_metadata
     )
 
@@ -485,7 +485,7 @@ endif()
     build_metadata = build_metadata.replace('\\', '/')
 
     utils.runcmd(
-            f'cmake {obj.domain_dir} {cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
+            f'cmake -G "Unix Makefiles" {obj.domain_dir} {cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
             cwd = build_metadata
     )
     if obj.os == "freertos":
