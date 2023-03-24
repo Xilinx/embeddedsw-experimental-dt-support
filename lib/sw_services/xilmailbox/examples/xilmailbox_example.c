@@ -63,7 +63,7 @@ volatile static int ErrorStatus = 0;	/**< Error Status flag*/
 static u32 ReqBuffer[TEST_MSG_LEN];
 static u32 RespBuffer[TEST_MSG_LEN];
 
-int XMailbox_Example(XMailbox *InstancePtr, u8 DeviceId);
+int XMailbox_Example(XMailbox *InstancePtr, u32 DeviceId);
 static void DoneHandler(void *CallBackRefPtr);
 static void ErrorHandler(void *CallBackRefPtr, u32 Mask);
 
@@ -82,7 +82,7 @@ int main(void)
 	return XST_SUCCESS;
 }
 
-int XMailbox_Example(XMailbox *InstancePtr, u8 DeviceId)
+int XMailbox_Example(XMailbox *InstancePtr, u32 DeviceId)
 {
 	u32 Index;
 	u32 Status;
