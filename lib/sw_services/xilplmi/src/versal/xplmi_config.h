@@ -60,6 +60,7 @@ extern "C" {
 
 /***************************** Include Files *********************************/
 #include "xparameters.h"
+#include "xilplmi_config.h"
 
 /**@cond xplmi_internal
  * @{

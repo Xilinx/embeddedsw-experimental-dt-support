@@ -67,4 +67,9 @@ if (XILPLMI_plm_stl_en)
 	set(PLM_ENABLE_STL " ")
 endif()
 
+option(XILPLMI_ssit_plm_to_plm_comm_en "Enables or Disables SSIT PLM to PLM communication (valid only for Versal)" ON)
+if (XILPLMI_ssit_plm_to_plm_comm_en)
+	set(PLM_ENABLE_PLM_TO_PLM_COMM " ")
+endif()
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/xilplmi_config.h.in ${CMAKE_BINARY_DIR}/include/xilplmi_config.h)

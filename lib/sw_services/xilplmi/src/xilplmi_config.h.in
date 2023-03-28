@@ -5,6 +5,8 @@
 #ifndef XILPLMI_CONFIG_H
 #define XILPLMI_CONFIG_H
 
+#include "xparameters.h"
+
 #cmakedefine	PLM_PRINT_NO_UART
 #cmakedefine	PLM_PRINT	
 #cmakedefine	PLM_DEBUG
@@ -22,5 +24,8 @@
 #cmakedefine	PLM_PUF_EXCLUDE
 #cmakedefine	PLM_ENABLE_STL 
 
+#if (defined NUMBER_OF_SLRS)
+#cmakedefine	PLM_ENABLE_PLM_TO_PLM_COMM
+#endif
 
 #endif /* XILPLMI_CONFIG_H */
