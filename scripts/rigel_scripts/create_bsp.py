@@ -381,45 +381,29 @@ find_package(common)
 
     # If domain has to be created for a certain template, few libraries need
     # to be added in the bsp.
-    lib_list = []
+    lib_list = ["xiltimer"]
     cmake_cmd_append = ""
     lib_obj = Library(
         obj.domain_dir, obj.proc, obj.os, obj.sdt, cmake_paths_append, obj.libsrc_folder, obj.repo_yaml_path
     )
 
+    if obj.app:
+        # If template app is passed, read the app's yaml file and add
+        # lib accordingly.
+        lib_list, cmake_cmd_append = lib_obj.add_lib_for_apps(obj.app)
+    else:
+        # If no app is passed and bsp is created add xiltimer by default.
+        lib_obj.copy_lib_src("xiltimer")
+
     if obj.os == "freertos":
-        if obj.app:
-            # If template app is passed, read the app's yaml file and add
-            # lib accordingly.
-            lib_list, cmake_cmd_append = lib_obj.add_lib(obj.app, is_app=True)
-        else:
-            # If no app is passed and bsp is created for freertos os, add
-            # xiltimer by default.
-            lib_list, cmake_cmd_append = lib_obj.add_lib("xiltimer", is_app=False)
         # Copy the freertos source code to libsrc folder
         os_dir_path, os_dir_version = obj.get_comp_dir("freertos10_xilinx")
         os_srcdir = os.path.join(os_dir_path, "src")
         bspsrc = os.path.join(obj.libsrc_folder, "freertos10_xilinx/src")
         utils.copy_directory(os_srcdir, bspsrc)
         obj.os_info['freertos10_xilinx'] = {'path': os_dir_path, 'version':os_dir_version}
-
-    elif obj.app:
-        # If template app is passed, read the app's yaml file and add
-        # lib accordingly.
-        lib_list, cmake_cmd_append = lib_obj.add_lib(obj.app, is_app=True)
-    else:
-        # If no app is passed and bsp is created add xiltimer by default.
-        lib_list, cmake_cmd_append = lib_obj.add_lib("xiltimer", is_app=False)
-
-
-    cmake_lib_list = ""
-    if lib_list:
-        for lib in lib_list:
-            cmake_lib_list += f"{lib};"
-
-    cmake_file_cmds += f"\nset(lib_list {cmake_lib_list})\n"
-    if obj.os == "freertos":
         lib_list.append("freertos10_xilinx")
+
 
     if lib_list:
         for lib in lib_list:
@@ -436,7 +420,7 @@ find_package(common)
 
     cmake_file_cmds += f"\nadd_library(bsp INTERFACE)"
     cmake_file_cmds = cmake_file_cmds.replace('\\', '/')
-    cmake_file_cmds += f"\nadd_dependencies(bsp xilstandalone_config xilstandalone_meta xparam {cmake_lib_list} {cmake_drv_name_list})"
+    cmake_file_cmds += f"\nadd_dependencies(bsp xilstandalone_config xilstandalone_meta xparam {' '.join(lib_list)} {cmake_drv_name_list})"
     utils.write_into_file(cmake_file, cmake_file_cmds)
 
     # Create a build directory for cmake to generate all _g.c files.
@@ -455,39 +439,49 @@ find_package(common)
 
     utils.runcmd("make -f CMakeFiles/Makefile2 -j22 > nul", cwd = build_metadata)
 
+    bsp_libsrc_cmake_subdirs = "libsrc standalone " + " ".join(lib_list)
+
     # Create new CMakeLists.txt
-    cmake_file_cmds = cmake_header
-    cmake_file_cmds += """ 
+    cmake_file_cmds = f'''{cmake_header}
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
-    set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
-    set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
+    set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${{CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES}})
+    set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES ${{CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}})
 endif()
-    """
-    cmake_file_cmds += f"\nadd_subdirectory({obj.libsrc_folder}/standalone/src)\n"
-    if lib_list:
-        for lib in lib_list:
-            dstdir = os.path.join(obj.libsrc_folder, f"{lib}/src")
-            cmake_file_cmds += f"\nadd_subdirectory({dstdir})\n"
-    cmake_file_cmds = cmake_file_cmds.replace('\\', '/')
+
+set (BSP_LIBSRC_SUBDIRS {bsp_libsrc_cmake_subdirs})
+
+if(NOT DEFINED SUBDIR_LIST)
+    set (SUBDIR_LIST ${{BSP_LIBSRC_SUBDIRS}})
+endif()
+
+foreach(entry ${{SUBDIR_LIST}})
+    if(${{entry}} EQUAL "libsrc")
+        set (path "${{CMAKE_LIBRARY_PATH}}/../libsrc")
+    else()
+        set (path "${{CMAKE_LIBRARY_PATH}}/../libsrc/${{entry}}/src")
+    endif()
+    if(EXISTS ${{path}})
+        add_subdirectory(${{path}})
+    endif()
+endforeach()
+    '''
+
     utils.write_into_file(cmake_file, cmake_file_cmds)
 
     build_metadata = os.path.join(obj.libsrc_folder, "build_configs", "gen_bsp")
     utils.mkdir(build_metadata)
+    lib_list += ["standalone"]
     if obj.app:
         lib_obj.config_lib(obj.app, lib_list, cmake_cmd_append, is_app=True)
     else:
         # If no app is passed and bsp is created xiltimer got added default
         # Update config entries for the same.
-        lib_obj.config_lib("xiltimer", lib_list, cmake_cmd_append, is_app=False)
+        lib_obj.config_lib(None, lib_list, "", is_app=False)
 
     # Run cmake configuration with all the default cache entries
     cmake_paths_append = cmake_paths_append.replace('\\', '/')
     build_metadata = build_metadata.replace('\\', '/')
 
-    utils.runcmd(
-            f'cmake -G "Unix Makefiles" {obj.domain_dir} {cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
-            cwd = build_metadata
-    )
     if obj.os == "freertos":
         os_config = lib_obj.get_default_lib_params(build_metadata, ["freertos"])
     else:

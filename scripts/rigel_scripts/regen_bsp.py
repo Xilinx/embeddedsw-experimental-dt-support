@@ -54,15 +54,16 @@ class RegenBSP(BSP, Library):
         domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
         lib_list = list(domain_data["lib_config"].keys()) + [self.proc, self.os]
         drvlist = list(domain_data["drv_info"].keys())
-        add_lib_list = [lib for lib in self.lib_list if lib not in lib_list]
+        lib_diff_old_to_new = [lib for lib in self.lib_list if lib not in lib_list]
 
+        libs_to_add = []
         # Check library list against existing lib_list in the previous bsp.yaml 
         # if lib is missing add the library
         cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
         build_folder = os.path.join(self.libsrc_folder, "build_configs")
         ignored_lib_list = []
         changed_version_lib_list = []
-        for lib in add_lib_list:
+        for lib in lib_diff_old_to_new:
             cur_lib_version = self.lib_info[lib]['version']
             lib_version_fetched = ''
             if cur_lib_version in self.repo_schema.get('library').get(lib,{}).keys():
@@ -72,9 +73,16 @@ class RegenBSP(BSP, Library):
             if not self.validate_drv_for_lib(lib, drvlist, lib_version_fetched):
                 ignored_lib_list.append(lib)
                 continue
-            self.gen_lib_cmake(lib, lib_version_fetched)
-            lib_list, cmake_cmd_append = self.add_lib(lib, is_app=False, version=lib_version_fetched)
-            self.config_lib(lib, lib_list, cmake_cmd_append, is_app=False, version=lib_version_fetched)
+            self.gen_lib_metadata(lib, lib_version_fetched)
+            libs_to_add += [lib]
+        if libs_to_add:
+            self.config_lib(None, libs_to_add, "", is_app=False, version=lib_version_fetched)
+            domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
+
+        build_metadata = os.path.join(self.libsrc_folder, "build_configs", "gen_bsp")
+        lib_config = domain_data["lib_config"]
+        os_config = domain_data["os_config"]
+        proc_config = domain_data["proc_config"]
 
         # Apply the Old software configuraiton
         cmake_cmd_append = ""
@@ -83,24 +91,25 @@ class RegenBSP(BSP, Library):
         for lib in self.lib_list:
             for key, value in self.bsp_lib_config[lib].items():
                 val = value['value']
+                if lib == self.proc:
+                    proc_config[lib][key]['value'] = val
+                elif lib == self.os:
+                    os_config[lib][key]['value'] = val
+                else:
+                    lib_config[lib][key]['value'] = val
                 if val in bool_match:
                     val = bool_match[val]
                 cmake_cmd_append += f" -D{key}='{val}'"
 
-        build_metadata = os.path.join(self.libsrc_folder, "build_configs", "gen_bsp")
-        utils.runcmd(f'cmake -G "Unix Makefiles" {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON {cmake_cmd_append}', cwd=build_metadata)
+        self.lib_list.remove(self.proc)
+        if self.os == 'freertos':
+            self.lib_list.remove("freertos")
+            self.lib_list.append("freertos10_xilinx")
+        cmake_subdir_list = ";".join(self.lib_list)
+        utils.runcmd(f'cmake {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -DSUBDIR_LIST="{cmake_subdir_list}" {cmake_cmd_append}', cwd=build_metadata)
 
-        # Run cmake configuration to get cache entries update bsp yaml with this data
-        utils.runcmd(
-                f'cmake -G "Unix Makefiles" {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -LH > cmake_lib_configs.txt',
-                cwd = build_metadata
-        )
-        lib_list = list(domain_data["lib_config"].keys()) + add_lib_list
-        lib_config = self.get_default_lib_params(build_metadata, lib_list)
         utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)
-        proc_config = self.get_default_lib_params(build_metadata, [self.proc])
         utils.update_yaml(self.domain_config_file, "domain", "proc_config", proc_config)
-        os_config = self.get_default_lib_params(build_metadata, [self.os])
         utils.update_yaml(self.domain_config_file, "domain", "os_config", os_config)
 
         # In case of Re generate BSP with different SDT print differences
