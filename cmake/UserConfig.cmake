@@ -21,7 +21,7 @@ set(USER_COMPILE_DEFINITIONS
 # To enable verbose -v
 # Note: Do not delete the default option below as the code IntelliSense will not function.
 set(USER_COMPILE_OPTIONS
-"-U__clang__"
+" -U__clang__"
 )
 
 
