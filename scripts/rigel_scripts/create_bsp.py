@@ -439,6 +439,13 @@ find_package(common)
 
     utils.runcmd("make -f CMakeFiles/Makefile2 -j22 > nul", cwd = build_metadata)
 
+    # Copy the actual drivers cmake file in the libsrc folder.
+    # This is to compile all the available driver sources.
+    libxil_cmake = utils.get_high_precedence_path(
+        obj.repo_paths_list, "XilinxProcessorIPLib/drivers/CMakeLists.txt", "Driver compilation CMake File"
+    )
+    utils.copy_file(libxil_cmake, f"{obj.libsrc_folder}/")
+
     bsp_libsrc_cmake_subdirs = "libsrc standalone " + " ".join(lib_list)
 
     # Create new CMakeLists.txt
@@ -450,12 +457,12 @@ endif()
 
 set (BSP_LIBSRC_SUBDIRS {bsp_libsrc_cmake_subdirs})
 
-if(NOT DEFINED SUBDIR_LIST)
+if (SUBDIR_LIST STREQUAL "ALL")
     set (SUBDIR_LIST ${{BSP_LIBSRC_SUBDIRS}})
 endif()
 
 foreach(entry ${{SUBDIR_LIST}})
-    if(${{entry}} EQUAL "libsrc")
+    if(entry STREQUAL "libsrc")
         set (path "${{CMAKE_LIBRARY_PATH}}/../libsrc")
     else()
         set (path "${{CMAKE_LIBRARY_PATH}}/../libsrc/${{entry}}/src")
@@ -470,7 +477,7 @@ endforeach()
 
     build_metadata = os.path.join(obj.libsrc_folder, "build_configs", "gen_bsp")
     utils.mkdir(build_metadata)
-    lib_list += ["standalone"]
+    lib_list += ["standalone","libsrc"]
     if obj.app:
         lib_obj.config_lib(obj.app, lib_list, cmake_cmd_append, is_app=True)
     else:
@@ -492,13 +499,6 @@ endforeach()
     utils.update_yaml(obj.domain_config_file, "domain", "proc_config", proc_config)
     utils.update_yaml(obj.domain_config_file, "domain", "os_info", obj.os_info)
     utils.update_yaml(obj.domain_config_file, "domain", "lib_info", lib_obj.lib_info)
-
-    # Copy the actual drivers cmake file in the libsrc folder.
-    # This is to compile all the available driver sources.
-    libxil_cmake = utils.get_high_precedence_path(
-        obj.repo_paths_list, "XilinxProcessorIPLib/drivers/CMakeLists.txt", "Driver compilation CMake File"
-    )
-    utils.copy_file(libxil_cmake, f"{obj.libsrc_folder}/")
 
     # Remove the metadata files that are no longer needed.
     utils.remove(drv_list_file)

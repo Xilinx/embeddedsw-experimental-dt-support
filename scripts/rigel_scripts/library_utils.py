@@ -292,7 +292,7 @@ class Library(Repo):
                 self.modify_cmake_subdirs(lib_list, action='remove')
 
             # Get the default cmake entries into yaml configuration file
-            ignore_default_data_list = ["standalone", "freertos10_xilinx"]
+            ignore_default_data_list = ["standalone", "freertos10_xilinx", "libsrc"]
             for entry in ignore_default_data_list:
                 if entry in lib_list:
                     lib_list.remove(entry)
