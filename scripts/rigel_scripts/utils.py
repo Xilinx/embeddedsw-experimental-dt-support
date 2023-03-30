@@ -453,6 +453,6 @@ def get_high_precedence_path(repo_paths_list, file_to_find, file_type):
         if is_file(path) or is_dir(path):
             break
     if not path:
-        print(f"Couldnt find the {file_type} in any of esw paths passed")
+        print(f"[ERROR]: Couldnt find the {file_type} in any of esw paths passed")
         sys.exit(1)
     return path

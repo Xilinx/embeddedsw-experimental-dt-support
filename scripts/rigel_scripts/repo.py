@@ -41,7 +41,7 @@ class Repo:
                 resolve_paths([shell_esw_repo])
             else:
                 print(f"""\b
-                    Please set a ESW repo path.
+                    [ERROR]: Please set the Embeddedsw directory path.
                     Usage:
                         python3 repo.py -st <the ESW_REPO_PATH>
                     For multiple esw repo paths, use below with left one having higher precedence:
@@ -61,7 +61,7 @@ class Repo:
                         comp_dir = self.repo_schema[entries][comp_name][version]
                         return self.validate_comp_path(comp_dir, comp_name, version)
                     else:
-                        print(f"Couldnt find the src directory for {comp_name} with {version}")
+                        print(f"[ERROR]: Couldnt find the src directory for {comp_name} with {version}")
                         sys.exit(1)
                 elif "vless" in version_list:
                     comp_dir = self.repo_schema[entries][comp_name]["vless"]
@@ -72,7 +72,7 @@ class Repo:
                     return self.validate_comp_path(comp_dir, comp_name, version_list[0])
 
         if not path_found:
-            print(f"Couldnt find the src directory for {comp_name}")
+            print(f"[ERROR]: Couldnt find the src directory for {comp_name}")
             sys.exit(1)
 
     def validate_comp_path(self, comp_dir, comp_name, version):
@@ -94,7 +94,7 @@ def resolve_paths(repo_paths):
     for path in repo_paths:
         abs_path = utils.get_abs_path(path)
         if not utils.is_dir(path):
-            print(f"ESW repo path {abs_path} doesn't exist")
+            print(f"[ERROR]: Directory path {abs_path} doesn't exist")
             sys.exit(1)
         elif abs_path not in path_dict['paths'].keys():
             path_dict['paths'].update({abs_path : {}})

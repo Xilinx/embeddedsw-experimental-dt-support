@@ -338,7 +338,7 @@ find_package(common)
     for drv in drv_list:
         drv_path, _ = obj.get_comp_dir(drv)
         if not drv_path:
-            print(f"Couldnt find the src directory for {drv}.")
+            print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
             sys.exit(1)
         obj.drv_info[drv] = {'path' : drv_path}
         cmake_drv_path_list += f"{drv_path};"

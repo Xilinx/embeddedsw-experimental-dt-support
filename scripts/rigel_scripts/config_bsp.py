@@ -58,7 +58,7 @@ def configure_bsp(args):
                 version_update = True
             else:
                 print(f"""\b
-                    {lib_name} is already added in the bsp. Nothing to do.
+                    [ERROR]: {lib_name} is already added in the bsp. Nothing to do.
                     Use config_bsp.py if you want to configure the library.
                 """)
                 sys.exit(1)
@@ -81,7 +81,7 @@ def configure_bsp(args):
 
         # Validate the command line inputs provided
         usage_print = """
-            [ERROR]: Please Pass Library Name followed by param:value.
+            [ERROR]: Please pass library name followed by param:value.
             e.g. -st xilffs XILFFS_read_only:ON XILFFS_use_lfn:1
             Wrong inputs passed with set_property.
         """

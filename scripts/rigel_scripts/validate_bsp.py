@@ -43,7 +43,7 @@ class Validation(BSP, Repo):
         if app_list_file:
             app_list_file = utils.get_abs_path(app_list_file)
             if not utils.is_file(app_list_file):
-                print(f"File {app_list_file} doesn't exist.")
+                print(f"[ERROR]: File {app_list_file} doesn't exist.")
                 sys.exit(1)
         else:
             app_list_file = os.path.join(self.domain_path, "app_list.yaml")
