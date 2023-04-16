@@ -36,15 +36,15 @@
 
 #if defined (__arm__) || defined (__aarch64__)
 
+#include "platform_config.h"
+#if defined(PLATFORM_ZYNQMP) || defined(PLATFORM_VERSAL)
 #include "xparameters.h"
 #include "xparameters_ps.h"	/* defines XPAR values */
 #include "xil_cache.h"
 #include "xscugic.h"
 #include "lwip/tcp.h"
 #include "xil_printf.h"
-#include "platform_config.h"
 #include "netif/xadapter.h"
-#if defined(PLATFORM_ZYNQMP) || defined(PLATFORM_VERSAL)
 #include "xttcps.h"
 #include "xtime_l.h"
 
