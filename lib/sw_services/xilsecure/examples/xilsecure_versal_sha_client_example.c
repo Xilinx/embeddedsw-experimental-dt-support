@@ -1,5 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2021 - 2022 Xilinx, Inc.  All rights reserved.
+* Copyright (C) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -65,6 +66,9 @@
 #include "xil_cache.h"
 #include "xil_util.h"
 #include "xsecure_shaclient.h"
+#ifdef SDT
+#include "xilmailbox_hwconfig.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -74,11 +78,15 @@
 
 #define SHA3_HASH_LEN_IN_BYTES  48U
 #define SHA3_INPUT_DATA_LEN     6U
+#ifdef SDT
+#define TEST_IPI_CHANNEL_ID            (XMAILBOX_IPI_BASEADDRESS)
+#else
+#define TEST_IPI_CHANNEL_ID            (0U)
+#endif
 
 /************************** Function Prototypes ******************************/
 
 static u32 SecureSha3Example(void);
-static u32 SecureSha3CompareHash(const u8 *Hash, const u8 *ExpectedHash);
 static void SecureSha3PrintHash(const u8 *Hash);
 
 /************************** Variable Definitions *****************************/
@@ -159,7 +167,7 @@ static u32 SecureSha3Example(void)
 	XMailbox MailboxInstance;
 	XSecure_ClientInstance SecureClientInstance;
 
-	Status = XMailbox_Initialize(&MailboxInstance, 0U);
+	Status = XMailbox_Initialize(&MailboxInstance, TEST_IPI_CHANNEL_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Mailbox initialize failed:%08x \r\n", Status);
 		goto END;
@@ -197,39 +205,15 @@ static u32 SecureSha3Example(void)
 	xil_printf(" Calculated Hash \r\n ");
 	SecureSha3PrintHash((u8 *)(UINTPTR)&Sha3Hash);
 
-	Status = SecureSha3CompareHash((u8*)(UINTPTR)&Sha3Hash, ExpHash);
+	Status = Xil_SMemCmp_CT(ExpHash, SHA3_HASH_LEN_IN_BYTES, Sha3Hash, SHA3_HASH_LEN_IN_BYTES,
+				SHA3_HASH_LEN_IN_BYTES);
+	if (Status != XST_SUCCESS) {
+		xil_printf("Expected Hash \r\n");
+		SecureSha3PrintHash(ExpHash);
+		xil_printf("SHA Example Failed at Hash Comparison \r\n");
+	}
+
 END:
-	return Status;
-}
-
-/****************************************************************************/
-/**
-*
-* This function compares the given hash with the expected Hash
-*
-* @return
-*		- XST_SUCCESS - if the expected hash is equal to the
-*                               given hash
-*		- XST_FAILURE - if the comparison fails.
-*
-****************************************************************************/
-static u32 SecureSha3CompareHash(const u8 *Hash, const u8 *ExpectedHash)
-{
-	u32 Index;
-	u32 Status = XST_FAILURE;
-
-	for (Index = 0U; Index < SHA3_HASH_LEN_IN_BYTES; Index++) {
-		if (Hash[Index] != ExpectedHash[Index]) {
-			xil_printf("Expected Hash \r\n");
-			SecureSha3PrintHash(ExpectedHash);
-			xil_printf("SHA Example Failed at Hash Comparison \r\n");
-			break;
-		}
-	}
-	if (Index == SHA3_HASH_LEN_IN_BYTES) {
-		Status = XST_SUCCESS;
-	}
-
 	return Status;
 }
 

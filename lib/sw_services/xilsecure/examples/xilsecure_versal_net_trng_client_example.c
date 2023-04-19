@@ -61,8 +61,17 @@
 #include "xil_util.h"
 #include "xsecure_trngclient.h"
 #include "xsecure_plat_katclient.h"
+#ifdef SDT
+#include "xilmailbox_hwconfig.h"
+#endif
 
 /************************** Constant Definitions *****************************/
+
+#ifdef SDT
+#define TEST_IPI_CHANNEL_ID            (XMAILBOX_IPI_BASEADDRESS)
+#else
+#define TEST_IPI_CHANNEL_ID            (0U)
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -97,7 +106,7 @@ int main(void)
 		Xil_DCacheDisable();
 	#endif
 
-	Status = XMailbox_Initialize(&MailboxInstance, 0U);
+	Status = XMailbox_Initialize(&MailboxInstance, TEST_IPI_CHANNEL_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Mailbox initialize failed:%08x \r\n", Status);
 		goto END;

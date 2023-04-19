@@ -1,5 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2019 - 2022 Xilinx, Inc. All rights reserved.
+* Copyright (C) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -71,6 +72,9 @@
 #include "xil_cache.h"
 #include "xil_util.h"
 #include "xsecure_aesclient.h"
+#ifdef SDT
+#include "xilmailbox_hwconfig.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 
@@ -101,6 +105,12 @@
 #define XSECURE_AES_KEY_SIZE_256 	(2U)
 #define XSECURE_SHARED_TOTAL_MEM_SIZE		(XSECURE_SHARED_MEM_SIZE +\
 						XSECURE_IV_SIZE + XSECURE_KEY_SIZE)
+
+#ifdef SDT
+#define TEST_IPI_CHANNEL_ID            (XMAILBOX_IPI_BASEADDRESS)
+#else
+#define TEST_IPI_CHANNEL_ID            (0U)
+#endif
 
 /**************************** Type Definitions *******************************/
 
@@ -167,7 +177,7 @@ int main(void)
 		Xil_DCacheDisable();
 	#endif
 
-	Status = XMailbox_Initialize(&MailboxInstance, 0U);
+	Status = XMailbox_Initialize(&MailboxInstance, TEST_IPI_CHANNEL_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Mailbox initialize failed:%08x \r\n", Status);
 		goto END;

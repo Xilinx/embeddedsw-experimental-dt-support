@@ -1,5 +1,6 @@
 /******************************************************************************
 * Copyright (c) 2021 - 2022 Xilinx, Inc.  All rights reserved.
+* Copyright (C) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -73,12 +74,21 @@
 #include "xparameters.h"
 #include "xil_util.h"
 #include "xsecure_rsaclient.h"
+#ifdef SDT
+#include "xilmailbox_hwconfig.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 #define XSECURE_RSA_SIZE	512	/**< 512 bytes for 4096 bit data */
 #define XSECURE_SHARED_BUF_SIZE	(XSECURE_SHARED_MEM_SIZE +\
 								XSECURE_RSA_SIZE + XSECURE_RSA_SIZE+\
 								XSECURE_RSA_SIZE + XSECURE_RSA_SIZE)
+
+#ifdef SDT
+#define TEST_IPI_CHANNEL_ID            (XMAILBOX_IPI_BASEADDRESS)
+#else
+#define TEST_IPI_CHANNEL_ID            (0U)
+#endif
 
 /**************************** Type Definitions *******************************/
 /* Exponent of private key */
@@ -353,7 +363,7 @@ static u32 SecureRsaExample(void)
 	XMailbox MailboxInstance;
 	XSecure_ClientInstance SecureClientInstance;
 
-	Status = XMailbox_Initialize(&MailboxInstance, 0U);
+	Status = XMailbox_Initialize(&MailboxInstance, TEST_IPI_CHANNEL_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Mailbox initialize failed:%08x \r\n", Status);
 		goto END;

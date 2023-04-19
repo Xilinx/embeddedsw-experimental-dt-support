@@ -70,6 +70,9 @@
 #include "xil_printf.h"
 #include "xsecure_ellipticclient.h"
 #include "xstatus.h"
+#ifdef SDT
+#include "xilmailbox_hwconfig.h"
+#endif
 
 /************************** Constant Definitions *****************************/
 #define TEST_NIST_P384
@@ -88,6 +91,12 @@
 						XSECURE_ECC_P521_WORD_ALIGN_BYTES)
 #define XSECURE_SHARED_TOTAL_MEM_SIZE	(XSECURE_SHARED_MEM_SIZE + \
 					P521_KEY_SIZE + P521_KEY_SIZE)
+
+#ifdef SDT
+#define TEST_IPI_CHANNEL_ID            (XMAILBOX_IPI_BASEADDRESS)
+#else
+#define TEST_IPI_CHANNEL_ID            (0U)
+#endif
 
 /************************** Variable Definitions *****************************/
 /* shared memory allocation */
@@ -193,7 +202,7 @@ int main()
 		Xil_DCacheDisable();
 	#endif
 
-	Status = XMailbox_Initialize(&MailboxInstance, 0U);
+	Status = XMailbox_Initialize(&MailboxInstance, TEST_IPI_CHANNEL_ID);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Mailbox initialize failed:%08x \r\n", Status);
 		goto END;
