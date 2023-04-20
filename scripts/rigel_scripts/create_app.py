@@ -115,6 +115,8 @@ def create_app(args):
     # Create a dummy folder to get compile_commands.json
     compile_commands_dir = os.path.join(obj.app_src_dir, ".compile_commands")
     utils.mkdir(compile_commands_dir)
+    obj.app_src_dir = obj.app_src_dir.replace('\\', '/')
+    obj.cmake_paths_append = obj.cmake_paths_append.replace('\\', '/')
     utils.runcmd(f'cmake -G "Unix Makefiles" {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON > nul', cwd=compile_commands_dir)
 
     '''
