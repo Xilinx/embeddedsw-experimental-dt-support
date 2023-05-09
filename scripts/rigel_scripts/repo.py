@@ -50,7 +50,7 @@ class Repo:
                 )
                 sys.exit(1)
 
-    def get_comp_dir(self, comp_name, version=""):
+    def get_comp_dir(self, comp_name, version="", sdt_path=""):
         path_found = False
         for entries in self.repo_schema.keys():
             if comp_name in self.repo_schema[entries].keys():
@@ -72,6 +72,14 @@ class Repo:
                     return self.validate_comp_path(comp_dir, comp_name, version_list[0])
 
         if not path_found:
+            if sdt_path:
+                has_drivers = os.path.join(sdt_path, "drivers")
+                if utils.is_dir(has_drivers, silent_discard=False):
+                    yaml_list = glob.glob(has_drivers + '/**/data/*.yaml', recursive=True)
+                    yaml_file_abs = [yaml for yaml in yaml_list if f"{comp_name}.yaml" in yaml]
+                    if yaml_file_abs:
+                        comp_dir = utils.get_dir_path(utils.get_dir_path(yaml_file_abs[0]))
+                        return self.validate_comp_path(comp_dir, comp_name, 'vless')
             print(f"[ERROR]: Couldnt find the src directory for {comp_name}")
             sys.exit(1)
 

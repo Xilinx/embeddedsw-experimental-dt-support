@@ -36,6 +36,7 @@ class Domain(Repo):
         self.include_folder = os.path.join(self.domain_dir, "include")
         self.lib_folder = os.path.join(self.domain_dir, "lib")
         self.libsrc_folder = os.path.join(self.domain_dir, "libsrc")
+        self.sdt_folder = os.path.join(self.domain_dir, "hw_artifacts")
         self.domain_config_file = os.path.join(self.domain_dir, "bsp.yaml")
         self.repo_paths_list = self.repo_schema['paths']
         self.drv_info = {}
@@ -100,6 +101,10 @@ class Domain(Repo):
         utils.mkdir(self.include_folder)
         utils.mkdir(self.lib_folder)
         utils.mkdir(self.libsrc_folder)
+        utils.mkdir(self.sdt_folder)
+        if utils.is_dir(os.path.join(utils.get_dir_path(self.sdt), "drivers"), silent_discard=True):
+            utils.copy_directory(os.path.join(utils.get_dir_path(self.sdt), "drivers"),
+                                 os.path.join((self.sdt_folder), "drivers"))
 
 
     def toolchain_intr_mapping(self):
@@ -133,7 +138,7 @@ class Domain(Repo):
             "psm": ("microblaze-psm", "", "microblaze"),
         }
         lops_file = ""
-        out_dts_path = os.path.join(self.domain_dir, f"{self.proc}_baremetal.dts")
+        out_dts_path = os.path.join(self.sdt_folder, f"{self.proc}_baremetal.dts")
         toolchain_file_copy = None
         for val in proc_lops_specs_map.keys():
             if val in self.proc:
@@ -264,11 +269,11 @@ def create_domain(args):
     # Initialize the Domain class
     obj = Domain(args)
 
-    # Create the Domain specific sdt and the toolchain file.
-    obj.sdt, obj.toolchain_file, obj.specs_file = obj.toolchain_intr_mapping()
-
     # Create the bsp directory structure.
     obj.build_dir_struct()
+
+    # Create the Domain specific sdt and the toolchain file.
+    obj.sdt, obj.toolchain_file, obj.specs_file = obj.toolchain_intr_mapping()
 
     # Common cmake variables to support cmake build infra.
     cmake_paths_append = f" -DCMAKE_LIBRARY_PATH={obj.lib_folder} \
@@ -334,7 +339,7 @@ find_package(common)
         drv_list = drv_names.split()
 
     for drv in drv_list:
-        drv_path, _ = obj.get_comp_dir(drv)
+        drv_path, _ = obj.get_comp_dir(drv, "", obj.sdt_folder)
         if not drv_path:
             print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
             sys.exit(1)
@@ -344,7 +349,7 @@ find_package(common)
     ip_drv_map = utils.load_yaml(ip_drv_map_file)
     for ip,driver in ip_drv_map.items():
         if driver != "None":
-            drv_path, _ = obj.get_comp_dir(driver)
+            drv_path, _ = obj.get_comp_dir(driver, "", obj.sdt_folder)
             if not drv_path:
                 print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
                 sys.exit(1)
