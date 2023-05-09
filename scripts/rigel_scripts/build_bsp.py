@@ -48,7 +48,7 @@ class BSP:
             -DCMAKE_SPECS_FILE={self.specs_file} \
             -DCMAKE_VERBOSE_MAKEFILE=ON"
 
-        self.drvlist = list(domain_data["drv_info"].keys())
+        self.drvlist = self.getdrv_list()
         self.lib_config = domain_data["lib_config"]
         self.template = domain_data["template"]
 
@@ -63,6 +63,18 @@ class BSP:
         utils.runcmd(f'cmake -G "Unix Makefiles" {self.domain_path} -DNON_YOCTO=ON -DSUBDIR_LIST="ALL" {self.cmake_paths_append}', cwd=build_libxil)
         utils.runcmd("make -f CMakeFiles/Makefile2 -j22 > nul", cwd = build_libxil)
         utils.runcmd("make install", cwd=build_libxil)
+
+    def getdrv_list(self):
+        domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
+        drvlist = []
+        for ip in domain_data["drv_info"].keys():
+            if domain_data["drv_info"][ip] != "None":
+                drvlist.append(domain_data["drv_info"][ip].get('driver',{}))
+
+        if drvlist:
+            # Remove duplicate references
+            drvlist = list(dict.fromkeys(drvlist))
+        return drvlist
 
 def generate_bsp(args):
     """

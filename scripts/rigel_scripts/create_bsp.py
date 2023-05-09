@@ -340,13 +340,22 @@ find_package(common)
         if not drv_path:
             print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
             sys.exit(1)
-        obj.drv_info[drv] = {'path' : drv_path}
         cmake_drv_path_list += f"{drv_path};"
 
-    cmake_drv_name_list += ';'.join(list(obj.drv_info.keys()))
     ip_drv_map_file = os.path.join(obj.libsrc_folder, "ip_drv_map.yaml")
+    ip_drv_map = utils.load_yaml(ip_drv_map_file)
+    for ip,driver in ip_drv_map.items():
+        if driver != "None":
+            drv_path, _ = obj.get_comp_dir(driver)
+            if not drv_path:
+                print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
+                sys.exit(1)
+            obj.drv_info[ip] = {'driver': driver,
+                                'path' : drv_path}
+        else:
+            obj.drv_info[ip] = "None"
 
-
+    cmake_drv_name_list += ';'.join(drv_list)
     cmake_file_cmds += cmake_drv_custom_target(obj.proc, obj.libsrc_folder, obj.sdt, cmake_drv_name_list, cmake_drv_path_list)
     cmd = f"baremetal_xparameters_xlnx {obj.proc} {obj.repo_yaml_path}"
     cmake_file_cmds += cmake_add_target("xparam", obj.include_folder, obj.sdt, cmd, "xparameters.h")

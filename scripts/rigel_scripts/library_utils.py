@@ -306,7 +306,6 @@ class Library(Repo):
                 utils.runcmd(f'cmake -G "Unix Makefiles" {self.domain_path} {self.cmake_paths_append} -DNON_YOCTO=ON -DSUBDIR_LIST="{cmake_lib_list}" {cmake_cmd_append}', cwd = build_metadata)
                 # Add the modified lib param values in yaml configuration dict
                 if schema.get("depends_libs", {}):
-                    drvlist = list(utils.fetch_yaml_data(self.domain_config_file, "domain")["drv_info"].keys())
                     for name, props in schema["depends_libs"].items():
                         if props:
                             for key, value in props.items():

@@ -53,7 +53,7 @@ class RegenBSP(BSP, Library):
         # Get the library list in the new bsp
         domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
         lib_list = list(domain_data["lib_config"].keys()) + [self.proc, self.os]
-        drvlist = list(domain_data["drv_info"].keys())
+        drvlist = BSP.getdrv_list(self)
         lib_diff_old_to_new = [lib for lib in self.lib_list if lib not in lib_list]
 
         libs_to_add = []
