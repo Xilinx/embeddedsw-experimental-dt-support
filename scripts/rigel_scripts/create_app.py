@@ -90,12 +90,12 @@ def create_app(args):
     # Copy the static linker files from embeddedsw to the app src dir
     linker_dir = os.path.join(obj.app_src_dir, "linker_files")
     linker_src = utils.get_high_precedence_path(
-            obj.repo_paths_list, "scripts/linker_files", "Linker file directory"
+            obj.repo_paths_list, "Linker file directory", "scripts", "linker_files"
         )
     utils.copy_directory(linker_src, linker_dir)
     # Copy the User Configuration cmake file to the app src dir
     user_config_cmake = utils.get_high_precedence_path(
-            obj.repo_paths_list, "cmake/UserConfig.cmake", "UserConfig.cmake file"
+            obj.repo_paths_list, "UserConfig.cmake file", "cmake", "UserConfig.cmake"
         )
     utils.copy_file(user_config_cmake, obj.app_src_dir)
 

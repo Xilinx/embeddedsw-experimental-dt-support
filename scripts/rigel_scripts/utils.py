@@ -444,11 +444,11 @@ def write_into_file(out_file, content):
     with open(out_file, 'w') as f:
         f.write(content)
 
-def get_high_precedence_path(repo_paths_list, file_to_find, file_type):
+def get_high_precedence_path(repo_paths_list, file_type, *argv):
     path = ""
     for entries in repo_paths_list:
         path = os.path.join(
-            entries, file_to_find
+            entries, *argv
         )
         if is_file(path) or is_dir(path):
             break

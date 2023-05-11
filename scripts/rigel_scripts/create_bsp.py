@@ -138,15 +138,14 @@ class Domain(Repo):
         for val in proc_lops_specs_map.keys():
             if val in self.proc:
                 toolchain_file_name = f"{proc_lops_specs_map[val][0]}_toolchain.cmake"
-                #FIXME: Dont use / in the paths
                 toolchain_file_path = utils.get_high_precedence_path(
-                    self.repo_paths_list, f"cmake/toolchainfiles/{toolchain_file_name}", "toolchain File"
+                    self.repo_paths_list, "toolchain File", "cmake", "toolchainfiles", toolchain_file_name
                 )
                 lops_file = os.path.join(self.lops_dir, f"{proc_lops_specs_map[val][1]}.dts")
                 toolchain_file_copy = os.path.join(self.domain_dir, toolchain_file_name)
                 utils.copy_file(toolchain_file_path, toolchain_file_copy)
                 specs_file = utils.get_high_precedence_path(
-                    self.repo_paths_list, f"scripts/specs/{proc_lops_specs_map[val][2]}/Xilinx.spec", "Xilinx.spec File"
+                    self.repo_paths_list, "Xilinx.spec File", "scripts", "specs", proc_lops_specs_map[val][2], "Xilinx.spec"
                 )
                 specs_copy_file = os.path.join(self.domain_dir, 'Xilinx.spec')
                 utils.copy_file(specs_file, specs_copy_file)
@@ -303,9 +302,8 @@ find_package(common)
     cmake_file_cmds += cmake_add_target("xilstandalone_meta", bspcomsrc, obj.sdt, cmd, "StandaloneExample.cmake")
 
     # Copy cmake file that contains cmake utility APIs to a common location.
-    # FIXME: Dont use / in the paths
     find_common_cmake_path = utils.get_high_precedence_path(
-            obj.repo_paths_list, "cmake/Findcommon.cmake", "Findcommon.cmake"
+            obj.repo_paths_list, "Findcommon.cmake", "cmake", "Findcommon.cmake"
         )
     utils.copy_file(
         find_common_cmake_path,
@@ -452,7 +450,7 @@ find_package(common)
     # Copy the actual drivers cmake file in the libsrc folder.
     # This is to compile all the available driver sources.
     libxil_cmake = utils.get_high_precedence_path(
-        obj.repo_paths_list, "XilinxProcessorIPLib/drivers/CMakeLists.txt", "Driver compilation CMake File"
+        obj.repo_paths_list, "Driver compilation CMake File", "XilinxProcessorIPLib", "drivers", "CMakeLists.txt"
     )
     utils.copy_file(libxil_cmake, f"{obj.libsrc_folder}/")
 
