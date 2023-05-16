@@ -105,6 +105,13 @@ def create_app(args):
             f"lopper -O {obj.app_src_dir} {obj.sdt} -- baremetal_gentestapp_xlnx {obj.proc} {obj.repo_yaml_path}"
         )
 
+    # Copy psu_init* files for zynqmp fsbl app
+    if obj.template == "zynqmp_fsbl":
+        psu_init_c = os.path.join(obj.domain_path, "hw_artifacts", "psu_init.c")
+        psu_init_h = os.path.join(obj.domain_path, "hw_artifacts", "psu_init.h")
+        utils.copy_file(psu_init_c, obj.app_src_dir, silent_discard=True)
+        utils.copy_file(psu_init_h, obj.app_src_dir, silent_discard=True)
+
     # Add domain path entry in the app configuration file.
     data = {"domain_path": obj.domain_path,
             "app_src_dir": esw_app_dir,

@@ -105,7 +105,11 @@ class Domain(Repo):
         if utils.is_dir(os.path.join(utils.get_dir_path(self.sdt), "drivers"), silent_discard=True):
             utils.copy_directory(os.path.join(utils.get_dir_path(self.sdt), "drivers"),
                                  os.path.join((self.sdt_folder), "drivers"))
-
+        if self.app == "zynqmp_fsbl":
+            utils.copy_file(os.path.join(utils.get_dir_path(self.sdt), "psu_init.c"),
+                            os.path.join(self.sdt_folder, "psu_init.c"), silent_discard=True)
+            utils.copy_file(os.path.join(utils.get_dir_path(self.sdt), "psu_init.h"),
+                            os.path.join(self.sdt_folder, "psu_init.h"), silent_discard=True)
 
     def toolchain_intr_mapping(self):
         """
