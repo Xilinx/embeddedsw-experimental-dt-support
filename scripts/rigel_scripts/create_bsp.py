@@ -74,7 +74,7 @@ class Domain(Repo):
 
             if not utils.is_file(cpu_list_file):
                 utils.runcmd(
-                    f"lopper --werror -f -O {self.domain_dir} -i {self.lops_dir}/lop-cpulist.dts {self.sdt} >/dev/null",
+                    f"lopper --werror -f -O {self.domain_dir} -i {self.lops_dir}/lop-cpulist.dts {self.sdt} > nul",
                     cwd = self.domain_dir
                 )
             avail_cpu_data = utils.fetch_yaml_data(cpu_list_file, "cpulist")
