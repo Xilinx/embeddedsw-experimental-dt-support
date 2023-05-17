@@ -1,4 +1,4 @@
-export XILINX_TOOLCHAIN=/proj/xbuilds/2023.1_daily_latest/installs/lin64/Vitis/2023.1
+export XILINX_TOOLCHAIN=/proj/xbuilds/2023.2_daily_latest/installs/lin64/Vitis/2023.2
 export PYTHON_VER="python-3.8.3"
 export CMAKE_VER="cmake-3.24.2"
 
@@ -20,7 +20,7 @@ export PYTHONPATH=${XBUILDS_LOPPER_PATH}:$PYTHONPATH
 export OSF="True"
 
 # Below is a fallback mechanism to set an esw repo when no user repo is set
-export ESW_REPO="${XILINX_TOOLCHAIN}/data/embeddedsw-sdt"
+# export ESW_REPO="${XILINX_TOOLCHAIN}/data/embeddedsw-sdt"
 
 # LOPPER_DTC_FLAGS is needed to generate device tree with symbols in it.
 export LOPPER_DTC_FLAGS="-b 0 -@"
