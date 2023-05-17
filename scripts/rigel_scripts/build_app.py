@@ -8,10 +8,9 @@ import os
 import argparse
 from build_bsp import generate_bsp
 from build_bsp import BSP
-from repo import Repo
 from validate_bsp import Validation
 
-class Build_App(BSP, Repo):
+class Build_App(BSP):
     """
     This class helps in building a template application.
     """
@@ -19,7 +18,6 @@ class Build_App(BSP, Repo):
     def __init__(self, args):
         self._build_dir_struct(args)
         BSP.__init__(self, args)
-        Repo.__init__(self)
 
     def _build_dir_struct(self, args):
         if args["ws_dir"] == '.' and not args.get('build_dir'):
