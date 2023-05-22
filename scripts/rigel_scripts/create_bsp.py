@@ -525,6 +525,25 @@ endforeach()
     utils.remove(os.path.join(obj.domain_dir, "*.dtb"), pattern=True)
     utils.remove(os.path.join(obj.domain_dir, "*.pp"), pattern=True)
 
+    '''
+    compile_commands.json file needs to be kept inside libsrc directory.
+    '''
+    utils.copy_file(os.path.join(build_metadata, "compile_commands.json"), obj.libsrc_folder)
+
+    '''
+    There are few GCC flags (e.g. -fno-tree-loop-distribute-patterns) that
+    clang server doesnt recognise for Code Intellisense. To get over this
+    "Unknown Argument" Error of clang, a .clangd file with below content is
+    to be kept in parallel to compile_commands.json file.
+    '''
+    clangd_ignore_content = f'''
+CompileFlags:
+    Add: -Wno-unknown-warning-option
+    Remove: [-m*, -f*]
+'''
+    clangd_ignore_file = os.path.join(obj.libsrc_folder, ".clangd")
+    utils.write_into_file(clangd_ignore_file, clangd_ignore_content)
+
     # Success prints if everything went well till this point
     if utils.is_file(obj.domain_config_file):
         print(f"Successfully created Domain at {obj.domain_dir}")
