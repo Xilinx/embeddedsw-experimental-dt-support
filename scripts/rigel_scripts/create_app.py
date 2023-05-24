@@ -131,7 +131,7 @@ def create_app(args):
     Silent_discard needs to be true as for Empty Application, this file
     is not created.
     '''
-    utils.copy_file(f"{compile_commands_dir}/compile_commands.json", obj.app_src_dir, silent_discard=True)
+    utils.copy_file(os.path.join(compile_commands_dir, "compile_commands.json"), obj.app_src_dir, silent_discard=True)
 
     '''
     There are few GCC flags (e.g. -fno-tree-loop-distribute-patterns) that
