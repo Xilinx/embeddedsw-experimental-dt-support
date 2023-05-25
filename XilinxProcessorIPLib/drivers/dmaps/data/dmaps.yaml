@@ -20,15 +20,9 @@ properties:
     description: Physical base address and size of the controller register map
 
 config:
-   - XDpDma_Config 
+   - XDmaPs_Config
 
 required:
     - compatible
     - reg
-    - interrupts: 9
-    - interrupt-parent
-
-examples:
-   xdmaps_example_w_intr.c:
-    - interrupts
 ...

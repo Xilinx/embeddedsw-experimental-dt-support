@@ -163,7 +163,11 @@ int XDmaPs_CfgInitialize(XDmaPs *InstPtr,
 	for (Channel = 0; Channel < XDMAPS_CHANNELS_PER_DEV; Channel++) {
 		ChanData = InstPtr->Chans + Channel;
 		ChanData->ChanId = Channel;
+#ifndef SDT
 		ChanData->DevId = Config->DeviceId;
+#else
+		ChanData->DevId = XDmaPs_GetDrvIndex(InstPtr, EffectiveAddr);
+#endif
 	}
 
 	InstPtr->IsReady = 1;
@@ -249,8 +253,11 @@ void XDmaPs_FaultISR(XDmaPs *InstPtr)
 	Fsm = XDmaPs_ReadReg(BaseAddr, XDMAPS_FSM_OFFSET) & 0x01;
 	Fsc = XDmaPs_ReadReg(BaseAddr, XDMAPS_FSC_OFFSET) & 0xFF;
 
-
+#ifndef SDT
 	DevId = InstPtr->Config.DeviceId;
+#else
+	DevId = XDmaPs_GetDrvIndex(InstPtr, BaseAddr);
+#endif
 
 	if (Fsm) {
 		/*

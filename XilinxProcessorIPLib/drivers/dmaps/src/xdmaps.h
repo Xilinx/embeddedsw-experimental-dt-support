@@ -320,6 +320,7 @@ void XDmaPs_FaultISR(XDmaPs *InstPtr);
 XDmaPs_Config *XDmaPs_LookupConfig(u16 DeviceId);
 #else
 XDmaPs_Config *XDmaPs_LookupConfig(UINTPTR BaseAddress);
+u32 XDmaPs_GetDrvIndex(XDmaPs *InstancePtr, UINTPTR BaseAddress);
 #endif
 
 
