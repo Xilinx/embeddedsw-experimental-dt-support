@@ -99,7 +99,7 @@ class RegenBSP(BSP, Library):
                     lib_config[lib][key]['value'] = val
                 if val in bool_match:
                     val = bool_match[val]
-                cmake_cmd_append += f" -D{key}='{val}'"
+                cmake_cmd_append += f' -D{key}="{val}"'
 
         self.lib_list.remove(self.proc)
         if self.os == 'freertos':
