@@ -9,7 +9,7 @@ import os
 import utils
 from library_utils import Library
 from build_bsp import BSP
-
+from regen_bsp import regenerate_bsp
 
 class Bsp_config(BSP, Library):
     """
@@ -110,6 +110,57 @@ def configure_bsp(args):
             utils.update_yaml(obj.domain_config_file, "domain", "os_config", os_config, action="add")
         utils.update_yaml(obj.domain_config_file, "domain", "lib_config", obj.bsp_lib_config)
 
+    if args.get("set_repo_path"):
+        prop_params = args["set_repo_path"]
+
+        # Validate the command line inputs provided
+        usage_print = """
+            [ERROR]: Please pass component and component name followed by path
+            component name:path.
+            e.g. -sr driver csudma:<path to driver source>
+            Wrong inputs passed with set_repo_path.
+        """
+        if len(prop_params) < 2:
+            print(usage_print)
+            sys.exit(1)
+
+        # Copy the repo.yaml to the bsp path
+        repo_yaml = os.path.join(obj.domain_path, '.repo.yaml')
+        if not utils.is_file(repo_yaml):
+            utils.copy_file(args['repo_info'], obj.domain_path)
+
+        component = prop_params[0]
+        for entries in prop_params[1:]:
+            if ":" not in entries:
+                print(usage_print)
+                sys.exit(1)
+            else:
+                prop_data = entries.split(":")
+                component_name = prop_data[0]
+                component_path = prop_data[1]
+                # Update the .repo.yaml and the bsp.yaml paths
+                repo_metadata = utils.load_yaml(repo_yaml)
+                # Get the index
+                comp_dict = repo_metadata[component]
+                path = comp_dict[component_name]['path']
+
+                try:
+                    index = path.index(component_path)
+                except ValueError:
+                    print(f"[ERROR]: provide {component_path} is not a valid path")
+                    sys.exit(1)
+
+                old_path = path[0]
+                path.insert(0, path.pop(index))
+                utils.update_yaml(repo_yaml, "repo_meta", component, comp_dict)
+                utils.replace_line(
+                    obj.domain_config_file,
+                    old_path,
+                    f'    path: {component_path}'
+                )
+
+        args.update({'sdt':obj.sdt})
+        regenerate_bsp(args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -148,6 +199,13 @@ if __name__ == "__main__":
         nargs="*",
         action="store",
         help="Specify libaries with the params that need to be configured",
+    )
+    group.add_argument(
+        "-sr",
+        "--set_repo_path",
+        nargs="*",
+        action="store",
+        help="Update the path for a given component",
     )
     parser.add_argument(
         "-r",

@@ -22,6 +22,11 @@ class RegenBSP(BSP, Library):
         BSP.__init__(self, args)
         if args.get('sdt'):
             self.sdt = utils.get_abs_path(args["sdt"])
+        if utils.is_file(os.path.join(self.domain_path, ".repo.yaml")):
+            self.repo_info = os.path.join(self.domain_path, ".repo.yaml")
+        else:
+            self.repo_info = args['repo_info']
+
         Library.__init__(
             self,
             self.domain_path,
@@ -30,7 +35,7 @@ class RegenBSP(BSP, Library):
             self.sdt,
             self.cmake_paths_append,
             self.libsrc_folder,
-            args['repo_info']
+            self.repo_info
         )
 
     def modify_bsp(self, args):
@@ -39,7 +44,8 @@ class RegenBSP(BSP, Library):
             'proc':self.proc,
             'os':self.os,
             'template':self.template,
-            'sdt':self.sdt
+            'sdt':self.sdt,
+            'repo_info':self.repo_info
         })
 
         # Remove existing folder structure
