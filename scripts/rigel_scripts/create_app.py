@@ -57,7 +57,7 @@ def create_app(args):
     obj = App(args)
 
     # Copy the application src directory from embeddedsw to app src folder.
-    esw_app_dir, _ = obj.get_comp_dir(obj.template)
+    esw_app_dir = obj.get_comp_dir(obj.template)
     srcdir = os.path.join(esw_app_dir, "src")
     utils.copy_directory(srcdir, obj.app_src_dir)
 

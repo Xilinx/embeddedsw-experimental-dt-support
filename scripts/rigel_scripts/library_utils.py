@@ -38,7 +38,7 @@ class Library(Repo):
         self.bsp_lib_config.update(self.domain_data["proc_config"])
         self.lib_info = self.domain_data["lib_info"]
 
-    def validate_lib_name(self, lib, version=''):
+    def validate_lib_name(self, lib):
         """
         Checks if the passed library name from the user is valid for the sdt 
         proc and os combination. Exits with valid assertion if the user input 
@@ -94,7 +94,7 @@ class Library(Repo):
             )
             sys.exit(1)
 
-    def copy_lib_src(self, lib, version=''):
+    def copy_lib_src(self, lib):
         """
         Copies the src directory of the passed library from the respective path
         of embeddedsw to the libsrc folder of bsp.
@@ -107,12 +107,12 @@ class Library(Repo):
             | srcdir (str): Path of src folder of library inside embeddedsw
             | dstdir (str): Path of src folder inside libsrc folder of bsp
         """
-        libdir, lib_version = self.get_comp_dir(lib, version)
+        libdir = self.get_comp_dir(lib)
         srcdir = os.path.join(libdir, "src")
         dstdir = os.path.join(self.libsrc_folder, lib, "src")
         utils.copy_directory(srcdir, dstdir)
-        self.lib_info[lib] = {'path': libdir, 'version': lib_version}
-        return libdir, lib_version, srcdir, dstdir
+        self.lib_info[lib] = {'path': libdir}
+        return libdir, srcdir, dstdir
 
     def get_default_lib_params(self, build_lib_dir, lib_list):
         """
@@ -216,8 +216,8 @@ class Library(Repo):
 
         return default_lib_config
 
-    def validate_drv_for_lib(self, comp_name, drvlist, version=''):
-        comp_dir, _ = self.get_comp_dir(comp_name, version)
+    def validate_drv_for_lib(self, comp_name, drvlist):
+        comp_dir = self.get_comp_dir(comp_name)
         yaml_file = os.path.join(comp_dir, "data", f"{comp_name}.yaml")
         schema = utils.load_yaml(yaml_file)
         if schema.get("depends"):
@@ -233,7 +233,7 @@ class Library(Repo):
                 return False
         return True
 
-    def add_lib_for_apps(self, app_name, version=''):
+    def add_lib_for_apps(self, app_name):
         """
         Adds library to the bsp. Creates metadata if needed for the library, 
         runs cmake configure to prepare the build area for library 
@@ -249,7 +249,7 @@ class Library(Repo):
         lib_list = []
 
         # Read the yaml file of the passed component.
-        app_dir, _ = self.get_comp_dir(app_name, version)
+        app_dir = self.get_comp_dir(app_name)
         yaml_file = os.path.join(app_dir, "data", f"{app_name}.yaml")
         schema = utils.load_yaml(yaml_file)
         lib_config = {}
@@ -258,7 +258,7 @@ class Library(Repo):
             # If the passed template has any lib dependency, add those dependencies.
             for name, props in schema["depends_libs"].items():
                 lib_list += [name]
-                _, _, _, _ = self.copy_lib_src(name, version)
+                _, _, _ = self.copy_lib_src(name)
                 if props:
                     # If the template needs specific config param of the lib.
                     for key, value in props.items():
@@ -266,7 +266,7 @@ class Library(Repo):
 
         return lib_list, cmake_cmd_append
 
-    def config_lib(self, comp_name, lib_list, cmake_cmd_append, is_app=False, version=''):
+    def config_lib(self, comp_name, lib_list, cmake_cmd_append, is_app=False):
         lib_config = {}
         ignore_lib = False
         if lib_list:
@@ -298,7 +298,7 @@ class Library(Repo):
                     lib_list.remove(entry)
             lib_config = self.get_default_lib_params(build_metadata, lib_list)
             if is_app:
-                comp_dir, _ = self.get_comp_dir(comp_name, version)
+                comp_dir = self.get_comp_dir(comp_name)
                 yaml_file = os.path.join(comp_dir, "data", f"{comp_name}.yaml")
                 schema = utils.load_yaml(yaml_file)
                 cmake_cmd_append = cmake_cmd_append.replace('\\', '/')
@@ -313,7 +313,7 @@ class Library(Repo):
 
             for lib in lib_list:
                 # Update examples if any for the library
-                comp_dir, _ = self.get_comp_dir(lib, version)
+                comp_dir = self.get_comp_dir(lib)
                 yaml_file = os.path.join(comp_dir, "data", f"{lib}.yaml")
                 schema = utils.load_yaml(yaml_file)
                 example_schema = schema.get('examples',{})
@@ -341,8 +341,8 @@ class Library(Repo):
                 utils.update_yaml(self.domain_config_file, "domain", "lib_config", lib_config)
                 utils.update_yaml(self.domain_config_file, "domain", "lib_info", self.lib_info)
 
-    def gen_lib_metadata(self, lib, version=''):
-        _, _, src_dir, dst_dir = self.copy_lib_src(lib, version)
+    def gen_lib_metadata(self, lib):
+        _, src_dir, dst_dir = self.copy_lib_src(lib)
         lopper_cmd = f"lopper -O {dst_dir} -f {self.sdt} --  bmcmake_metadata_xlnx {self.proc} {src_dir} hwcmake_metadata {self.repo_yaml_path}"
         utils.runcmd(lopper_cmd, cwd = dst_dir)
 

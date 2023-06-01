@@ -34,7 +34,7 @@ def regen_linker(args):
     app_config_file = os.path.join(obj.app_src_dir, "app.yaml")
     template = utils.fetch_yaml_data(app_config_file, "template")["template"]
 
-    esw_app_dir, _ = obj.get_comp_dir(template)
+    esw_app_dir = obj.get_comp_dir(template)
     srcdir = os.path.join(esw_app_dir, "src")
     app_linker_build = os.path.join(obj.app_src_dir, "linker_build")
     utils.mkdir(app_linker_build)

@@ -78,7 +78,7 @@ def create_example(args):
     app_file = os.path.join(esw_app_dir, obj.app_name)
     utils.copy_file(app_file, obj.app_src_dir)
 
-    esw_app_dir, _ = obj.get_comp_dir("empty_application")
+    esw_app_dir = obj.get_comp_dir("empty_application")
     srcdir = os.path.join(esw_app_dir, "src")
     utils.copy_directory(srcdir, obj.app_src_dir)
 

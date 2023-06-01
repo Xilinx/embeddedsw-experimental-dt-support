@@ -50,27 +50,13 @@ class Repo:
                 )
                 sys.exit(1)
 
-    def get_comp_dir(self, comp_name, version="", sdt_path=""):
+    def get_comp_dir(self, comp_name, sdt_path=""):
         path_found = False
         for entries in self.repo_schema.keys():
             if comp_name in self.repo_schema[entries].keys():
                 path_found = True
-                version_list = list(self.repo_schema[entries][comp_name].keys())
-                if version:
-                    if self.repo_schema[entries][comp_name].get(version):
-                        comp_dir = self.repo_schema[entries][comp_name][version]
-                        return self.validate_comp_path(comp_dir, comp_name, version)
-                    else:
-                        print(f"[ERROR]: Couldnt find the src directory for {comp_name} with {version}")
-                        sys.exit(1)
-                elif "vless" in version_list:
-                    comp_dir = self.repo_schema[entries][comp_name]["vless"]
-                    return self.validate_comp_path(comp_dir, comp_name, 'vless')
-                else:
-                    version_list.sort(key = float, reverse = True)
-                    comp_dir = self.repo_schema[entries][comp_name][version_list[0]]
-                    return self.validate_comp_path(comp_dir, comp_name, version_list[0])
-
+                comp_dir = self.repo_schema[entries][comp_name]["path"][0]
+                return self.validate_comp_path(comp_dir, comp_name)
         if not path_found:
             if sdt_path:
                 has_drivers = os.path.join(sdt_path, "drivers")
@@ -79,15 +65,15 @@ class Repo:
                     yaml_file_abs = [yaml for yaml in yaml_list if f"{comp_name}.yaml" in yaml]
                     if yaml_file_abs:
                         comp_dir = utils.get_dir_path(utils.get_dir_path(yaml_file_abs[0]))
-                        return self.validate_comp_path(comp_dir, comp_name, 'vless')
+                        return self.validate_comp_path(comp_dir, comp_name)
             print(f"[ERROR]: Couldnt find the src directory for {comp_name}")
             sys.exit(1)
 
-    def validate_comp_path(self, comp_dir, comp_name, version):
+    def validate_comp_path(self, comp_dir, comp_name):
         assert utils.is_dir(
             comp_dir
         ), f"{comp_dir} doesnt exist. Not able to fetch the dir for {comp_name}"
-        return comp_dir, version
+        return comp_dir
 
 
 def resolve_paths(repo_paths):
@@ -114,22 +100,11 @@ def resolve_paths(repo_paths):
             comp_name = utils.get_base_name(dir_path)
             comp_name =  re.sub("_v(\d+)_(\d+)", "", comp_name)
             yaml_data = utils.load_yaml(entries)
-            version = yaml_data.get('version','vless')
 
-            if yaml_data['type'] in ['library','os'] and version == 'vless':
-                print(f"""\b
-                    [ERROR]:  Couldnt set the paths correctly.
-                    {comp_name} in {path} doesnt have a version.
-                    Library and OS needs version numbers in its yaml.
-                """)
-                sys.exit(1)
-
-            if path_dict[yaml_data['type']].get(comp_name,{}).get(version):
-                continue
-            elif path_dict[yaml_data['type']].get(comp_name):
-                path_dict[yaml_data['type']][comp_name].update({version : dir_path})
+            if not path_dict[yaml_data['type']].get(comp_name):
+                path_dict[yaml_data['type']][comp_name] = {"path" : [dir_path]}
             else:
-                path_dict[yaml_data['type']][comp_name] = {version : dir_path}
+                path_dict[yaml_data['type']][comp_name]["path"].append(dir_path)
 
     utils.write_yaml('.repo.yaml', path_dict)
 

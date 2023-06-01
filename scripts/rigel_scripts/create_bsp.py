@@ -291,11 +291,11 @@ def create_domain(args):
     cmake_file = os.path.join(obj.domain_dir, "CMakeLists.txt")
 
     # Copy the standalone bsp src file.
-    os_dir_path, os_dir_version = obj.get_comp_dir("standalone")
+    os_dir_path = obj.get_comp_dir("standalone")
     os_srcdir = os.path.join(os_dir_path, "src")
     bspsrc = os.path.join(obj.libsrc_folder, "standalone", "src")
     utils.copy_directory(os_srcdir, bspsrc)
-    obj.os_info['standalone'] = {'path': os_dir_path, 'version':os_dir_version}
+    obj.os_info['standalone'] = {'path': os_dir_path}
     
     cmake_header = """
 cmake_minimum_required(VERSION 3.15)
@@ -343,7 +343,7 @@ find_package(common)
         drv_list = drv_names.split()
 
     for drv in drv_list:
-        drv_path, _ = obj.get_comp_dir(drv, "", obj.sdt_folder)
+        drv_path = obj.get_comp_dir(drv, obj.sdt_folder)
         if not drv_path:
             print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
             sys.exit(1)
@@ -353,7 +353,7 @@ find_package(common)
     ip_drv_map = utils.load_yaml(ip_drv_map_file)
     for ip,driver in ip_drv_map.items():
         if driver != "None":
-            drv_path, _ = obj.get_comp_dir(driver, "", obj.sdt_folder)
+            drv_path = obj.get_comp_dir(driver, obj.sdt_folder)
             if not drv_path:
                 print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
                 sys.exit(1)
@@ -414,17 +414,17 @@ find_package(common)
 
     if obj.os == "freertos":
         # Copy the freertos source code to libsrc folder
-        os_dir_path, os_dir_version = obj.get_comp_dir("freertos10_xilinx")
+        os_dir_path = obj.get_comp_dir("freertos10_xilinx")
         os_srcdir = os.path.join(os_dir_path, "src")
         bspsrc = os.path.join(obj.libsrc_folder, "freertos10_xilinx/src")
         utils.copy_directory(os_srcdir, bspsrc)
-        obj.os_info['freertos10_xilinx'] = {'path': os_dir_path, 'version':os_dir_version}
+        obj.os_info['freertos10_xilinx'] = {'path': os_dir_path}
         lib_list.append("freertos10_xilinx")
 
 
     if lib_list:
         for lib in lib_list:
-            lib_dir_path, lib_dir_version = obj.get_comp_dir(lib)
+            lib_dir_path = obj.get_comp_dir(lib)
             srcdir = os.path.join(lib_dir_path, "src")
             dstdir = os.path.join(obj.libsrc_folder, f"{lib}/src")
             cmd = f"bmcmake_metadata_xlnx {obj.proc} {srcdir} hwcmake_metadata {obj.repo_yaml_path}"

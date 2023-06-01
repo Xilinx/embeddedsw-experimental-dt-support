@@ -62,21 +62,14 @@ class RegenBSP(BSP, Library):
         cmake_file = os.path.join(self.domain_path, "CMakeLists.txt")
         build_folder = os.path.join(self.libsrc_folder, "build_configs")
         ignored_lib_list = []
-        changed_version_lib_list = []
         for lib in lib_diff_old_to_new:
-            cur_lib_version = self.lib_info[lib]['version']
-            lib_version_fetched = ''
-            if cur_lib_version in self.repo_schema.get('library').get(lib,{}).keys():
-                lib_version_fetched = cur_lib_version
-            else:
-                changed_version_lib_list += [lib]
-            if not self.validate_drv_for_lib(lib, drvlist, lib_version_fetched):
+            if not self.validate_drv_for_lib(lib, drvlist):
                 ignored_lib_list.append(lib)
                 continue
-            self.gen_lib_metadata(lib, lib_version_fetched)
+            self.gen_lib_metadata(lib)
             libs_to_add += [lib]
         if libs_to_add:
-            self.config_lib(None, libs_to_add, "", is_app=False, version=lib_version_fetched)
+            self.config_lib(None, libs_to_add, "", is_app=False)
             domain_data = utils.fetch_yaml_data(self.domain_config_file, "domain")
 
         build_metadata = os.path.join(self.libsrc_folder, "build_configs", "gen_bsp")
@@ -115,7 +108,7 @@ class RegenBSP(BSP, Library):
         # In case of Re generate BSP with different SDT print differences
         add_drv_list = [drv for drv in drvlist if drv not in self.drvlist]
         del_drv_list = [drv for drv in self.drvlist if drv not in drvlist]
-        if add_drv_list or del_drv_list or ignored_lib_list or changed_version_lib_list:
+        if add_drv_list or del_drv_list or ignored_lib_list:
             print(f"During Regeneration of BSP")
             if add_drv_list:
                 print(f"Drivers {*add_drv_list,} got added")
@@ -123,8 +116,6 @@ class RegenBSP(BSP, Library):
                 print(f"Drivers {*del_drv_list,} got deleted")
             if ignored_lib_list:
                 print(f"Libraries {*ignored_lib_list,} ignored due to incompatible with new system device-tree")
-            if changed_version_lib_list:
-                print(f"Libraries {*changed_version_lib_list,} changed their versions")
 
 
 def regenerate_bsp(args):
