@@ -351,13 +351,15 @@ find_package(common)
 
     ip_drv_map_file = os.path.join(obj.libsrc_folder, "ip_drv_map.yaml")
     ip_drv_map = utils.load_yaml(ip_drv_map_file)
-    for ip,driver in ip_drv_map.items():
+    for ip,data in ip_drv_map.items():
+        driver = data[1]
         if driver != "None":
             drv_path = obj.get_comp_dir(driver, obj.sdt_folder)
             if not drv_path:
                 print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
                 sys.exit(1)
             obj.drv_info[ip] = {'driver': driver,
+                                'ip_name': data[0],
                                 'path' : drv_path}
         else:
             obj.drv_info[ip] = "None"
@@ -387,7 +389,6 @@ find_package(common)
         "include_folder": utils.get_rel_path(obj.include_folder, obj.domain_dir),
         "lib_folder": utils.get_rel_path(obj.lib_folder, obj.domain_dir),
         "libsrc_folder": utils.get_rel_path(obj.libsrc_folder, obj.domain_dir),
-        "ip_drv_map": utils.load_yaml(ip_drv_map_file),
         "drv_info": obj.drv_info,
         "lib_info": {},
         "lib_config": {}
