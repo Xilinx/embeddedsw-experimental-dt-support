@@ -58,6 +58,8 @@ class Domain(Repo):
                 return "ZynqMP"
             elif "cpus_a72" in content:
                 return "Versal"
+            elif "cpus_a9" in content:
+                return "Zynq"
 
     def _validate_inputs(self):
         """
@@ -105,11 +107,19 @@ class Domain(Repo):
         if utils.is_dir(os.path.join(utils.get_dir_path(self.sdt), "drivers"), silent_discard=True):
             utils.copy_directory(os.path.join(utils.get_dir_path(self.sdt), "drivers"),
                                  os.path.join((self.sdt_folder), "drivers"))
-        if self.app == "zynqmp_fsbl":
-            utils.copy_file(os.path.join(utils.get_dir_path(self.sdt), "psu_init.c"),
-                            os.path.join(self.sdt_folder, "psu_init.c"), silent_discard=True)
-            utils.copy_file(os.path.join(utils.get_dir_path(self.sdt), "psu_init.h"),
-                            os.path.join(self.sdt_folder, "psu_init.h"), silent_discard=True)
+
+        if self.family == "ZynqMP":
+            init_file = "psu_init"
+        elif self.family == "Zynq":
+            init_file = "ps7_init"
+        else:
+            init_file = ""
+
+        if init_file:
+            utils.copy_file(os.path.join(utils.get_dir_path(self.sdt), f"{init_file}.c"),
+                            os.path.join(self.sdt_folder, f"{init_file}.c"), silent_discard=True)
+            utils.copy_file(os.path.join(utils.get_dir_path(self.sdt), f"{init_file}.h"),
+                            os.path.join(self.sdt_folder, f"{init_file}.h"), silent_discard=True)
 
     def toolchain_intr_mapping(self):
         """
@@ -137,6 +147,7 @@ class Domain(Repo):
             "a53": ("cortexa53", "lop-a53-imux", "arm"),
             "a72": ("cortexa72", "lop-a72-imux", "arm"),
             "r5": ("cortexr5", "lop-r5-imux", "arm"),
+            "a9": ("cortexa9", "", "arm"),
             "pmu": ("microblaze-pmu", "", "microblaze"),
             "pmc": ("microblaze-plm", "", "microblaze"),
             "psm": ("microblaze-psm", "", "microblaze"),
