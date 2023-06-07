@@ -100,7 +100,7 @@ int XAdcPs_CfgInitialize(XAdcPs *InstancePtr, XAdcPs_Config *ConfigPtr,
 	InstancePtr->Config.BaseAddress = EffectiveAddr;
 
 	/* Write Unlock value to Device Config Unlock register */
-	XAdcPs_WriteReg(XPAR_XDCFG_0_BASEADDR,
+	XAdcPs_WriteReg((InstancePtr)->Config.BaseAddress,
 				XADCPS_UNLK_OFFSET, XADCPS_UNLK_VALUE);
 
 	/* Enable the PS access of xadc and set FIFO thresholds */
