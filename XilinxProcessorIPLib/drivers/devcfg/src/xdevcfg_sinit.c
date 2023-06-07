@@ -71,7 +71,7 @@ XDcfg_Config *XDcfg_LookupConfig(u16 DeviceId)
 #else
 XDcfg_Config *XDcfg_LookupConfig(UINTPTR BaseAddress)
 {
-	extern XDcfg_Config XDevcfg_ConfigTable[];
+	extern XDcfg_Config XDcfg_ConfigTable[];
 	XDcfg_Config *CfgPtr = NULL;
 	u32 Index;
 
