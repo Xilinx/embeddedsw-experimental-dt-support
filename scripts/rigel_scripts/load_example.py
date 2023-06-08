@@ -76,12 +76,14 @@ project(bsp)
         )
 
         utils.runcmd("make -f CMakeFiles/Makefile2 -j22 > nul", cwd = build_metadata)
-        for ip,driver in domain_data['ip_drv_map'].items():
-            drv_ex_list_yaml = os.path.join(self.libsrc_folder, driver, f"{driver}_exlist.yaml")
-            if utils.is_file(drv_ex_list_yaml):
-                driver_ex = utils.load_yaml(drv_ex_list_yaml)
-                if len(driver_ex) != 0:
-                    domain_data["drv_info"][ip].update({"examples":driver_ex[ip]})
+        for ip,data in domain_data['drv_info'].items():
+            if data != "None":
+                driver = data['driver']
+                drv_ex_list_yaml = os.path.join(self.libsrc_folder, driver, f"{driver}_exlist.yaml")
+                if utils.is_file(drv_ex_list_yaml):
+                    driver_ex = utils.load_yaml(drv_ex_list_yaml)
+                    if len(driver_ex) != 0:
+                        domain_data["drv_info"][ip].update({"examples":driver_ex[ip]})
 
         utils.update_yaml(self.domain_config_file, "domain", "drv_info", domain_data["drv_info"])
         for drv in driver_name_list:
