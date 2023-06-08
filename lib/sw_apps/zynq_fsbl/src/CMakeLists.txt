@@ -13,6 +13,7 @@ enable_language(C ASM)
 collect(PROJECT_LIB_DEPS xiltimer)
 collect(PROJECT_LIB_DEPS xilffs)
 collect(PROJECT_LIB_DEPS xilrsa)
+collect(PROJECT_LIB_DEPS xil)
 collect(PROJECT_LIB_DEPS xilstandalone)
 collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
@@ -53,7 +54,7 @@ aux_source_directory(${CMAKE_SOURCE_DIR} _sources)
 
 string(APPEND CMAKE_C_FLAGS ${USER_COMPILE_OPTIONS})
 string(APPEND CMAKE_C_LINK_FLAGS ${USER_LINK_OPTIONS})
-add_executable(${APP_NAME}.elf ${_sources})
+add_executable(${APP_NAME}.elf fsbl_handoff.S ${_sources})
 
 target_link_libraries(${APP_NAME}.elf -Os -Wl,--gc-sections -n -T\"${CMAKE_SOURCE_DIR}/lscript.ld\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 

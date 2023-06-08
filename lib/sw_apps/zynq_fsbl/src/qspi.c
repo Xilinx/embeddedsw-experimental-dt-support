@@ -59,7 +59,11 @@
  * xparameters.h file. They are defined here such that a user can easily
  * change all the needed parameters in one place.
  */
+#ifndef SDT
 #define QSPI_DEVICE_ID		XPAR_XQSPIPS_0_DEVICE_ID
+#else
+#define QSPI_DEVICE_ID		XPAR_XQSPIPS_0_BASEADDR
+#endif
 
 /*
  * The following constants define the commands which may be sent to the FLASH

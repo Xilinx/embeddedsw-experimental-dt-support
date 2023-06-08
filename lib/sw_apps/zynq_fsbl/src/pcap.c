@@ -87,7 +87,11 @@
  * change all the needed parameters in one place.
  */
 
+#ifndef SDT
 #define DCFG_DEVICE_ID		XPAR_XDCFG_0_DEVICE_ID
+#else
+#define DCFG_DEVICE_ID		XPAR_XDEVCFG_0_BASEADDR	
+#endif
 
 /**************************** Type Definitions *******************************/
 
