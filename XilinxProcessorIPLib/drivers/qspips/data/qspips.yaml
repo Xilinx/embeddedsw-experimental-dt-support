@@ -35,4 +35,7 @@ required:
     - xlnx,bus-width
     - interrupts 
     - interrupt-parent
+
+additionalProperties:
+    - xlnx,qspi-mode
 ...
