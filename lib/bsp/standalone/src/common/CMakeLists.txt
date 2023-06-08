@@ -50,10 +50,6 @@ if(("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexr5") OR
    collect (PROJECT_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../xcortexr5_g.c)
 endif()
 
-if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "cortexa9")
-	collect (PROJECT_LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../xcortexa9_g.c)
-endif()
-
 if("${CMAKE_MACHINE}" STREQUAL "Versal")
 add_subdirectory(versal)
 endif()

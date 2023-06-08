@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2023 Advanced Micro Devices, Inc.  All rights reserved.
+%YAML 1.2
+---
+title: Bindings for cortexa9 cpu
+
+maintainers:
+  - Mubin Sayyed <mubin.usman.sayyed@xilinx.com>
+
+config:
+    - XCortexa9_Config
+
+properties:
+  compatible:
+    OneOf:
+      - items:
+        - enum:
+          - arm,cortex-a9
+
+required:
+    - xlnx,i-cache-size
+    - xlnx,d-cache-size
+    - xlnx,cpu-1x-clk-freq-hz
+    - reg
+    - xlnx,i-cache-line-size
+    - xlnx,d-cache-line-size
+...
+
