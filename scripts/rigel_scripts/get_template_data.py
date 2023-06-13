@@ -17,7 +17,7 @@ def fetch_template_data(esw_schema, dest_dir):
     overall_data = {}
     apps_schema = esw_schema.get('apps',{})
     for app in apps_schema.keys():
-        app_data_file = os.path.join(apps_schema[app]['vless'], 'data', f'{app}.yaml')
+        app_data_file = os.path.join(apps_schema[app]['path'][0], 'data', f'{app}.yaml')
         if utils.is_file(app_data_file):
             overall_data[app] = utils.load_yaml(app_data_file)
 
