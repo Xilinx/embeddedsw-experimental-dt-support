@@ -12,6 +12,7 @@ import os
 import utils
 import re
 from repo import Repo
+from open_amp import open_amp_copy_lib_src
 
 
 class Library(Repo):
@@ -109,8 +110,14 @@ class Library(Repo):
         """
         libdir = self.get_comp_dir(lib)
         srcdir = os.path.join(libdir, "src")
+        if lib in ['libmetal', 'open-amp']:
+            srcdir = os.environ.get('XILINX_TOOLCHAIN') + '/data/' + lib
+
         dstdir = os.path.join(self.libsrc_folder, lib, "src")
         utils.copy_directory(srcdir, dstdir)
+        if lib in ['libmetal', 'open-amp']:
+            open_amp_copy_lib_src(lib, libdir, dstdir)
+
         self.lib_info[lib] = {'path': libdir}
         return libdir, srcdir, dstdir
 
