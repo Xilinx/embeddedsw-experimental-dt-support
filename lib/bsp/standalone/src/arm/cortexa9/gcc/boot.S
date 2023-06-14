@@ -73,7 +73,10 @@
 *
 ******************************************************************************/
 
+#include "bspconfig.h"
+#ifndef SDT
 #include "xparameters.h"
+#endif
 #include "xil_errata.h"
 
 .globl MMUTable

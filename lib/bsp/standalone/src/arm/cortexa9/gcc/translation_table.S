@@ -67,7 +67,12 @@
 *
 *
 ******************************************************************************/
+#include "bspconfig.h"
+#ifndef SDT
 #include "xparameters.h"
+#else
+#include "xmem_config.h"
+#endif
 	.globl  MMUTable
 
 	.section .mmu_tbl,"a"
@@ -82,6 +87,11 @@ MMUTable:
 #ifdef XPAR_PS7_DDR_0_S_AXI_BASEADDR
 .set DDR_START, XPAR_PS7_DDR_0_S_AXI_BASEADDR
 .set DDR_END, XPAR_PS7_DDR_0_S_AXI_HIGHADDR
+.set DDR_SIZE, (DDR_END - DDR_START)+1
+.set DDR_REG, DDR_SIZE/0x100000
+#elif defined(XPAR_PS7_DDR_0_BASEADDRESS)
+.set DDR_START, XPAR_PS7_DDR_0_BASEADDRESS
+.set DDR_END, XPAR_PS7_DDR_0_HIGHADDRESS
 .set DDR_SIZE, (DDR_END - DDR_START)+1
 .set DDR_REG, DDR_SIZE/0x100000
 #else

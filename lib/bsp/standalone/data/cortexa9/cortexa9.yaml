@@ -18,11 +18,6 @@ properties:
           - arm,cortex-a9
 
 required:
-    - xlnx,i-cache-size
-    - xlnx,d-cache-size
-    - xlnx,cpu-1x-clk-freq-hz
-    - reg
-    - xlnx,i-cache-line-size
-    - xlnx,d-cache-line-size
+    - xlnx,cpu-clk-freq-hz
 ...
 
