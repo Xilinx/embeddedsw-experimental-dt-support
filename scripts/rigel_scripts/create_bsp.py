@@ -151,6 +151,7 @@ class Domain(Repo):
             "pmu": ("microblaze-pmu", "", "microblaze"),
             "pmc": ("microblaze-plm", "", "microblaze"),
             "psm": ("microblaze-psm", "", "microblaze"),
+            "microblaze": ("microblaze", "", "microblaze"),
         }
         lops_file = ""
         out_dts_path = os.path.join(self.sdt_folder, f"{self.proc}_baremetal.dts")
@@ -178,10 +179,38 @@ class Domain(Repo):
                 f'set( CMAKE_MACHINE "{self.family}")',
             )
 
+        if "microblaze" in self.proc:
+            lops_file = os.path.join(self.lops_dir, "lop-microblaze.dts")
+            vitis_path = os.environ.get("XILINX_VITIS")
+
+            utils.runcmd(
+                f"lopper -f -O {self.domain_dir} --enhanced -i {lops_file} {self.sdt} > nul",
+                cwd = self.domain_dir
+            )
+            cflags_file = os.path.join(self.domain_dir, "cflags.yaml")
+            avail_cflag_data = utils.fetch_yaml_data(cflags_file, "cflags")
+            cflags = avail_cflag_data.get("cflags")
+
+            utils.replace_line(
+                toolchain_file_copy,
+                f'set( CMAKE_HW_FLAGS "" )',
+                f'set( CMAKE_HW_FLAGS "{cflags}" )\n',
+            )
+
+            #TODO: Handle libpath in cflags.yaml based on OS
+            relative_libpath = avail_cflag_data.get("libpath")
+            vitis_path = os.environ.get("XILINX_VITIS")
+            libpath = os.path.join(vitis_path, "gnu", "microblaze", "lin", relative_libpath)
+
+            utils.replace_line(
+                toolchain_file_copy,
+                f'set( CMAKE_COMPILER_LIB_PATH "" )',
+                f'set( CMAKE_COMPILER_LIB_PATH "{libpath}" )\n',
+            )
+
         # freertos needs a separate CMAKE_SYSTEM_NAME
         if "freertos" in self.os:
             utils.add_newline(toolchain_file_copy, "set( CMAKE_SYSTEM_NAME FreeRTOS)")
-
         # Do the gic pruning in the sdt for APU/RPU.
         if self.sdt != out_dts_path:
             if utils.is_file(lops_file):
