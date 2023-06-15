@@ -159,8 +159,10 @@ def configure_bsp(args):
                     f'    path: {component_path}'
                 )
 
-        args.update({'sdt':obj.sdt})
-        regenerate_bsp(args)
+        # Regenerate bsp only for OSF flow
+        if os.environ.get("OSF"):
+            args.update({'sdt':obj.sdt})
+            regenerate_bsp(args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

@@ -38,7 +38,7 @@ class App(BSP, Repo):
             self.app_src_dir = os.path.join(self.app_dir, "src")
 
         # Validate the passed template w.r.t the passed domain path
-        if os.environ.get("OSF"):
+        if os.environ.get("VALIDATE_ARGS"):
             obj = Validation(args)
             obj.validate_template_for_bsp()
         utils.mkdir(self.app_src_dir)

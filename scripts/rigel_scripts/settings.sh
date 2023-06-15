@@ -15,9 +15,11 @@ export PATH=${XILINX_TOOLCHAIN}/bin:${XILINX_TOOLCHAIN}/gnu/microblaze/lin/bin:$
 # Adds Installed Lopper directory to the PYTHONPATH
 export PYTHONPATH=${XBUILDS_LOPPER_PATH}:$PYTHONPATH
 
-# OSF flag is needed to enable the validation of inputs. Set this flag to "" when
+# VALIDATE_ARGS flag is needed to enable the validation of inputs. Set this flag to "" when
 # using the GUI flow.
-export OSF="True"
+export VALIDATE_ARGS="True"
+# OSF Flag is needed to be enabled for Open Source Flow.
+export OSF="False"
 
 # Below is a fallback mechanism to set an esw repo when no user repo is set
 # export ESW_REPO="${XILINX_TOOLCHAIN}/data/embeddedsw-sdt"

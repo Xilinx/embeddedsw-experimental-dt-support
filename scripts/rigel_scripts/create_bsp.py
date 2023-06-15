@@ -64,12 +64,12 @@ class Domain(Repo):
     def _validate_inputs(self):
         """
         If User wants to validate the inputs before creating the domain,
-        'OSF' needs to be set over console. Once set, this function
+        'VALIDATE_ARGS' needs to be set over console. Once set, this function
         will come into action and validate if the processor, the os, the
         template app passed over command line are valid or not for the
         sdt input.
         """
-        if os.environ.get("OSF"):
+        if os.environ.get("VALIDATE_ARGS"):
             cpu_list_file = os.path.join(self.domain_dir, "cpulist.yaml")
             app_list_file = os.path.join(self.domain_dir, "app_list.yaml")
             lib_list_file = os.path.join(self.domain_dir, "lib_list.yaml")
