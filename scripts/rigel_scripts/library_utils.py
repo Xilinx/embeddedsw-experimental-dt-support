@@ -111,7 +111,8 @@ class Library(Repo):
         libdir = self.get_comp_dir(lib)
         srcdir = os.path.join(libdir, "src")
         if lib in ['libmetal', 'open-amp']:
-            srcdir = os.environ.get('XILINX_TOOLCHAIN') + '/data/' + lib
+            srcdir = os.path.join(os.environ.get('XILINX_TOOLCHAIN'), 'data')
+            srcdir = os.path.join(srcdir, lib)
 
         dstdir = os.path.join(self.libsrc_folder, lib, "src")
         utils.copy_directory(srcdir, dstdir)
