@@ -16,6 +16,7 @@ depends_libs:
     xiltimer: {}
 
 supported_processors:
+  - microblaze
   - psu_cortexa53
   - psu_cortexr5
   - psv_cortexa72
