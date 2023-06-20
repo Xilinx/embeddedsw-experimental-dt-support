@@ -20,6 +20,7 @@ supported_processors:
   - psu_cortexr5
   - psv_cortexa72
   - psv_cortexr5
+  - microblaze
 
 supported_os:
   - standalone
