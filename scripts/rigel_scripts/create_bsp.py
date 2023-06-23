@@ -253,20 +253,41 @@ class Domain(Repo):
 
             utils.add_newline(
                 toolchain_file,
-                f'set( CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} {compiler_flags} ${{proc_extra_compiler_flags}}")',
+                f'set( CMAKE_C_FLAGS "${{TOOLCHAIN_C_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} {compiler_flags} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "CFLAGS")',
             )
             utils.add_newline(
                 toolchain_file,
-                f'set( CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} {compiler_flags} ${{proc_extra_compiler_flags}}")',
+                f'set( CMAKE_CXX_FLAGS "${{TOOLCHAIN_CXX_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} {compiler_flags} -I${{CMAKE_INCLUDE_PATH}}")',
+            )
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_ASM_FLAGS "${{TOOLCHAIN_ASM_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} {compiler_flags} -I${{CMAKE_INCLUDE_PATH}}")',
+            )
+        elif "r5" or "a9" in proc:
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_C_FLAGS "${{TOOLCHAIN_C_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} ${{TOOLCHAIN_EXTRA_C_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "CFLAGS")',
+            )
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_CXX_FLAGS "${{TOOLCHAIN_CXX_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} ${{TOOLCHAIN_EXTRA_C_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "CXXFLAGS")',
+            )
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_ASM_FLAGS "${{TOOLCHAIN_ASM_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} ${{TOOLCHAIN_EXTRA_C_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "ASMFLAGS")',
             )
         else:
             utils.add_newline(
                 toolchain_file,
-                f'set( CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} ${{proc_extra_compiler_flags}}")',
+                f'set( CMAKE_C_FLAGS "${{TOOLCHAIN_C_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "CFLAGS")',
             )
             utils.add_newline(
                 toolchain_file,
-                f'set( CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} ${{proc_extra_compiler_flags}}")',
+                f'set( CMAKE_CXX_FLAGS "${{TOOLCHAIN_CXX_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "CXXFLAGS")',
+            )
+            utils.add_newline(
+                toolchain_file,
+                f'set( CMAKE_ASM_FLAGS "${{TOOLCHAIN_ASM_FLAGS}} ${{TOOLCHAIN_DEP_FLAGS}} -specs=${{CMAKE_SPECS_FILE}} -I${{CMAKE_INCLUDE_PATH}}" CACHE STRING "ASMFLAGS")',
             )
         return compiler_flags
 
@@ -513,6 +534,9 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
     set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES ${{CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES}})
 endif()
 
+set(CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} -c ${{proc_extra_compiler_flags}}" CACHE STRING "CFLAGS" FORCE)
+set(CMAKE_CXX_FLAGS "${{CMAKE_CXX_FLAGS}} -c ${{proc_extra_compiler_flags}}" CACHE STRING "CXXFLAGS" FORCE)
+set(CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} -c ${{proc_extra_compiler_flags}}" CACHE STRING "ASMFLAGS" FORCE)
 include_directories(${{CMAKE_BINARY_DIR}}/include)
 set (BSP_LIBSRC_SUBDIRS {bsp_libsrc_cmake_subdirs})
 
