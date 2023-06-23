@@ -69,9 +69,11 @@ project(bsp)
         cmake_file_cmds = cmake_header
         cmake_file_cmds += cmake_drv_custom_target(self.proc, self.libsrc_folder, self.sdt, cmake_drv_name_list, cmake_drv_path_list)
 
+        self.cmake_paths_append = self.cmake_paths_append.replace('\\','/')
+        cmake_file_cmds = cmake_file_cmds.replace('\\', '/')
         utils.write_into_file(cmake_file, cmake_file_cmds)
         utils.runcmd(
-            f'cmake -G "Unix Makefiles" {build_metadata}',
+            f'cmake -G "Unix Makefiles" {build_metadata} {self.cmake_paths_append}',
             cwd = build_metadata
         )
 
