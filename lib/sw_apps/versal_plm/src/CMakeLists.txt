@@ -66,4 +66,8 @@ add_executable(${APP_NAME}.elf ${_sources})
 target_link_libraries(${APP_NAME}.elf -Wl,-Map=versal_plm.map -Wl,--build-id=none -Wl,--gc-sections -T\"${CMAKE_SOURCE_DIR}/versal/lscript.ld\" -L\"${USER_LINK_DIRECTORIES}/\" -Wl,--start-group ${_deps} -Wl,--end-group)
 target_compile_definitions(${APP_NAME}.elf PUBLIC ${USER_COMPILE_DEFINITIONS})
 target_include_directories(${APP_NAME}.elf PUBLIC ${USER_INCLUDE_DIRECTORIES})
-print_elf_size(CMAKE_SIZE ${APP_NAME})
+if(DEFINED CMAKE_SIZE)
+add_custom_command(
+	TARGET ${APP_NAME}.elf POST_BUILD
+	COMMAND ${CMAKE_SIZE} --format=berkeley ${APP_NAME}.elf)
+endif()
