@@ -155,6 +155,11 @@ class Domain(Repo):
         }
         lops_file = ""
         out_dts_path = os.path.join(self.sdt_folder, f"{self.proc}_baremetal.dts")
+
+        # Save unpruned SDT as it may be used later
+        ori_sdt_path = os.path.join(self.sdt_folder, "sdt.dts")
+        utils.runcmd(f"lopper -f -v --enhanced  --permissive  {self.sdt} {ori_sdt_path}")
+
         toolchain_file_copy = None
         for val in proc_lops_specs_map.keys():
             if val in self.proc:
