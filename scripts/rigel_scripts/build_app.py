@@ -8,7 +8,11 @@ import os
 import argparse
 from build_bsp import generate_bsp
 from build_bsp import BSP
+from create_app import App
 from validate_bsp import Validation
+from open_amp import openamp_app_configure_common
+from open_amp import openamp_lopper_run
+from utils import is_file
 
 class Build_App(BSP):
     """
@@ -50,6 +54,32 @@ def build_app(args):
     obj.app_src_dir = obj.app_src_dir.replace('\\', '/')
     obj.cmake_paths_append = obj.cmake_paths_append.replace('\\', '/')
     obj.app_build_dir = obj.app_build_dir.replace('\\', '/')
+
+    app_name = utils.fetch_yaml_data(obj.app_config_file, "template")["template"]
+    enable_lopper = False
+    if app_name in ['openamp_echo_test', 'openamp_matrix_multiply', 'openamp_rpc_demo', 'libmetal_echo_demo']:
+        bsp_obj = BSP(args)
+
+        # only applicable for openamp
+        if app_name != 'libmetal_echo_demo':
+            overlay_path = os.path.join(bsp_obj.domain_path, 'hw_artifacts', 'domain.yaml')
+
+            if is_file(overlay_path):
+                original_sdt = os.path.join(bsp_obj.domain_path, 'hw_artifacts', 'sdt.dts')
+                print('Domain YAML is found. Passing this in to a OpenAMP Lopper run to generate platform info header.')
+                enable_lopper = True
+                openamp_lopper_run(overlay_path, original_sdt, obj.app_src_dir)
+            else:
+                print('Domain YAML is NOT found. Generating with prebuilt OpenAMP Repo source.')
+
+        args['repo_info'] = '.repo.yaml'
+        args['src_dir'] = bsp_obj.domain_path
+        args['template'] = app_name
+        args['ws_dir'] = obj.app_dir
+        app_obj = App(args)
+        esw_app_dir = app_obj.get_comp_dir(app_name)
+        openamp_app_configure_common(obj, esw_app_dir, enable_lopper)
+
     utils.runcmd(f'cmake -G "Unix Makefiles" {obj.app_src_dir} {obj.cmake_paths_append} -DNON_YOCTO=ON', cwd=obj.app_build_dir)
     utils.copy_file(f"{obj.app_build_dir}/compile_commands.json", obj.app_src_dir, silent_discard=True)
     utils.runcmd("make -j22", cwd=obj.app_build_dir)

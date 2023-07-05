@@ -10,6 +10,8 @@ import os
 from build_bsp import BSP
 from repo import Repo
 from validate_bsp import Validation
+from open_amp import create_openamp_app
+from open_amp import create_libmetal_app
 
 
 class App(BSP, Repo):
@@ -59,6 +61,13 @@ def create_app(args):
     # Copy the application src directory from embeddedsw to app src folder.
     esw_app_dir = obj.get_comp_dir(obj.template)
     srcdir = os.path.join(esw_app_dir, "src")
+    if obj.template in ['openamp_echo_test', 'openamp_matrix_multiply', 'openamp_rpc_demo']:
+        srcdir = os.path.join(os.environ.get('XILINX_VITIS'), 'data')
+        srcdir = os.path.join(srcdir, 'open-amp')
+    elif obj.template == 'libmetal_echo_demo':
+        srcdir = os.path.join(os.environ.get('XILINX_VITIS'), 'data')
+        srcdir = os.path.join(srcdir, 'libmetal')
+
     utils.copy_directory(srcdir, obj.app_src_dir)
 
     if obj.app_name:
@@ -120,6 +129,11 @@ def create_app(args):
         init_h = os.path.join(obj.domain_path, "hw_artifacts", f"{init_file}.h")
         utils.copy_file(init_c, obj.app_src_dir, silent_discard=True)
         utils.copy_file(init_h, obj.app_src_dir, silent_discard=True)
+
+    if obj.template in ['openamp_echo_test', 'openamp_matrix_multiply', 'openamp_rpc_demo']:
+        create_openamp_app(obj, esw_app_dir)
+    elif obj.template == 'libmetal_echo_demo':
+        create_libmetal_app(obj, esw_app_dir)
 
     # Add domain path entry in the app configuration file.
     data = {"domain_path": obj.domain_path,
