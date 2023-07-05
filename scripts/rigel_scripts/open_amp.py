@@ -38,16 +38,23 @@ def open_amp_copy_lib_src(lib, libdir, dstdir):
         # Tell CMake build to install library in BSP library area
 
         # libmetal specific logic. Only picked up in case of libmetal
-        content = content.replace("install (TARGETS ${_lib} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})",
-                                  "install (TARGETS ${_lib} ARCHIVE DESTINATION ${CMAKE_LIBRARY_PATH})")
+        orig = "install (TARGETS ${_lib} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})"
+        new = "install (TARGETS ${_lib} ARCHIVE DESTINATION ${CMAKE_LIBRARY_PATH})"
+        content = content.replace(orig, new)
         # open-amp specific logic. Only picked up in case of open-amp
-        content = content.replace("install (DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/include/openamp\" DESTINATION include)",
-                                  "install (DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/include/openamp\" DESTINATION ${CMAKE_INCLUDE_PATH}/)")
-        content = content.replace("install (DIRECTORY \"${PROJECT_BINARY_DIR}/include/generated/openamp\" DESTINATION include)",
-                                  "install (DIRECTORY \"${PROJECT_BINARY_DIR}/include/generated/openamp\" DESTINATION ${CMAKE_INCLUDE_PATH}/)")
+        orig = "install (DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/include/openamp\" "
+        orig += "DESTINATION include)"
+        new = "install (DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}/include/openamp\" "
+        new += "DESTINATION ${CMAKE_INCLUDE_PATH}/)"
+        content = content.replace(orig, new)
+        orig = "install (DIRECTORY \"${PROJECT_BINARY_DIR}/include/generated/openamp\" "
+        orig += "DESTINATION include)"
+        new = "install (DIRECTORY \"${PROJECT_BINARY_DIR}/include/generated/openamp\" "
+        new += "DESTINATION ${CMAKE_INCLUDE_PATH}/)"
+        content = content.replace(orig, new)
 
     lib_dstdir = os.path.join(dstdir, 'lib')
     lib_dstdir = os.path.join(lib_dstdir, 'CMakeLists.txt')
-    with open(lib_dstdir, 'w') as file:
+    with open(lib_dstdir, 'w', encoding='utf-8') as file:
         file.write(content)
 
