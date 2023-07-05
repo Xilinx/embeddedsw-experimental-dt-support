@@ -8,13 +8,12 @@ import os
 import utils
 
 
-def open_amp_copy_lib_src(lib, libdir, dstdir):
+def open_amp_copy_lib_src(libdir, dstdir):
     """
     Copies the src directory of the passed library from the respective path
     of OpenAMP or Libmetal to the libsrc folder of bsp.
 
     Args:
-        lib (str): library whose source code needs to be copied
         libdir (str): location for library in embeddedsw for cmake info.
         dstdir (str): destionation to copy lib sources to
 

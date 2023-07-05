@@ -117,7 +117,7 @@ class Library(Repo):
         dstdir = os.path.join(self.libsrc_folder, lib, "src")
         utils.copy_directory(srcdir, dstdir)
         if lib in ['libmetal', 'open-amp']:
-            open_amp_copy_lib_src(lib, libdir, dstdir)
+            open_amp_copy_lib_src(libdir, dstdir)
 
         self.lib_info[lib] = {'path': libdir}
         return libdir, srcdir, dstdir
