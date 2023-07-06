@@ -1,8 +1,8 @@
 # Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
 # SPDX-License-Identifier: MIT
-find_package( PythonInterp 3.5 REQUIRED)
 
 option(NON_YOCTO "Non Yocto embeddedsw FLOW" OFF)
+set(CMAKE_POLICY_DEFAULT_CMP0140 OLD)
 
 set (CMAKE_INSTALL_LIBDIR "lib")
 function (collector_create name base)

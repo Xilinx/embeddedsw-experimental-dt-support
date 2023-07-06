@@ -319,7 +319,6 @@ while(${{index}} LESS ${{no_of_drivers}})
     list(GET DRIVER_TARGETS ${{index}} drv)
     list(GET DRIVER_LOCATIONS ${{index}} drv_dir)
     set(src_dir "${{drv_dir}}/src")
-    execute_process(COMMAND ${{CMAKE_COMMAND}} -E copy_directory ${{src_dir}} ${{CMAKE_LIBRARY_PATH}}/../libsrc/${{drv}}/src)
     add_custom_target(
         ${{drv}} ALL
         COMMAND lopper -O {libsrc_folder}/${{drv}}/src {sdt} -- baremetalconfig_xlnx {proc} ${{src_dir}}
@@ -410,6 +409,11 @@ find_package(common)
 
     for drv in drv_list:
         drv_path = obj.get_comp_dir(drv, obj.sdt_folder)
+
+        drv_srcdir = os.path.join(drv_path, "src")
+        drvsrc = os.path.join(obj.libsrc_folder, drv, "src")
+        utils.copy_directory(drv_srcdir, drvsrc)
+
         if not drv_path:
             print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
             sys.exit(1)
@@ -508,7 +512,7 @@ find_package(common)
     utils.write_into_file(cmake_file, cmake_file_cmds)
 
     # Create a build directory for cmake to generate all _g.c files.
-    build_metadata = os.path.join(obj.libsrc_folder, "build_configs/metadata")
+    build_metadata = os.path.join(obj.libsrc_folder, "build_configs", "gen_bsp")
     utils.mkdir(build_metadata)
 
     # Run cmake configure and build to generate _g.c files
@@ -564,8 +568,7 @@ endforeach()
     utils.write_into_file(cmake_file, cmake_file_cmds)
 
     build_metadata = os.path.join(obj.libsrc_folder, "build_configs", "gen_bsp")
-    utils.mkdir(build_metadata)
-    lib_list += ["standalone","libsrc"]
+    lib_list += ["standalone"]
     if obj.app:
         lib_obj.config_lib(obj.app, lib_list, cmake_cmd_append, is_app=True)
     else:
