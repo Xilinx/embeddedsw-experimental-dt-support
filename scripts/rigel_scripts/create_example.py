@@ -119,6 +119,7 @@ def create_example(args):
     # Add domain path entry in the app configuration file.
     data = {"domain_path": obj.domain_path,
             "app_src_dir": esw_app_dir,
+            "template": "empty_application"
         }
     utils.write_yaml(obj.app_config_file, data)
 
