@@ -27,7 +27,7 @@ def open_amp_copy_lib_src(libdir, dstdir):
         None
     """
     # copy specific cmake files
-    srcdir = os.path.join(libdir, "src")
+    srcdir = os.path.join(libdir, "src", "sdt")
     top_srcdir = os.path.join(srcdir, 'top-CMakeLists.txt')
 
     top_dstdir = os.path.join(dstdir, 'CMakeLists.txt')
@@ -73,7 +73,7 @@ def openamp_app_configure_common(obj, esw_app_dir, enable_generated_header=False
     Returns:
         None
     """
-    new_src = os.path.join(esw_app_dir, 'src')
+    new_src = os.path.join(esw_app_dir, 'src', 'sdt')
 
     # APP_CMAKE_FILE is global for application cmake file name
     # present in all applications for OpenAMP and Libmetal
@@ -103,7 +103,7 @@ def create_app(mappings, obj, esw_app_dir):
     Returns:
         None
     """
-    new_src = os.path.join(esw_app_dir, 'src')
+    new_src = os.path.join(esw_app_dir, 'src', 'sdt')
 
     for key in mappings.keys():
         src = os.path.join(new_src, key)
