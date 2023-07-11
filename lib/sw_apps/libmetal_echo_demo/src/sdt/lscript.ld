@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (C) 2021 Xilinx, Inc.  All rights reserved.
+* Copyright (C) 2023 Advanced Micro Devices, Inc.  All rights reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
@@ -14,15 +14,12 @@ _UNDEF_STACK_SIZE = DEFINED(_UNDEF_STACK_SIZE) ? _UNDEF_STACK_SIZE : 1024;
 
 MEMORY
 {
-	psu_ddr_0 : ORIGIN = 0x100000, LENGTH = 0x7fefffff
-	psu_ocm_0 : ORIGIN = 0xfffc0000, LENGTH = 0x40000
+   psu_ddr_0 : ORIGIN = 0x3ED00000, LENGTH = 0x00080000
    psu_r5_0_atcm_MEM_0 : ORIGIN = 0x0, LENGTH = 0x10000
    psu_r5_0_btcm_MEM_0 : ORIGIN = 0x20000, LENGTH = 0x10000
-   psu_r5_tcm_ram_0_MEM_0 : ORIGIN = 0x0, LENGTH = 0x40000
-
 }
 
-ENTRY(_boot)
+ENTRY(_vector_table)
 
 /* Define the sections, and where they are mapped in memory */
 

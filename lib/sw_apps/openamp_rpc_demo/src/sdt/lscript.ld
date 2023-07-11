@@ -14,10 +14,9 @@ _UNDEF_STACK_SIZE = DEFINED(_UNDEF_STACK_SIZE) ? _UNDEF_STACK_SIZE : 1024;
 
 MEMORY
 {
-	psu_ddr_0 : ORIGIN = 0x3ED00000, LENGTH = 0x00040000
+   psu_ddr_0 : ORIGIN = 0x3ED00000, LENGTH = 0x00040000
    psu_r5_0_atcm_MEM_0 : ORIGIN = 0x0, LENGTH = 0x10000
    psu_r5_0_btcm_MEM_0 : ORIGIN = 0x20000, LENGTH = 0x10000
-
 }
 
 ENTRY(_vector_table)
@@ -255,6 +254,11 @@ _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
    HeapLimit = .;
 } > psu_ddr_0
 
+.resource_table 0x3ed20000 : {
+	. = ALIGN(4);
+	*(.resource_table)
+} > psu_ddr_0
+
 .stack (NOLOAD) : {
    . = ALIGN(16);
    _stack_end = .;
@@ -290,6 +294,7 @@ _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
     __drvcfgsecdata_end = .;
     __drvcfgsecdata_size = __drvcfgsecdata_end - __drvcfgsecdata_start;
 } > psu_ddr_0
+
 
 end = .;
 }
