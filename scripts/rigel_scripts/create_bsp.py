@@ -417,12 +417,17 @@ find_package(common)
         )
         drv_list = drv_names.split()
 
+    drv_lib_dep = []
     for drv in drv_list:
         drv_path = obj.get_comp_dir(drv, obj.sdt_folder)
 
         drv_srcdir = os.path.join(drv_path, "src")
         drvsrc = os.path.join(obj.libsrc_folder, drv, "src")
         utils.copy_directory(drv_srcdir, drvsrc)
+        yaml_file = os.path.join(drv_path, "data", f"{drv}.yaml")
+        schema = utils.load_yaml(yaml_file)
+        if schema and schema.get("depends_libs", {}):
+           drv_lib_dep.extend(list(schema["depends_libs"].keys()))
 
         if not drv_path:
             print(f"[ERROR]: Couldnt find the src directory for {drv}. {drv_path} doesnt exist.")
@@ -493,6 +498,13 @@ find_package(common)
         # If no app is passed and bsp is created add xiltimer by default.
         lib_obj.copy_lib_src("xiltimer")
 
+    if drv_lib_dep:
+        #Remove duplicate entries
+        drv_lib_dep = list(set(drv_lib_dep))
+        lib_list.extend(drv_lib_dep)
+        for lib in drv_lib_dep:
+            lib_obj.copy_lib_src(lib)
+
     if obj.os == "freertos":
         # Copy the freertos source code to libsrc folder
         os_dir_path = obj.get_comp_dir("freertos10_xilinx")
@@ -557,6 +569,10 @@ set(CMAKE_C_FLAGS "${{CMAKE_C_FLAGS}} -c ${{proc_extra_compiler_flags}}" CACHE S
 set(CMAKE_CXX_FLAGS "${{CMAKE_CXX_FLAGS}} -c ${{proc_extra_compiler_flags}}" CACHE STRING "CXXFLAGS" FORCE)
 set(CMAKE_ASM_FLAGS "${{CMAKE_ASM_FLAGS}} -c ${{proc_extra_compiler_flags}}" CACHE STRING "ASMFLAGS" FORCE)
 include_directories(${{CMAKE_BINARY_DIR}}/include)
+
+if (EXISTS ${{metal_BINARY_DIR}})
+include_directories(${{metal_BINARY_DIR}}/lib/include)
+endif()
 set (BSP_LIBSRC_SUBDIRS {bsp_libsrc_cmake_subdirs})
 
 if (SUBDIR_LIST STREQUAL "ALL")
