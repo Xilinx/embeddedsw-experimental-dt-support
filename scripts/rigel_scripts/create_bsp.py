@@ -205,7 +205,13 @@ class Domain(Repo):
             #TODO: Handle libpath in cflags.yaml based on OS
             relative_libpath = avail_cflag_data.get("libpath")
             vitis_path = os.environ.get("XILINX_VITIS")
-            libpath = os.path.join(vitis_path, "gnu", "microblaze", "lin", relative_libpath)
+            if os.name == "nt":
+                libpath = os.path.join(vitis_path, "gnu", "microblaze", "nt", relative_libpath)
+            else:
+                libpath = os.path.join(vitis_path, "gnu", "microblaze", "lin", relative_libpath)
+            libpath = libpath.replace('\\', '/')
+
+            assert utils.is_dir(libpath), f"Microblaze compiler library path {libpath} is not found."
 
             utils.replace_line(
                 toolchain_file_copy,
