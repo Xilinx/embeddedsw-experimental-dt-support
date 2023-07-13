@@ -60,6 +60,8 @@ class Domain(Repo):
                 return "Versal"
             elif "cpus_a9" in content:
                 return "Zynq"
+            elif "cpus_a78" in content:
+                return "VersalNet"
 
     def _validate_inputs(self):
         """
@@ -146,6 +148,8 @@ class Domain(Repo):
         proc_lops_specs_map = {
             "a53": ("cortexa53", "lop-a53-imux", "arm"),
             "a72": ("cortexa72", "lop-a72-imux", "arm"),
+            "a78": ("cortexa78", "lop-a78-imux", "arm"),
+            "r52": ("cortexr52", "lop-r52-imux", "arm"),
             "r5": ("cortexr5", "lop-r5-imux", "arm"),
             "a9": ("cortexa9", "", "arm"),
             "pmu": ("microblaze-pmu", "", "microblaze"),
