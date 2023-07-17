@@ -13,6 +13,11 @@ import utils
 from utils import is_file
 
 APP_CMAKE_FILE = 'cortexr5_toolchain.cmake'
+APP_NAMES = {
+    'openamp_echo_test': 'echo',
+    'openamp_matrix_multiply': 'matrix_multiply',
+    'openamp_rpc_demo': 'rpc_demo'
+}
 
 def open_amp_copy_lib_src(libdir, dstdir):
     """
@@ -73,7 +78,12 @@ def openamp_app_configure_common(obj, esw_app_dir, enable_generated_header=False
     Returns:
         None
     """
-    new_src = os.path.join(esw_app_dir, 'src', 'sdt')
+    if obj.template in ['openamp_echo_test', 'openamp_matrix_multiply', 'openamp_rpc_demo']:
+        new_src = os.path.join(esw_app_dir, '..', 'openamp_sdt_common', 'src', 'sdt')
+        append_app_name = True
+    else:
+        new_src = os.path.join(esw_app_dir, 'src', 'sdt')
+        append_app_name = False
 
     # APP_CMAKE_FILE is global for application cmake file name
     # present in all applications for OpenAMP and Libmetal
@@ -82,6 +92,10 @@ def openamp_app_configure_common(obj, esw_app_dir, enable_generated_header=False
 
     new_cmake_toolchain_file = os.path.join(obj.app_src_dir, APP_CMAKE_FILE)
     new_cmake_toolchain_file = '-DCMAKE_TOOLCHAIN_FILE=' + new_cmake_toolchain_file
+
+    if append_app_name:
+        # also append app name for openamp apps
+        new_cmake_toolchain_file += ' -DAPP_NAME=' + APP_NAMES[obj.template]
 
     toolchain_file_path = re.search(r'-DCMAKE_TOOLCHAIN_FILE=\S*', obj.cmake_paths_append).group()
     obj.cmake_paths_append = obj.cmake_paths_append.replace(toolchain_file_path,
@@ -103,7 +117,10 @@ def create_app(mappings, obj, esw_app_dir):
     Returns:
         None
     """
-    new_src = os.path.join(esw_app_dir, 'src', 'sdt')
+    if obj.template in ['openamp_echo_test', 'openamp_matrix_multiply', 'openamp_rpc_demo']:
+        new_src = os.path.join(esw_app_dir, '..', 'openamp_sdt_common', 'src', 'sdt')
+    else:
+        new_src = os.path.join(esw_app_dir, 'src', 'sdt')
 
     for key in mappings.keys():
         src = os.path.join(new_src, key)
@@ -133,14 +150,8 @@ def create_openamp_app(obj, esw_app_dir):
                                         'zynqmp_r5', 'linker_remote.ld']
     }
 
-    app_names = {
-        'openamp_echo_test': 'echo',
-        'openamp_matrix_multiply': 'matrix_multiply',
-        'openamp_rpc_demo': 'rpc_demo'
-    }
-
-    app_cmake_name = app_names[obj.template]
-    common_mappings[app_cmake_name + '-CMakeLists.txt'] = ['apps', 'examples',
+    app_cmake_name = APP_NAMES[obj.template]
+    common_mappings['demo-dir-CMakeLists.txt'] = ['apps', 'examples',
                     app_cmake_name, 'CMakeLists.txt']
 
     # Create new mappings based on app name. Each record is (embeddedsw-src : app-workspace
